@@ -31,9 +31,14 @@
     .logo { width: min(300px, 70vw); height: auto; }
     .slogan { margin: -6px 0 0; color: #103C9B; font-weight: 600; letter-spacing: .2px; }
     .barra { width: 180px; height: 6px; border-radius: 99px; background: #dfe6f3; overflow: hidden; }
-    .barra i { display: block; height: 100%; width: 40%; border-radius: 99px; background: linear-gradient(90deg, #1EAAFF, #0164C8, #6a11b8);
-               animation: corre 1.1s ease-in-out infinite; }
-    @keyframes corre { 0% { transform: translateX(-100%); } 100% { transform: translateX(260%); } }
+    .barra { width: 220px; height: 8px; }
+    .barra i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, #1EAAFF, #0164C8, #6a11b8);
+               transition: width .25s ease-out; position: relative; overflow: hidden; }
+    .barra i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+               animation: brilho 1.2s linear infinite; }
+    @keyframes brilho { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+    .pct { margin: -6px 0 0; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+    .pct span { color: #0164C8; font-weight: 700; }
     .card { background: #fff; border: 1px solid var(--borda); border-radius: 18px; padding: 26px; max-width: 420px; box-shadow: 0 14px 40px rgba(16,24,40,.1); }
     .card h1 { font-size: 19px; margin: 14px 0 6px; }
     .card p { margin: 0 0 18px; color: var(--muted); line-height: 1.5; }
@@ -44,14 +49,15 @@
     .demo { color: var(--muted); font-size: 13px; }
     .demo a { color: var(--azul); font-weight: 600; }
     [hidden] { display: none !important; }
-    @media (prefers-reduced-motion: reduce) { .barra i { animation: none; width: 100%; } }
+    @media (prefers-reduced-motion: reduce) { .barra i::after { animation: none; } }
   </style>
 </head>
 <body>
   <div id="splash" class="overlay">
     <img class="logo" src="icons/logo.svg" alt="Pivotando">
     <p class="slogan">Juntos, viramos o jogo.</p>
-    <div class="barra"><i></i></div>
+    <div class="barra"><i id="barraPct"></i></div>
+    <p class="pct"><span id="pct">0%</span> · carregando</p>
   </div>
 
   <div id="help" class="overlay" hidden>
@@ -72,8 +78,8 @@
     (function () {
       // Web App do Pivotando (Apps Script, acesso só do domínio LTI). A implantação é sempre a mesma.
       var EXEC = 'https://script.google.com/a/macros/lti.net.br/s/AKfycbysw9lnWzAjSFIzmsZfzYHWzO1D1erYiAatyQIqBNVPvmIv-Q4Rpk6dcjw5m_r50AKAQA/exec';
-      var TIMEOUT_MS = 15000;   // sem resposta do app até aqui: provavelmente falta login
-      var SPLASH_MAX_MS = 3000; // a tela de abertura nunca fica mais que isso
+      var TIMEOUT_MS = 25000;   // sem resposta do app até aqui: provavelmente falta login
+      var pct = 0, pctTimer = null;
       var frame = document.getElementById('app');
       var splash = document.getElementById('splash');
       var help = document.getElementById('help');
@@ -89,12 +95,22 @@
         frame.src = EXEC + rota();
         clearTimeout(timer);
         timer = setTimeout(falhou, TIMEOUT_MS);
-        setTimeout(esconderSplash, SPLASH_MAX_MS);
+        iniciarPercentual();
+      }
+      // percentual de carregamento: avança rápido no começo e desacelera perto do fim;
+      // chega a 100% quando o app avisa que abriu
+      function mostrarPct(v) { pct = v; document.getElementById('pct').textContent = Math.floor(v) + '%'; document.getElementById('barraPct').style.width = v + '%'; }
+      function iniciarPercentual() {
+        clearInterval(pctTimer);
+        mostrarPct(0);
+        pctTimer = setInterval(function () { if (pct < 95) mostrarPct(pct + Math.max(0.4, (95 - pct) * 0.06)); }, 120);
       }
       function esconderSplash() {
         if (splash.hidden || splash.classList.contains('fade')) return;
-        splash.classList.add('fade');
-        setTimeout(function () { splash.hidden = true; }, 320);
+        clearInterval(pctTimer);
+        mostrarPct(100);
+        setTimeout(function () { splash.classList.add('fade'); }, 250);
+        setTimeout(function () { splash.hidden = true; }, 600);
       }
       function pronto() {
         clearTimeout(timer);
@@ -102,6 +118,7 @@
         esconderSplash();
       }
       function falhou() {
+        clearInterval(pctTimer);
         splash.hidden = true;
         var on = navigator.onLine;
         document.getElementById('helpTitle').textContent = on ? 'Entre com sua conta da LTI' : 'Você está sem conexão';

@@ -493,9 +493,15 @@ button.av.eu:hover { transform:scale(1.06); box-shadow:0 0 0 3px color-mix(in sr
         + (erros.length ? '<details style="text-align:left;color:#6b7088;font-size:12px"><summary>Detalhes técnicos (mande um print para o suporte)</summary><pre style="white-space:pre-wrap">'
           + erros.join('\n').replace(/</g, '&lt;') + '\n' + navigator.userAgent + '</pre></details>' : '');
     }
-    window.addEventListener('error', function (e) { if (/extension:\/\//.test(e.filename || '')) return; erros.push((e.message || 'erro') + ' @ ' + (e.filename || '') + ':' + (e.lineno || '')); mostrar('O Pivotando não conseguiu abrir'); });
+    // Erros só são anotados: muitos vêm de scripts do próprio Google e não impedem o app.
+    // O aviso aparece apenas se o Pivotando realmente não tiver iniciado.
+    window.addEventListener('error', function (e) {
+      if (/extension:\/\//.test(e.filename || '')) return;
+      erros.push((e.message || 'erro') + ' @ ' + (e.filename || '') + ':' + (e.lineno || ''));
+      setTimeout(function () { mostrar('O Pivotando não conseguiu abrir'); }, 6000);
+    });
     window.addEventListener('unhandledrejection', function (e) { erros.push('promessa: ' + ((e.reason && e.reason.message) || e.reason)); });
-    setTimeout(function () { mostrar('O Pivotando está demorando para abrir'); }, 12000);
+    setTimeout(function () { mostrar('O Pivotando está demorando para abrir'); }, 20000);
   })();
 </script>
 <div id="toast"></div>
