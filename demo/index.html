@@ -2434,7 +2434,7 @@ function menuConta() {
       <span class="mc-papel">${esc(PAPEL_NOME[ME.papel] || ME.papel)}</span></div></div>
     ${BOOT.demo
       ? '<div class="mc-nota">🎬 Você está na demonstração. Use a barra no rodapé para trocar de visão ou sair.</div>'
-      : `<a class="mc-item" role="menuitem" target="_top" href="${esc(urlTrocarConta(BOOT.execUrl || APP_PUBLICO))}">🔄 Trocar de conta</a>
+      : `<a class="mc-item" role="menuitem" target="_top" href="${esc(urlTrocarConta(BOOT.execUrl || APP_PUBLICO))}" title="O Pivotando só aceita contas @lti.net.br: escolha outra conta da LTI">🔄 Trocar de conta LTI</a>
          <button class="mc-item sair" role="menuitem" id="mc-sair">🚪 Sair</button>`}`;
   document.body.appendChild(m);
   const sair = $('#mc-sair', m);
