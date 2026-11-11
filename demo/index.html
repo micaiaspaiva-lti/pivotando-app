@@ -1017,6 +1017,28 @@ var PIVDEMO = (() => {
     }
     return times;
   }
+  function lerLinhaPessoa(linha) {
+    const m = /[^\s;,<>"']+@[^\s;,<>"']+\.[^\s;,<>"']+/.exec(linha || "");
+    if (!m)
+      return null;
+    const email = m[0].toLowerCase();
+    const limpa = (s) => s.replace(/^[\s;,|]+|[\s;,|]+$/g, "").replace(/\s+/g, " ");
+    const colunas = (s) => {
+      const t = s.replace(/^[;,|]+|[;,|]+$/g, "");
+      const partes = /[\t;,|]/.test(t.trim()) ? t.split(/[\t;,|]/) : [t];
+      return partes.map(limpa).filter(Boolean);
+    };
+    const antes = colunas(linha.slice(0, m.index));
+    const depois = colunas(linha.slice(m.index + m[0].length));
+    if (!antes.length) {
+      const [nome2 = "", departamento = "", funcao = ""] = depois;
+      return { email, nome: nome2, departamento, funcao };
+    }
+    const nome = antes.join(" ");
+    if (depois.length >= 2)
+      return { email, nome, departamento: depois[0], funcao: depois[1] };
+    return { email, nome, departamento: "", funcao: depois[0] || "" };
+  }
 
   // src/server/usuarios.ts
   var PAPEIS = ["admin", "facilitador", "participante"];
@@ -1072,12 +1094,15 @@ var PIVDEMO = (() => {
       String(texto || "").split(/\r?\n/).forEach((linha, i) => {
         if (!linha.trim())
           return;
-        const [e, nome = "", dep = "", fun = ""] = linha.split(/\t|;|,/).map((s) => s.trim());
-        const email = (e || "").toLowerCase();
-        if (i === 0 && !isEmail(email) && /e-?mail/i.test(email))
-          return;
+        const lida = lerLinhaPessoa(linha);
+        if (!lida) {
+          if (i === 0 && /e-?mail/i.test(linha))
+            return;
+          return erros.push(`Linha ${i + 1}: n\xE3o achei um e-mail (${linha.trim().slice(0, 60)})`);
+        }
+        const { email, nome, departamento: dep, funcao: fun } = lida;
         if (!isEmail(email) || !email.endsWith("@" + DOMAIN))
-          return erros.push(`Linha ${i + 1}: e-mail inv\xE1lido (${e || "vazio"})`);
+          return erros.push(`Linha ${i + 1}: ${email} n\xE3o \xE9 uma conta @${DOMAIN}`);
         if (vistos.has(email))
           return;
         vistos.add(email);
@@ -3367,8 +3392,9 @@ ROTAS.usuarios = async (el) => {
   $('#tb-u').onclick = (ev) => { const tr = ev.target.closest('tr[data-id]'); if (tr) editar(us.find((u) => u.id === tr.dataset.id)); };
   $('#importar').onclick = () => {
     const m = modal(`<h2>Importar lista de pessoas</h2>
-      <p class="muted">Cole uma pessoa por linha, no formato <b>e-mail; nome; departamento; função</b>. Pode colar direto de uma planilha (colunas nessa ordem).</p>
-      <textarea id="imp" rows="9" placeholder="ana.souza@lti.net.br; Ana Souza; Comercial; Executiva de contas&#10;bruno.lima@lti.net.br; Bruno Lima; Suporte; Analista N2"></textarea>
+      <p class="muted">Cole uma pessoa por linha, direto da planilha. O sistema acha o <b>e-mail</b> em qualquer coluna: o que vem antes é o <b>nome</b>; o que vem depois é a <b>função</b> (ou <b>departamento</b> e <b>função</b>, se houver duas colunas).</p>
+      <p class="muted small">💡 Inclua o <b>departamento</b> para o sorteio conseguir misturar as áreas nos times. Dá para completar depois, clicando na pessoa.</p>
+      <textarea id="imp" rows="9" placeholder="Ana Souza&#9;ana.souza@lti.net.br&#9;Comercial&#9;Executiva de contas&#10;Bruno Lima&#9;bruno.lima@lti.net.br&#9;Analista N2"></textarea>
       <div id="imp-res" class="small" style="margin-top:8px"></div>
       <div class="acoes-form"><button class="btn sec" id="canc">Fechar</button><button class="btn" id="ok">Importar</button></div>`, 640);
     $('#canc', m.el).onclick = m.fechar;
