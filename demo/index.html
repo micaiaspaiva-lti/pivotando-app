@@ -2415,6 +2415,11 @@ function montarCabecalho() {
 }
 
 const APP_PUBLICO = 'https://micaiaspaiva-lti.github.io/pivotando-app/';
+// Endereços de conta do Google montados em partes: o Apps Script altera o texto literal desses
+// endereços na página e o script inteiro quebrava (tela "O Pivotando não conseguiu abrir").
+const CONTAS_GOOGLE = 'https://' + ['accounts', 'google', 'com'].join('.') + '/';
+const urlTrocarConta = (volta) => CONTAS_GOOGLE + 'Account' + 'Chooser?continue=' + encodeURIComponent(volta);
+const urlSair = (volta) => CONTAS_GOOGLE + 'Log' + 'out?continue=' + encodeURIComponent(volta);
 const PAPEL_NOME = { admin: 'Administrador', facilitador: 'Facilitador', participante: 'Participante' };
 
 /** Menu da conta (clique no avatar): quem sou eu, trocar de conta e sair. */
@@ -2429,7 +2434,7 @@ function menuConta() {
       <span class="mc-papel">${esc(PAPEL_NOME[ME.papel] || ME.papel)}</span></div></div>
     ${BOOT.demo
       ? '<div class="mc-nota">🎬 Você está na demonstração. Use a barra no rodapé para trocar de visão ou sair.</div>'
-      : `<a class="mc-item" role="menuitem" target="_top" href="https://accounts.google.com/AccountChooser?continue=${encodeURIComponent(BOOT.execUrl || APP_PUBLICO)}">🔄 Trocar de conta</a>
+      : `<a class="mc-item" role="menuitem" target="_top" href="${esc(urlTrocarConta(BOOT.execUrl || APP_PUBLICO))}">🔄 Trocar de conta</a>
          <button class="mc-item sair" role="menuitem" id="mc-sair">🚪 Sair</button>`}`;
   document.body.appendChild(m);
   const sair = $('#mc-sair', m);
@@ -2442,7 +2447,7 @@ function menuConta() {
     });
     // depois de sair, o Google mostra a tela de login; ao entrar de novo, abre o Pivotando
     // (o Google só aceita voltar para endereços do próprio Google)
-    if (ok) window.open('https://accounts.google.com/Logout?continue=' + encodeURIComponent(BOOT.execUrl || 'https://accounts.google.com/'), '_top');
+    if (ok) window.open(urlSair(BOOT.execUrl || CONTAS_GOOGLE), '_top');
   };
   const fechar = (ev) => { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('click', fechar); document.removeEventListener('keydown', tecla); } };
   const tecla = (ev) => { if (ev.key === 'Escape') { m.remove(); document.removeEventListener('click', fechar); document.removeEventListener('keydown', tecla); } };
