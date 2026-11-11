@@ -463,6 +463,15 @@ button.av.eu:hover { transform:scale(1.06); box-shadow:0 0 0 3px color-mix(in sr
 .mc-item:hover { background:var(--card-2); }
 .mc-item.sair { color:var(--erro); }
 .mc-nota { padding:8px 10px; font-size:12px; color:var(--muted); }
+
+/* convite para o Pivotando */
+.convite-card { display:flex; gap:16px; align-items:center; flex-wrap:wrap; background:linear-gradient(120deg, color-mix(in srgb,var(--f-definir) 7%,var(--card)), var(--card)); }
+.convite-ico { width:52px; height:52px; border-radius:16px; display:grid; place-items:center; font-size:26px; background:linear-gradient(135deg,var(--f-empatizar),var(--f-definir)); box-shadow:0 6px 18px rgba(106,17,184,.3); }
+.convite-barra { height:6px; border-radius:99px; background:var(--borda); overflow:hidden; margin:8px 0 6px; max-width:360px; }
+.convite-barra i { display:block; height:100%; background:linear-gradient(90deg,#1EAAFF,var(--azul),var(--f-definir)); border-radius:99px; transition:width .6s; }
+.convite-grid { display:grid; grid-template-columns: 1fr 1.25fr; gap:20px; }
+.convite-previa { width:100%; height:440px; border:1px solid var(--borda); border-radius:14px; background:#f5f8fd; }
+@media (max-width: 800px) { .convite-grid { grid-template-columns:1fr; } .convite-previa { height:360px; } }
 </style>
 
 </head>
@@ -617,6 +626,8 @@ var PIVDEMO = (() => {
   var server_exports = {};
   __export(server_exports, {
     api_boot: () => api_boot,
+    api_conviteEnviar: () => api_conviteEnviar,
+    api_convitePrevia: () => api_convitePrevia,
     api_desafio: () => api_desafio,
     api_desafioIniciar: () => api_desafioIniciar,
     api_desafioSalvar: () => api_desafioSalvar,
@@ -689,7 +700,8 @@ var PIVDEMO = (() => {
       "iniciadoEm",
       "encerradoEm"
     ],
-    Participacoes: ["id", "desafioId", "email", "timeId"],
+    // convidadoEm: quando recebeu o convite para o desafio (antes do sorteio)
+    Participacoes: ["id", "desafioId", "email", "timeId", "convidadoEm"],
     // concluidas / reabertas: etapas separadas por vírgula
     Times: ["id", "desafioId", "nome", "cor", "microproblemaId", "concluidas", "reabertas", "versao"],
     GutItens: ["id", "timeId", "texto", "g", "u", "t", "autor", "criadoEm", "atualizadoEm"],
@@ -953,6 +965,39 @@ var PIVDEMO = (() => {
      ${botao(p.link, "Continuar com o time")}`
     );
   }
+  function conteudoConvitePivotando(p) {
+    const d = p.desafio;
+    const prazos = [
+      ["\u{1F3AF} Matriz GUT", d.prazoGut],
+      ["\u{1F50D} Matriz CSD", d.prazoCsd],
+      ["\u{1F5FA}\uFE0F Plano de A\xE7\xE3o", d.prazoPlano],
+      ["\u{1F4A1} Brainstorm", d.prazoIdeias],
+      ["\u{1F3A4} Apresenta\xE7\xE3o ao vivo", d.dataApresentacao]
+    ].filter(([, v]) => v);
+    const mensagem = (p.mensagem || "").trim();
+    return {
+      assunto: `\u{1F680} Voc\xEA foi convidado(a) para o Pivotando \xB7 Desafio #${d.numero}`,
+      corpo: `<p style="font-size:16px">Ol\xE1, ${escapeHtml(p.nome)}!</p>
+     <p>Voc\xEA foi convidado(a) para participar do <b>Pivotando</b>, a iniciativa da LTI em que colaboradores de diferentes \xE1reas se juntam em times para resolver problemas reais da empresa com ideias inovadoras.</p>
+     ${mensagem ? `<div style="background:#fff8e6;border-left:4px solid #f59e0b;border-radius:8px;padding:12px 16px;margin:16px 0;white-space:pre-wrap">${escapeHtml(mensagem)}<div style="margin-top:8px;font-size:12px;color:#8a6d1f">\u2014 ${escapeHtml(p.remetente)}</div></div>` : ""}
+     <div style="background:#f5f8fd;border-left:4px solid #6a11b8;border-radius:8px;padding:14px 16px;margin:18px 0">
+       <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6a11b8;font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
+       <div style="font-size:18px;font-weight:bold;margin:4px 0">${escapeHtml(d.titulo)}</div>
+       ${d.problema ? `<div style="color:#444">${escapeHtml(d.problema)}</div>` : ""}
+     </div>
+     <p><b>Como vai funcionar:</b> no encontro presencial, os times ser\xE3o <b>sorteados ao vivo</b>, misturando pessoas de \xE1reas diferentes. Cada time vai usar a Matriz GUT, a Matriz CSD, o Plano de A\xE7\xE3o e o Brainstorm para chegar a uma proposta e apresent\xE1-la no final.</p>
+     ${prazos.length ? `<table style="border-collapse:collapse;font-size:13px;margin:6px 0 4px">${prazos.map(([k, v]) => `<tr><td style="padding:3px 16px 3px 0;color:#666">${k}</td><td style="padding:3px 0"><b>${fmtDia(v)}</b></td></tr>`).join("")}</table>` : ""}
+     ${botao(p.link, "Conhecer o Pivotando")}
+     <p style="font-size:12px;color:#666">Entre com a sua conta Google <b>@lti.net.br</b>. Juntos, viramos o jogo. \u{1F499}</p>`
+    };
+  }
+  function mailConvitePivotando(email, c) {
+    send(email, c.assunto, c.corpo);
+  }
+  function previaEmail(c) {
+    const logo = "" ? "data:image/png;base64," : APP_PUBLICO + "capa.png";
+    return layout(c.corpo).replace("cid:logo", logo);
+  }
 
   // src/server/nucleo.ts
   var ETAPAS = ["gut", "csd", "plano", "ideias"];
@@ -1160,7 +1205,7 @@ var PIVDEMO = (() => {
       desafio: desafioPublico(d),
       participantes: parts.map((x) => {
         const u = porEmail.get(x.email);
-        return { email: x.email, timeId: x.timeId, nome: u?.nome || x.email, departamento: u?.departamento || "", funcao: u?.funcao || "" };
+        return { email: x.email, timeId: x.timeId, convidadoEm: x.convidadoEm || "", nome: u?.nome || x.email, departamento: u?.departamento || "", funcao: u?.funcao || "" };
       }),
       times: where("Times", (t) => t.desafioId === id).map((t) => ({
         id: t.id,
@@ -1367,6 +1412,50 @@ var PIVDEMO = (() => {
       CacheService.getScriptCache().remove("v:" + timeId);
       audit(p.email, abrir ? "etapa_reaberta" : "etapa_fechada", t.desafioId, timeId, { etapa });
       return api_desafio(t.desafioId);
+    });
+  }
+  function conviteDe(d, email, mensagem, remetente) {
+    const u = usuarioPorEmail(email);
+    return conteudoConvitePivotando({ nome: (u?.nome || email).split(" ")[0], desafio: d, mensagem: txt(mensagem, 1500), remetente, link: APP_PUBLICO });
+  }
+  function api_convitePrevia(desafioId, mensagem) {
+    const p = requireFacilitador();
+    const d = mustGet("Desafios", desafioId, "Desafio");
+    const partes = where("Participacoes", (x) => x.desafioId === desafioId);
+    if (!partes.length)
+      throw new Error("Escolha os participantes antes de enviar o convite.");
+    const c = conviteDe(d, partes[0].email, mensagem, p.nome);
+    return {
+      assunto: c.assunto,
+      html: previaEmail(c),
+      total: partes.length,
+      pendentes: partes.filter((x) => !x.convidadoEm).length,
+      exemplo: usuarioPorEmail(partes[0].email)?.nome || partes[0].email
+    };
+  }
+  function api_conviteEnviar(desafioId, mensagem, apenasPendentes) {
+    const p = requireFacilitador();
+    return withLock(() => {
+      const d = mustGet("Desafios", desafioId, "Desafio");
+      if (d.status === "encerrado")
+        throw new Error("Este desafio j\xE1 foi encerrado.");
+      const alvo = where("Participacoes", (x) => x.desafioId === desafioId && (!apenasPendentes || !x.convidadoEm));
+      if (!alvo.length)
+        throw new Error("Todos os participantes j\xE1 receberam o convite.");
+      let enviados = 0;
+      const falhas = [];
+      for (const x of alvo) {
+        try {
+          mailConvitePivotando(x.email, conviteDe(d, x.email, mensagem, p.nome));
+          update("Participacoes", x.id, { convidadoEm: nowIso() });
+          enviados++;
+        } catch (e) {
+          falhas.push(x.email);
+          audit("sistema", "erro_email", desafioId, "", { email: x.email, erro: String(e) });
+        }
+      }
+      audit(p.email, "convite_enviado", desafioId, "", { enviados, falhas: falhas.length });
+      return { enviados, falhas, ...api_desafio(desafioId) };
     });
   }
 
@@ -3143,7 +3232,8 @@ function passoParticipantes(el) {
     <div class="filtros" id="f-deps"><button class="filtro on" data-dep="">Todos</button>${deps.map((dp) => `<button class="filtro" data-dep="${esc(dp)}" style="--dc:${corDe(dp)}">${esc(dp)}</button>`).join('')}</div>
     <div class="selecao" id="lista-p"></div>
     ${!d.usuarios.length ? '<div class="vazio">Nenhuma pessoa cadastrada ainda. <a class="btn sec peq" data-go="/usuarios">Cadastrar pessoas</a></div>' : ''}
-    <div class="acoes-form"><a class="btn sec" data-go="/usuarios">+ Cadastrar pessoas</a>${ro ? '' : '<button class="btn" id="salvar-p">Salvar participantes →</button>'}</div></div>`;
+    <div class="acoes-form"><a class="btn sec" data-go="/usuarios">+ Cadastrar pessoas</a>${ro ? '' : '<button class="btn" id="salvar-p">Salvar participantes</button>'}</div></div>
+    ${cartaoConvite()}`;
   const visiveis = () => d.usuarios.filter((u) => (!filtroDep || (u.departamento || 'Sem departamento') === filtroDep)
     && (!busca || `${u.nome} ${u.email} ${u.funcao}`.toLowerCase().includes(busca)));
   const desenhar = () => {
@@ -3162,9 +3252,82 @@ function passoParticipantes(el) {
   if (salvar) salvar.onclick = async () => {
     D.d = await acao(salvar, () => gs('api_participantesDefinir', d.desafio.id, [...sel]));
     D.rascunhoTimes = null;
-    toast('✅ Participantes salvos');
-    D.passo = 'times'; desenharDesafio();
+    toast('✅ Participantes salvos. Agora você pode enviar o convite.');
+    desenharDesafio();
   };
+  const conv = $('#abrir-convite');
+  if (conv) conv.onclick = abrirConvite;
+}
+
+/* ---------- convite para participar (antes do sorteio, que é ao vivo no encontro) ---------- */
+function cartaoConvite() {
+  const ps = D.d.participantes;
+  if (!ps.length || D.d.desafio.status === 'encerrado') return '';
+  const ok = ps.filter((p) => p.convidadoEm).length;
+  const pend = ps.length - ok;
+  const ultimo = ps.map((p) => p.convidadoEm).filter(Boolean).sort().pop();
+  return `<div class="card convite-card" style="margin-top:16px">
+    <div class="convite-ico">✉️</div>
+    <div style="flex:1;min-width:220px"><b style="font-size:16px">Convite para o Pivotando</b>
+      <div class="muted">${ok === 0 ? `Os ${ps.length} participantes ainda não foram convidados.`
+        : pend ? `${ok} de ${ps.length} já receberam · <b>${pend} ainda não</b>.` : `Todos os ${ps.length} participantes já receberam ✓`}
+        ${ultimo ? `<span class="small"> Último envio: ${fmtDataHora(ultimo)}.</span>` : ''}</div>
+      <div class="convite-barra"><i style="width:${Math.round((ok / ps.length) * 100)}%"></i></div>
+      <div class="small muted">Os times serão sorteados ao vivo no encontro; o convite apresenta o desafio e as datas.</div></div>
+    <button class="btn ${pend ? 'grad' : 'sec'}" id="abrir-convite">${pend ? '✉️ Ver prévia e enviar' : '✉️ Reenviar convite'}</button></div>`;
+}
+
+async function abrirConvite() {
+  const d = D.d.desafio;
+  const pend = D.d.participantes.filter((p) => !p.convidadoEm).length;
+  const m = modal(`<h2>✉️ Convite para o Pivotando</h2>
+    <div class="convite-grid">
+      <div>
+        <label class="campo">Mensagem pessoal <small>(opcional, aparece em destaque no e-mail)</small></label>
+        <textarea id="cv-msg" rows="5" maxlength="1500" placeholder="Ex.: Pessoal, conto com vocês no nosso primeiro Pivotando! O encontro será na sala de treinamento, às 14h."></textarea>
+        <label class="campo">Enviar para</label>
+        <label class="sel-pessoa ${pend ? 'on' : ''}" style="cursor:pointer"><input type="radio" name="cv-quem" value="pend" ${pend ? 'checked' : 'disabled'}>
+          <div><b>Quem ainda não recebeu</b><div class="small muted">${pend} pessoa(s)</div></div></label>
+        <label class="sel-pessoa ${pend ? '' : 'on'}" style="cursor:pointer"><input type="radio" name="cv-quem" value="todos" ${pend ? '' : 'checked'}>
+          <div><b>Todos os participantes</b><div class="small muted">${D.d.participantes.length} pessoa(s) · reenvia a quem já recebeu</div></div></label>
+        <p class="small muted" style="margin-top:12px">Assunto: <b id="cv-assunto">…</b></p>
+      </div>
+      <div><div class="small muted" style="margin:14px 0 6px">Prévia <span id="cv-exemplo"></span></div>
+        <iframe id="cv-previa" class="convite-previa" title="Prévia do e-mail" sandbox></iframe></div>
+    </div>
+    <div class="acoes-form"><button class="btn sec" id="cv-cancelar">Cancelar</button><button class="btn grad" id="cv-enviar">Enviar convite</button></div>`, 980);
+  const msg = $('#cv-msg', m.el);
+  const quem = () => $('input[name="cv-quem"]:checked', m.el).value;
+  const rotuloBotao = () => {
+    const n = quem() === 'pend' ? pend : D.d.participantes.length;
+    $('#cv-enviar', m.el).textContent = `Enviar para ${n} pessoa${n === 1 ? '' : 's'} →`;
+    $$('.sel-pessoa', m.el).forEach((l) => l.classList.toggle('on', l.querySelector('input').checked));
+  };
+  let pedido = 0;
+  const atualizar = async () => {
+    const meu = ++pedido;
+    try {
+      const r = await gs('api_convitePrevia', d.id, msg.value);
+      if (meu !== pedido || !m.el.isConnected) return;
+      $('#cv-previa', m.el).srcdoc = r.html;
+      $('#cv-assunto', m.el).textContent = r.assunto;
+      $('#cv-exemplo', m.el).textContent = `· como ${r.exemplo} vai receber`;
+    } catch (e) { toast(e, true); }
+  };
+  let espera;
+  msg.oninput = () => { clearTimeout(espera); espera = setTimeout(atualizar, 600); };
+  m.el.onchange = (ev) => { if (ev.target.name === 'cv-quem') rotuloBotao(); };
+  $('#cv-cancelar', m.el).onclick = m.fechar;
+  $('#cv-enviar', m.el).onclick = async (ev) => {
+    const r = await acao(ev.target, () => gs('api_conviteEnviar', d.id, msg.value, quem() === 'pend'));
+    m.fechar();
+    D.d = r;
+    confete();
+    conquista('✉️', 'Convites enviados!', `${r.enviados} pessoa(s) convidada(s)${r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`);
+    desenharDesafio();
+  };
+  rotuloBotao();
+  atualizar();
 }
 
 /* ---------- times: sorteio animado + ajuste manual por arrastar ---------- */
