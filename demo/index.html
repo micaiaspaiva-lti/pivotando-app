@@ -447,6 +447,22 @@ textarea { resize:vertical; min-height:72px; }
 .hist-ideias { display:flex; flex-direction:column; gap:4px; }
 mark { background:color-mix(in srgb,#ffd54a 60%,transparent); color:inherit; border-radius:3px; padding:0 2px; }
 @media (max-width: 900px) { .cols2, .cols3, .cols5 { grid-template-columns:1fr; } .hist-time { grid-template-columns:1fr; } }
+
+/* menu da conta (clique no avatar) */
+button.av.eu { padding:0; cursor:pointer; font:inherit; font-weight:700; font-size:12px; transition:transform .15s, box-shadow .15s; }
+button.av.eu:hover { transform:scale(1.06); box-shadow:0 0 0 3px color-mix(in srgb,var(--azul) 25%,transparent); }
+.menu-conta { position:fixed; top:58px; right:16px; z-index:280; width:min(300px,calc(100% - 32px)); background:var(--card); color:var(--texto);
+  border:1px solid var(--borda); border-radius:16px; box-shadow:var(--sombra-forte); padding:8px; animation: entra .2s; }
+.mc-topo { display:flex; gap:12px; align-items:center; padding:10px 10px 12px; border-bottom:1px solid var(--borda); margin-bottom:6px; }
+.mc-topo b { display:block; }
+.mc-topo .small { word-break:break-all; }
+.mc-papel { display:inline-block; margin-top:6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; padding:3px 8px; border-radius:99px;
+  background:var(--marca-claro); color:var(--azul); }
+.mc-item { display:flex; align-items:center; gap:8px; width:100%; padding:10px 12px; border-radius:10px; border:0; background:none; color:var(--texto);
+  font:inherit; font-weight:600; text-decoration:none; cursor:pointer; text-align:left; }
+.mc-item:hover { background:var(--card-2); }
+.mc-item.sair { color:var(--erro); }
+.mc-nota { padding:8px 10px; font-size:12px; color:var(--muted); }
 </style>
 
 </head>
@@ -2344,7 +2360,8 @@ document.addEventListener('click', (ev) => {
 
 /** Avatar e menu conforme quem está usando (refeito ao trocar de visão na demonstração). */
 function montarCabecalho() {
-  $('#eu').outerHTML = `<div class="av eu on" id="eu" style="--c:${corDe(ME.nome)}" title="${esc(ME.nome)} · ${esc(ME.email)}">${esc(ini(ME.nome))}</div>`;
+  $('#eu').outerHTML = `<button class="av eu on" id="eu" style="--c:${corDe(ME.nome)}" title="${esc(ME.nome)} · ${esc(ME.email)}" aria-haspopup="menu">${esc(ini(ME.nome))}</button>`;
+  $('#eu').onclick = (ev) => { ev.stopPropagation(); menuConta(); };
   const itens = [['inicio', '/', 'Início'], ['historico', '/historico', 'Acervo de ideias']];
   if (ME.facilita) itens.push(['usuarios', '/usuarios', 'Pessoas']);
   $('#menu').innerHTML = itens.map(([k, h, t]) => `<a data-menu="${k}" data-go="${h}">${t}</a>`).join('');
@@ -2354,6 +2371,40 @@ function montarCabecalho() {
     $('#tema').insertAdjacentHTML('beforebegin', '<button class="btn sec peq" id="btn-demo" title="Demonstração com dados fictícios">🎬 Demo</button>');
     $('#btn-demo').onclick = abrirJanelaDemo;
   }
+}
+
+const APP_PUBLICO = 'https://micaiaspaiva-lti.github.io/pivotando-app/';
+const PAPEL_NOME = { admin: 'Administrador', facilitador: 'Facilitador', participante: 'Participante' };
+
+/** Menu da conta (clique no avatar): quem sou eu, trocar de conta e sair. */
+function menuConta() {
+  const aberto = $('#menu-conta');
+  if (aberto) return aberto.remove();
+  const m = document.createElement('div');
+  m.id = 'menu-conta';
+  m.className = 'menu-conta';
+  m.setAttribute('role', 'menu');
+  m.innerHTML = `<div class="mc-topo">${av(ME.nome)}<div><b>${esc(ME.nome)}</b><div class="small muted">${esc(ME.email)}</div>
+      <span class="mc-papel">${esc(PAPEL_NOME[ME.papel] || ME.papel)}</span></div></div>
+    ${BOOT.demo
+      ? '<div class="mc-nota">🎬 Você está na demonstração. Use a barra no rodapé para trocar de visão ou sair.</div>'
+      : `<a class="mc-item" role="menuitem" target="_top" href="https://accounts.google.com/AccountChooser?continue=${encodeURIComponent(APP_PUBLICO)}">🔄 Trocar de conta</a>
+         <button class="mc-item sair" role="menuitem" id="mc-sair">🚪 Sair</button>`}`;
+  document.body.appendChild(m);
+  const sair = $('#mc-sair', m);
+  if (sair) sair.onclick = async () => {
+    m.remove();
+    const ok = await dialogo({
+      titulo: 'Sair do Pivotando?',
+      texto: 'O Pivotando usa a sua conta Google da LTI. Sair desconecta a conta Google neste navegador (Gmail, Drive e outros também pedirão login de novo).',
+      ok: 'Sair', perigo: true,
+    });
+    // depois de sair, o Google volta para a página pública do Pivotando
+    if (ok) window.open('https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue=' + encodeURIComponent(APP_PUBLICO), '_top');
+  };
+  const fechar = (ev) => { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('click', fechar); document.removeEventListener('keydown', tecla); } };
+  const tecla = (ev) => { if (ev.key === 'Escape') { m.remove(); document.removeEventListener('click', fechar); document.removeEventListener('keydown', tecla); } };
+  setTimeout(() => { document.addEventListener('click', fechar); document.addEventListener('keydown', tecla); });
 }
 
 /** Só o Admin: abrir a demonstração ou copiar o link para mostrar a qualquer pessoa da LTI. */
