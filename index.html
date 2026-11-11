@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pivotando</title>
+  <meta name="description" content="Juntos, viramos o jogo. Desafios de inovação colaborativa da LTI.">
+  <meta name="theme-color" content="#0164C8">
+  <meta name="robots" content="noindex">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Pivotando">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://micaiaspaiva-lti.github.io/pivotando-app/">
+  <meta property="og:title" content="Pivotando">
+  <meta property="og:description" content="Juntos, viramos o jogo. Desafios de inovação colaborativa da LTI.">
+  <meta property="og:image" content="https://micaiaspaiva-lti.github.io/pivotando-app/capa.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <style>
+    :root { --bg: #f5f8fd; --text: #1b1e2e; --muted: #6b7088; --azul: #0164C8; --borda: #e3e6f0; }
+    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+                 font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: var(--bg); }
+    .overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+               z-index: 2; padding: 24px; text-align: center; transition: opacity .3s;
+               background: radial-gradient(900px 500px at 85% -10%, rgba(106,17,184,.14), transparent 60%),
+                           radial-gradient(800px 400px at -10% 110%, rgba(1,100,200,.14), transparent 60%), var(--bg); }
+    .overlay.fade { opacity: 0; pointer-events: none; }
+    .logo { width: min(300px, 70vw); height: auto; }
+    .slogan { margin: -6px 0 0; color: #103C9B; font-weight: 600; letter-spacing: .2px; }
+    .barra { width: 180px; height: 6px; border-radius: 99px; background: #dfe6f3; overflow: hidden; }
+    .barra i { display: block; height: 100%; width: 40%; border-radius: 99px; background: linear-gradient(90deg, #1EAAFF, #0164C8, #6a11b8);
+               animation: corre 1.1s ease-in-out infinite; }
+    @keyframes corre { 0% { transform: translateX(-100%); } 100% { transform: translateX(260%); } }
+    .card { background: #fff; border: 1px solid var(--borda); border-radius: 18px; padding: 26px; max-width: 420px; box-shadow: 0 14px 40px rgba(16,24,40,.1); }
+    .card h1 { font-size: 19px; margin: 14px 0 6px; }
+    .card p { margin: 0 0 18px; color: var(--muted); line-height: 1.5; }
+    .btns { display: flex; flex-direction: column; gap: 8px; }
+    .btn { display: block; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--borda); background: #fff; font: inherit; font-weight: 600;
+           color: var(--text); text-decoration: none; cursor: pointer; }
+    .btn.primary { background: var(--azul); border-color: var(--azul); color: #fff; }
+    .demo { color: var(--muted); font-size: 13px; }
+    .demo a { color: var(--azul); font-weight: 600; }
+    [hidden] { display: none !important; }
+    @media (prefers-reduced-motion: reduce) { .barra i { animation: none; width: 100%; } }
+  </style>
+</head>
+<body>
+  <div id="splash" class="overlay">
+    <img class="logo" src="icons/logo.svg" alt="Pivotando">
+    <p class="slogan">Juntos, viramos o jogo.</p>
+    <div class="barra"><i></i></div>
+  </div>
+
+  <div id="help" class="overlay" hidden>
+    <div class="card">
+      <img src="icons/icon-192.png" alt="" style="width:60px;height:60px;border-radius:14px">
+      <h1 id="helpTitle">Entre com sua conta da LTI</h1>
+      <p id="helpText">O Pivotando é exclusivo para colaboradores. Entre com sua conta Google <b>@lti.net.br</b> neste navegador e tente novamente.</p>
+      <div class="btns">
+        <button class="btn primary" id="btnLogin">Entrar com Google</button>
+        <button class="btn" id="btnRetry">Tentar novamente</button>
+        <a class="btn" id="btnBrowser" target="_blank" rel="noopener">Abrir direto no Google</a>
+      </div>
+    </div>
+    <p class="demo">Quer só conhecer? <a href="demo/">Veja a demonstração</a></p>
+  </div>
+
+  <iframe id="app" title="Pivotando" allow="clipboard-write; fullscreen" allowfullscreen></iframe>
+
+  <script>
+    (function () {
+      // Web App do Pivotando (Apps Script, acesso só do domínio LTI). A implantação é sempre a mesma.
+      var EXEC = 'https://script.google.com/a/macros/lti.net.br/s/AKfycbysw9lnWzAjSFIzmsZfzYHWzO1D1erYiAatyQIqBNVPvmIv-Q4Rpk6dcjw5m_r50AKAQA/exec';
+      var TIMEOUT_MS = 20000;
+      var frame = document.getElementById('app');
+      var splash = document.getElementById('splash');
+      var help = document.getElementById('help');
+      var timer = null;
+
+      // só repassa rotas do próprio app (ex.: #/time/<id> dos e-mails de convite)
+      function rota() { return /^#\/[\w\/-]*$/.test(location.hash) ? location.hash : ''; }
+
+      function carregar() {
+        help.hidden = true;
+        splash.hidden = false;
+        splash.classList.remove('fade');
+        frame.src = EXEC + rota();
+        clearTimeout(timer);
+        timer = setTimeout(falhou, TIMEOUT_MS);
+      }
+      function pronto() {
+        clearTimeout(timer);
+        help.hidden = true;
+        splash.classList.add('fade');
+        setTimeout(function () { splash.hidden = true; }, 320);
+      }
+      function falhou() {
+        splash.hidden = true;
+        var on = navigator.onLine;
+        document.getElementById('helpTitle').textContent = on ? 'Entre com sua conta da LTI' : 'Você está sem conexão';
+        document.getElementById('helpText').innerHTML = on
+          ? 'O Pivotando é exclusivo para colaboradores. Entre com sua conta Google <b>@lti.net.br</b> neste navegador e tente novamente.'
+          : 'Conecte-se à internet para usar o Pivotando.';
+        document.getElementById('btnLogin').hidden = !on;
+        help.hidden = false;
+      }
+
+      // mensagens vindas do app (iframe do Apps Script)
+      window.addEventListener('message', function (ev) {
+        if (!/^https:\/\/[a-z0-9.-]+\.googleusercontent\.com$/.test(ev.origin)) return;
+        var d = ev.data || {};
+        if (d.type === 'piv:ready') pronto();
+        else if (d.type === 'piv:rota' && /^#\/[\w\/-]*$/.test(d.hash || '')) {
+          pronto();
+          // mantém o endereço em dia para recarregar ou compartilhar a tela atual
+          history.replaceState(null, '', location.pathname + (d.hash === '#/' ? '' : d.hash));
+        }
+      });
+      window.addEventListener('hashchange', carregar);
+      window.addEventListener('online', function () { if (!help.hidden) carregar(); });
+      document.getElementById('btnRetry').addEventListener('click', carregar);
+      document.getElementById('btnLogin').addEventListener('click', function () {
+        window.open('https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(EXEC), '_blank', 'noopener');
+      });
+      document.getElementById('btnBrowser').href = EXEC;
+
+      carregar();
+      if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
+    })();
+  </script>
+</body>
+</html>
