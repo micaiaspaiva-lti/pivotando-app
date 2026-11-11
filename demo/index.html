@@ -476,6 +476,28 @@ button.av.eu:hover { transform:scale(1.06); box-shadow:0 0 0 3px color-mix(in sr
   </div>
 </header>
 <main id="app"></main>
+<noscript><div style="max-width:520px;margin:10vh auto;text-align:center;font-family:system-ui,sans-serif"><h2>Ative o JavaScript</h2><p>O Pivotando precisa de JavaScript ativado neste navegador.</p></div></noscript>
+<script>
+  // Se algo impedir o app de iniciar, mostra o motivo em vez de deixar a tela em branco.
+  (function () {
+    var erros = [];
+    function mostrar(titulo) {
+      var el = document.getElementById('app');
+      if (!el || window.__appOk) return;
+      el.innerHTML = '<div style="max-width:560px;margin:8vh auto;padding:28px;border-radius:18px;background:#fff;border:1px solid #e3e6f0;'
+        + 'box-shadow:0 12px 32px rgba(16,24,40,.08);font-family:Inter,system-ui,sans-serif;color:#1b1e2e;text-align:center">'
+        + '<div style="font-size:40px">😕</div><h2 style="margin:8px 0">' + titulo + '</h2>'
+        + '<p style="color:#6b7088">Tente recarregar a página. Se continuar, abra em uma janela anônima com a conta <b>@lti.net.br</b>, '
+        + 'ou desative extensões/bloqueadores e a "prevenção de rastreamento" para este site.</p>'
+        + '<p><button onclick="location.reload()" style="padding:10px 18px;border-radius:10px;border:0;background:#0164C8;color:#fff;font:inherit;font-weight:600;cursor:pointer">Recarregar</button></p>'
+        + (erros.length ? '<details style="text-align:left;color:#6b7088;font-size:12px"><summary>Detalhes técnicos (mande um print para o suporte)</summary><pre style="white-space:pre-wrap">'
+          + erros.join('\n').replace(/</g, '&lt;') + '\n' + navigator.userAgent + '</pre></details>' : '');
+    }
+    window.addEventListener('error', function (e) { if (/extension:\/\//.test(e.filename || '')) return; erros.push((e.message || 'erro') + ' @ ' + (e.filename || '') + ':' + (e.lineno || '')); mostrar('O Pivotando não conseguiu abrir'); });
+    window.addEventListener('unhandledrejection', function (e) { erros.push('promessa: ' + ((e.reason && e.reason.message) || e.reason)); });
+    setTimeout(function () { mostrar('O Pivotando está demorando para abrir'); }, 12000);
+  })();
+</script>
 <div id="toast"></div>
 <canvas id="confete"></canvas>
 <script>
@@ -2434,6 +2456,7 @@ function iniciarApp() {
     addEventListener('popstate', () => rotear(location.hash));
     rotear(location.hash);
   }
+  window.__appOk = true; // desliga o aviso de "não conseguiu abrir" do app.html
 }
 </script>
 
