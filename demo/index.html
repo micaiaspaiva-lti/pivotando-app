@@ -708,9 +708,20 @@ var PIVDEMO = (() => {
       sh.setFrozenRows(1);
     }
     if (!conferidas.has(table)) {
-      const head = sh.getRange(1, 1, 1, cols.length);
-      if (head.getValues()[0].join("|") !== cols.join("|"))
-        head.setValues([cols]).setFontWeight("bold");
+      const chave = "esq:" + table;
+      const assinatura = cols.join("|");
+      let cache2 = null;
+      try {
+        cache2 = CacheService.getScriptCache();
+      } catch (e) {
+      }
+      if (!cache2 || cache2.get(chave) !== assinatura) {
+        const head = sh.getRange(1, 1, 1, cols.length);
+        if (head.getValues()[0].join("|") !== assinatura)
+          head.setValues([cols]).setFontWeight("bold");
+        if (cache2)
+          cache2.put(chave, assinatura, 21600);
+      }
       conferidas.add(table);
     }
     return sh;

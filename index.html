@@ -72,7 +72,8 @@
     (function () {
       // Web App do Pivotando (Apps Script, acesso só do domínio LTI). A implantação é sempre a mesma.
       var EXEC = 'https://script.google.com/a/macros/lti.net.br/s/AKfycbysw9lnWzAjSFIzmsZfzYHWzO1D1erYiAatyQIqBNVPvmIv-Q4Rpk6dcjw5m_r50AKAQA/exec';
-      var TIMEOUT_MS = 20000;
+      var TIMEOUT_MS = 15000;   // sem resposta do app até aqui: provavelmente falta login
+      var SPLASH_MAX_MS = 3000; // a tela de abertura nunca fica mais que isso
       var frame = document.getElementById('app');
       var splash = document.getElementById('splash');
       var help = document.getElementById('help');
@@ -88,12 +89,17 @@
         frame.src = EXEC + rota();
         clearTimeout(timer);
         timer = setTimeout(falhou, TIMEOUT_MS);
+        setTimeout(esconderSplash, SPLASH_MAX_MS);
+      }
+      function esconderSplash() {
+        if (splash.hidden || splash.classList.contains('fade')) return;
+        splash.classList.add('fade');
+        setTimeout(function () { splash.hidden = true; }, 320);
       }
       function pronto() {
         clearTimeout(timer);
         help.hidden = true;
-        splash.classList.add('fade');
-        setTimeout(function () { splash.hidden = true; }, 320);
+        esconderSplash();
       }
       function falhou() {
         splash.hidden = true;
