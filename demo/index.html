@@ -32,6 +32,7 @@
   --n-certeza:#ffe3e3; --n-suposicao:#fff1c9; --n-duvida:#ddf6df;
   /* Plano 5W */
   --p-oque:#ffb000; --p-como:#ff6464; --p-onde:#001e82; --p-quando:#41c463; --p-quem:#5520c4;
+  --n-oque:#ffefb8; --n-como:#ffdede; --n-onde:#d6ebfb; --n-quando:#d5f5dc; --n-quem:#e3defc;
   /* GUT */
   --g1:#d9d9d9; --g2:#d9dff2; --g3:#ffe699; --g4:#ffc000; --g5:#ff1f1f;
   --ok:#1b8a4a; --aviso:#e58a00; --erro:#d93025;
@@ -41,12 +42,14 @@
     --fundo:#0f1220; --card:#181c2e; --card-2:#1f2438; --borda:#2a3050; --texto:#e8eaf4; --muted:#9aa0bd;
     --marca-claro:#1a2a4a; --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
     --n-certeza:#4a2328; --n-suposicao:#4a3b17; --n-duvida:#1d4224;
+    --n-oque:#4a3b17; --n-como:#4a2328; --n-onde:#1a2d4d; --n-quando:#1d4224; --n-quem:#2f2550; --p-onde:#2a4fc4;
   }
 }
 :root[data-theme="dark"] {
   --fundo:#0f1220; --card:#181c2e; --card-2:#1f2438; --borda:#2a3050; --texto:#e8eaf4; --muted:#9aa0bd;
   --marca-claro:#1a2a4a; --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
   --n-certeza:#4a2328; --n-suposicao:#4a3b17; --n-duvida:#1d4224;
+  --n-oque:#4a3b17; --n-como:#4a2328; --n-onde:#1a2d4d; --n-quando:#1d4224; --n-quem:#2f2550; --p-onde:#2a4fc4;
 }
 * { box-sizing:border-box; }
 html,body { margin:0; }
@@ -199,22 +202,18 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
 .nota:hover { transform:rotate(0) translateY(-2px) scale(1.02); box-shadow:0 10px 24px rgba(0,0,0,.14); }
 @keyframes pousa { from { opacity:0; transform:translateY(-14px) rotate(-6deg) scale(.9); } }
 .nota .rodape { display:flex; align-items:center; justify-content:space-between; margin-top:8px; font-family:Inter; font-size:11px; color:var(--muted); }
-.nota .plano-btn { border:0; border-radius:99px; padding:3px 9px; font-size:11px; font-weight:700; cursor:pointer; background:rgba(0,0,0,.08); }
-.nota .plano-btn.on { background:var(--p-quem); color:#fff; }
 .sortable-ghost { opacity:.35; } .sortable-chosen { cursor:grabbing; }
 .add-nota { display:flex; margin-top:10px; }
 
-/* ---------- Plano ---------- */
-.planos { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:16px; }
-.plano { border-radius:18px; overflow:hidden; background:var(--card); border:1px solid var(--borda); box-shadow:var(--sombra); animation: entra .5s; }
-.plano .origem { padding:10px 14px; font-size:12px; background:var(--card-2); border-bottom:1px solid var(--borda); display:flex; gap:8px; align-items:center; }
-.plano .origem .tag { padding:2px 8px; border-radius:99px; color:#fff; font-weight:700; font-size:10px; text-transform:uppercase; }
-.w { display:grid; grid-template-columns:88px 1fr; border-bottom:1px solid var(--borda); }
-.w:last-child { border-bottom:0; }
-.w .k { background:var(--wc); color:#fff; font-weight:700; font-size:12px; padding:10px; display:flex; align-items:center; }
-.w .v { padding:10px 12px; outline:0; min-height:40px; }
-.w .v:focus { background:color-mix(in srgb,var(--wc) 8%, var(--card)); }
-.w .v:empty::before { content:attr(data-ph); color:var(--muted); }
+/* ---------- Plano (quadro de 5 colunas) ---------- */
+.csd.quadro5 { grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+.quadro5 .coluna { background:color-mix(in srgb, var(--cc) 9%, var(--card)); border-color:color-mix(in srgb, var(--cc) 18%, var(--borda)); padding:0 10px 10px; }
+.quadro5 .coluna-head { margin:0 -10px 12px; text-align:center; }
+.quadro5 .coluna-head h3 { font-size:15px; letter-spacing:.3px; text-transform:none; justify-content:center; gap:8px; }
+.quadro5 .coluna-head h3 span { font-size:12px; background:rgba(255,255,255,.25); border-radius:99px; padding:1px 8px; align-self:center; }
+.quadro5 .nota { font-size:19px; }
+.quadro5 .add-nota input { min-width:0; width:100%; padding:10px 12px; background:color-mix(in srgb, var(--card) 70%, transparent); }
+@media (max-width: 1100px) { .csd.quadro5 { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 
 /* ---------- Brainstorm ---------- */
 .bs-modo { display:inline-flex; padding:4px; background:var(--card-2); border:1px solid var(--borda); border-radius:12px; }
@@ -302,6 +301,8 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
 .slide .cols3 > div { border-radius:14px; padding:1.4vh 1vw; background:rgba(255,255,255,.08); }
 .slide .cols3 h5 { margin:0 0 1vh; font-size:clamp(11px,1.3vw,16px); letter-spacing:1px; text-transform:uppercase; }
 .slide .cols3 p { font-family:Caveat, cursive; font-size:clamp(13px,1.6vw,22px); margin:.4vh 0; max-width:none; }
+.slide .cols3.c5 { grid-template-columns:repeat(5,minmax(0,1fr)); gap:1vw; }
+.slide .cols3.c5 p { font-size:clamp(12px,1.4vw,19px); overflow-wrap:anywhere; }
 .slides-nav { position:absolute; bottom:16px; left:0; right:0; display:flex; justify-content:center; gap:8px; z-index:5; }
 .slides-nav i { width:9px; height:9px; border-radius:99px; background:rgba(255,255,255,.35); transition:.3s; cursor:pointer; }
 .slides-nav i.on { width:28px; background:#fff; }
@@ -323,7 +324,7 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; } }
 @media (max-width: 900px) {
   .gut-grid, .sorteio, .painel { grid-template-columns:1fr; }
-  .csd { grid-template-columns:1fr; }
+  .csd, .csd.quadro5 { grid-template-columns:1fr; }
   .quadros { grid-template-columns:1fr; }
   .hero { grid-template-columns:1fr; } .hero-dir { align-items:flex-start; }
   .mapa { position:static; }
@@ -331,7 +332,7 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
   .fase .nome { font-size:9px; } .fase .sub { display:none; }
   header.top { padding:0 12px; gap:10px; } .logo span { display:none; }
 }
-@media (max-width: 560px) { .gut-escalas { grid-template-columns:1fr; } main { padding:16px 16px 60px; } .w { grid-template-columns:72px 1fr; } }
+@media (max-width: 560px) { .gut-escalas { grid-template-columns:1fr; } main { padding:16px 16px 60px; } }
 
 /* =================== componentes do sistema (além do protótipo) =================== */
 .logo img { height:36px; border-radius:0; background:none; padding:0; }
@@ -432,15 +433,10 @@ textarea { resize:vertical; min-height:72px; }
 [contenteditable="true"]:focus { box-shadow:0 0 0 2px color-mix(in srgb,var(--azul) 45%,transparent); background:color-mix(in srgb,var(--card) 60%,transparent); }
 .editavel { cursor:text; }
 .x { position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; border:0; background:rgba(0,0,0,.08); color:inherit; font-size:13px; line-height:1; cursor:pointer; opacity:0; transition:.15s; display:grid; place-items:center; }
-.nota:hover .x, .gut-item:hover .x, .plano:hover .x, .quadro:hover > .x, .rk:hover .x { opacity:1; }
+.nota:hover .x, .gut-item:hover .x, .quadro:hover > .x, .rk:hover .x { opacity:1; }
 .x:hover { background:var(--erro); color:#fff; }
 .gut-item .x { top:10px; right:auto; left:auto; position:absolute; right:10px; }
 .gut-item .grau { margin-right:22px; }
-.plano { position:relative; }
-.plano .x { top:8px; right:8px; z-index:2; }
-.w input, .w textarea { width:100%; border:0; background:transparent; font:inherit; color:var(--texto); padding:10px 12px; resize:none; min-height:40px; }
-.w input:focus, .w textarea:focus { outline:0; background:color-mix(in srgb,var(--wc) 8%, var(--card)); }
-.w .v-ro { padding:10px 12px; white-space:pre-wrap; }
 .nova-ideia { border:2px dashed var(--borda); border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:8px; justify-content:center; }
 .nova-ideia input, .nova-ideia textarea { width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid var(--borda); background:var(--card); color:var(--texto); font:inherit; }
 .quadro .x { top:10px; right:10px; }
@@ -634,6 +630,8 @@ var PIVDEMO = (() => {
   // src/server/index.ts
   var server_exports = {};
   __export(server_exports, {
+    api_avisoTimesEnviar: () => api_avisoTimesEnviar,
+    api_avisoTimesPrevia: () => api_avisoTimesPrevia,
     api_boot: () => api_boot,
     api_conviteEnviar: () => api_conviteEnviar,
     api_convitePrevia: () => api_convitePrevia,
@@ -715,12 +713,16 @@ var PIVDEMO = (() => {
       "localAbertura"
     ],
     // convidadoEm: quando recebeu o convite para o desafio (antes do sorteio)
-    Participacoes: ["id", "desafioId", "email", "timeId", "convidadoEm"],
+    // avisoTimeEm: quando recebeu o aviso do seu time (com o link da sala)
+    Participacoes: ["id", "desafioId", "email", "timeId", "convidadoEm", "avisoTimeEm"],
     // concluidas / reabertas: etapas separadas por vírgula
     Times: ["id", "desafioId", "nome", "cor", "microproblemaId", "concluidas", "reabertas", "versao"],
     GutItens: ["id", "timeId", "texto", "g", "u", "t", "autor", "criadoEm", "atualizadoEm"],
-    // coluna: certeza | suposicao | duvida; plano: '1' quando vai para o Plano de Ação
+    // coluna: certeza | suposicao | duvida; plano: (descontinuado) era '1' quando ia para o Plano de Ação
     CsdCards: ["id", "timeId", "coluna", "texto", "plano", "ordem", "autor", "criadoEm", "atualizadoEm"],
+    // Plano de Ação em post-its livres; coluna: oque | como | onde | quando | quem
+    PlanoCards: ["id", "timeId", "coluna", "texto", "ordem", "autor", "criadoEm", "atualizadoEm"],
+    // formato antigo (uma linha 5W por ação): convertido em PlanoCards na 1ª abertura do time
     PlanoAcoes: ["id", "timeId", "csdCardId", "oQue", "como", "onde", "quando", "quem", "autor", "criadoEm", "atualizadoEm"],
     Ideias: ["id", "timeId", "titulo", "descricao", "ordem", "autor", "criadoEm", "atualizadoEm"],
     IdeiaApoios: ["id", "timeId", "ideiaId", "texto", "autor", "criadoEm"],
@@ -971,32 +973,6 @@ var PIVDEMO = (() => {
     MailApp.sendEmail({ to, subject, htmlBody: layout(html), name: APP_NAME, inlineImages: { logo: logoBlob() } });
   }
   var ETAPA_NOME = { gut: "Matriz GUT", csd: "Matriz CSD", plano: "Plano de A\xE7\xE3o", ideias: "Brainstorm round-robin" };
-  function mailConvite(p) {
-    const d = p.desafio;
-    const prazos = [
-      ["Matriz GUT", d.prazoGut],
-      ["Matriz CSD", d.prazoCsd],
-      ["Plano de A\xE7\xE3o", d.prazoPlano],
-      ["Brainstorm", d.prazoIdeias],
-      ["Apresenta\xE7\xE3o ao vivo", d.dataApresentacao]
-    ].filter(([, v]) => v);
-    send(
-      p.email,
-      `Pivotando: voc\xEA est\xE1 no Time ${p.time.nome}! \u{1F680}`,
-      `<p style="font-size:16px">Ol\xE1, ${escapeHtml(p.nome)}!</p>
-     <p>Come\xE7ou um novo desafio do Pivotando, e voc\xEA foi sorteado(a) para o
-       <b style="color:${escapeHtml(p.time.cor)}">Time ${escapeHtml(p.time.nome)}</b>.</p>
-     <div style="background:#f5f8fd;border-left:4px solid #6a11b8;border-radius:8px;padding:14px 16px;margin:18px 0">
-       <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6a11b8;font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
-       <div style="font-size:18px;font-weight:bold;margin:4px 0">${escapeHtml(d.titulo)}</div>
-       ${d.problema ? `<div style="color:#444">${textoRico(d.problema)}</div>` : ""}
-     </div>
-     ${p.colegas.length ? `<p><b>Seus colegas de time:</b> ${p.colegas.map(escapeHtml).join(", ")}</p>` : ""}
-     ${prazos.length ? `<table style="border-collapse:collapse;font-size:13px">${prazos.map(([k, v]) => `<tr><td style="padding:3px 14px 3px 0;color:#666">${k}</td><td style="padding:3px 0"><b>${fmtDia(v)}</b></td></tr>`).join("")}</table>` : ""}
-     ${botao(p.link, "Entrar na sala do meu time")}
-     <p style="font-size:12px;color:#666">Juntos, viramos o jogo. \u{1F499}</p>`
-    );
-  }
   function mailLembrete(p) {
     send(
       p.email,
@@ -1035,12 +1011,20 @@ ${APP_PUBLICO}`),
     <td style="font-size:12px;font-weight:bold;letter-spacing:1.2px;text-transform:uppercase;color:${COR.escuro};white-space:nowrap;padding-right:10px">${icone}&nbsp; ${titulo}</td>
     <td width="100%" style="border-bottom:2px solid ${COR.borda}"></td></tr></table>`;
   }
-  function conteudoConvitePivotando(p) {
-    const d = p.desafio;
-    const mensagem = (p.mensagem || "").trim();
-    const ab = diaPorExtenso(d.dataAbertura);
-    const horario = d.horaAbertura ? d.horaFimAbertura ? `das ${d.horaAbertura} \xE0s ${d.horaFimAbertura}` : `\xE0s ${d.horaAbertura}` : "";
-    const agenda = linkAgenda(d);
+  function blocoMensagem(mensagem, remetente) {
+    if (!mensagem)
+      return "";
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 0"><tr><td style="background:#fff8e6;border-left:4px solid #f59e0b;border-radius:8px;padding:14px 16px">
+      <div style="white-space:pre-wrap;line-height:1.55;color:#3d3420">${escapeHtml(mensagem)}</div>
+      <div style="margin-top:8px;font-size:12px;color:#8a6d1f">\u2014 ${escapeHtml(remetente)}</div></td></tr></table>`;
+  }
+  function cartaoDesafio(d) {
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:${COR.fundo};border-left:4px solid ${COR.roxo};border-radius:8px;padding:16px 18px">
+      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:${COR.roxo};font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
+      <div style="font-size:19px;font-weight:bold;margin:6px 0 4px;color:${COR.texto};line-height:1.3">${escapeHtml(d.titulo)}</div>
+      ${d.problema ? `<div style="color:#444;margin-top:8px">${textoRico(d.problema)}</div>` : ""}</td></tr></table>`;
+  }
+  function tabelaPrazos(d) {
     const etapas2 = [
       ["\u{1F3AF}", "Matriz GUT", "listar e priorizar os microproblemas", d.prazoGut],
       ["\u{1F50D}", "Matriz CSD", "certezas, suposi\xE7\xF5es e d\xFAvidas", d.prazoCsd],
@@ -1048,6 +1032,28 @@ ${APP_PUBLICO}`),
       ["\u{1F4A1}", "Brainstorm", "ideias para resolver o problema", d.prazoIdeias],
       ["\u{1F3A4}", "Apresenta\xE7\xE3o ao vivo", "cada time apresenta sua proposta", d.dataApresentacao]
     ].filter((e) => e[3]);
+    if (!etapas2.length)
+      return "";
+    return `${secao("\u{1F5D3}\uFE0F", "Prazos das entregas")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${COR.borda};border-radius:10px;border-collapse:separate;overflow:hidden">
+      ${etapas2.map(([ic, nome, desc, dt], i) => `<tr style="background:${i % 2 ? "#ffffff" : COR.fundo}">
+        <td style="padding:11px 14px;font-size:14px"><b>${ic}&nbsp; ${nome}</b><div style="font-size:12px;color:${COR.muted};margin-top:2px">${desc}</div></td>
+        <td align="right" style="padding:11px 14px;font-size:14px;white-space:nowrap"><b style="color:${COR.azul}">${fmtDia(dt)}</b>
+          <div style="font-size:11px;color:${COR.muted};margin-top:2px">${(diaPorExtenso(dt) || { semana: "" }).semana}</div></td></tr>`).join("")}
+    </table>
+    <p style="font-size:12px;color:${COR.muted};margin:8px 0 0">Cada entrega fica aberta at\xE9 as 23h59 do dia do prazo. Na v\xE9spera, quem ainda n\xE3o concluiu recebe um lembrete.</p>`;
+  }
+  function botaoCentral(url, texto, nota) {
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 8px"><tr><td align="center">
+      <a href="${escapeHtml(url)}" style="background:${COR.azul};color:#fff;padding:14px 28px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold;font-size:15px">${escapeHtml(texto)}</a>
+      ${nota ? `<div style="font-size:12px;color:${COR.muted};margin-top:10px">${nota}</div>` : ""}</td></tr></table>`;
+  }
+  function conteudoConvitePivotando(p) {
+    const d = p.desafio;
+    const mensagem = (p.mensagem || "").trim();
+    const ab = diaPorExtenso(d.dataAbertura);
+    const horario = d.horaAbertura ? d.horaFimAbertura ? `das ${d.horaAbertura} \xE0s ${d.horaFimAbertura}` : `\xE0s ${d.horaAbertura}` : "";
+    const agenda = linkAgenda(d);
     const passos = [
       ["Encontro de abertura", "Apresentamos o desafio e os times s\xE3o <b>sorteados ao vivo</b>, misturando pessoas de \xE1reas diferentes."],
       ["Times em a\xE7\xE3o", "Cada time, ao ser sorteado, <b>se organiza para se reunir</b> e trabalhar nas entregas, cumprindo os prazos."],
@@ -1059,15 +1065,10 @@ ${APP_PUBLICO}`),
     <p style="margin:0;line-height:1.6;color:#333">Voc\xEA foi convidado(a) para o <b>Pivotando</b>: a iniciativa da LTI em que colaboradores de \xE1reas diferentes
       se juntam em times para resolver <b>problemas reais</b> da empresa com ideias inovadoras.</p>
 
-    ${mensagem ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 0"><tr><td style="background:#fff8e6;border-left:4px solid #f59e0b;border-radius:8px;padding:14px 16px">
-      <div style="white-space:pre-wrap;line-height:1.55;color:#3d3420">${escapeHtml(mensagem)}</div>
-      <div style="margin-top:8px;font-size:12px;color:#8a6d1f">\u2014 ${escapeHtml(p.remetente)}</div></td></tr></table>` : ""}
+    ${blocoMensagem(mensagem, p.remetente)}
 
     ${secao("\u{1F9E9}", "O desafio")}
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:${COR.fundo};border-left:4px solid ${COR.roxo};border-radius:8px;padding:16px 18px">
-      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:${COR.roxo};font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
-      <div style="font-size:19px;font-weight:bold;margin:6px 0 4px;color:${COR.texto};line-height:1.3">${escapeHtml(d.titulo)}</div>
-      ${d.problema ? `<div style="color:#444;margin-top:8px">${textoRico(d.problema)}</div>` : ""}</td></tr></table>
+    ${cartaoDesafio(d)}
 
     ${ab ? `${secao("\u{1F4CD}", "Encontro de abertura")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:linear-gradient(120deg,#103C9B,#3d0a91 60%,#6a11b8);background-color:#103C9B;border-radius:12px;padding:18px 20px;color:#ffffff">
@@ -1084,21 +1085,44 @@ ${APP_PUBLICO}`),
       <td valign="top" width="40" style="padding:0 12px 14px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${COR.azul};color:#fff;text-align:center;font-weight:bold;font-size:14px">${i + 1}</div></td>
       <td valign="top" style="padding:4px 0 14px"><b style="color:${COR.texto}">${t}</b><div style="color:#555;line-height:1.5;margin-top:2px">${txt2}</div></td></tr>`).join("")}</table>
 
-    ${etapas2.length ? `${secao("\u{1F5D3}\uFE0F", "Prazos das entregas")}
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${COR.borda};border-radius:10px;border-collapse:separate;overflow:hidden">
-      ${etapas2.map(([ic, nome, desc, dt], i) => `<tr style="background:${i % 2 ? "#ffffff" : COR.fundo}">
-        <td style="padding:11px 14px;font-size:14px"><b>${ic}&nbsp; ${nome}</b><div style="font-size:12px;color:${COR.muted};margin-top:2px">${desc}</div></td>
-        <td align="right" style="padding:11px 14px;font-size:14px;white-space:nowrap"><b style="color:${COR.azul}">${fmtDia(dt)}</b>
-          <div style="font-size:11px;color:${COR.muted};margin-top:2px">${(diaPorExtenso(dt) || { semana: "" }).semana}</div></td></tr>`).join("")}
-    </table>
-    <p style="font-size:12px;color:${COR.muted};margin:8px 0 0">Cada entrega fica aberta at\xE9 as 23h59 do dia do prazo. Na v\xE9spera, quem ainda n\xE3o concluiu recebe um lembrete.</p>` : ""}
+    ${tabelaPrazos(d)}
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 8px"><tr><td align="center">
-      <a href="${escapeHtml(p.link)}" style="background:${COR.azul};color:#fff;padding:14px 28px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold;font-size:15px">Conhecer o Pivotando \u2192</a>
-      <div style="font-size:12px;color:${COR.muted};margin-top:10px">Entre com a sua conta Google <b>@lti.net.br</b>.</div></td></tr></table>
+    ${botaoCentral(p.link, "Conhecer o Pivotando \u2192", "Entre com a sua conta Google <b>@lti.net.br</b>.")}
 
     <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Juntos, viramos o jogo. \u{1F499}</p>`;
     return { assunto: `\u{1F680} Convite: Pivotando \xB7 Desafio #${d.numero}${ab ? ` \xB7 abertura em ${fmtDia(d.dataAbertura)}` : ""}`, corpo };
+  }
+  function conteudoAvisoTime(p) {
+    const d = p.desafio;
+    const cor = /^#[0-9a-f]{6}$/i.test(p.time.cor) ? p.time.cor : COR.azul;
+    const inic = (n) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]).join("").toUpperCase();
+    const corpo = `
+    <p style="font-size:17px;margin:0 0 10px">Ol\xE1, <b>${escapeHtml(p.nome)}</b>! \u{1F44B}</p>
+    <p style="margin:0;line-height:1.6;color:#333">Os times do <b>Desafio #${escapeHtml(d.numero)}</b> do Pivotando foram sorteados, e o desafio come\xE7ou!</p>
+
+    ${blocoMensagem((p.mensagem || "").trim(), p.remetente)}
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 0"><tr><td align="center" style="background:${cor};border-radius:14px;padding:22px 20px;color:#ffffff">
+      <div style="font-size:13px;opacity:.9;letter-spacing:1px;text-transform:uppercase">Voc\xEA est\xE1 no</div>
+      <div style="font-size:28px;font-weight:bold;margin:4px 0">Time ${escapeHtml(p.time.nome)} \u{1F389}</div>
+      <div style="font-size:13px;opacity:.9">${p.colegas.length + 1} pessoas \xB7 \xE1reas diferentes, um s\xF3 objetivo</div>
+    </td></tr></table>
+
+    ${p.colegas.length ? `${secao("\u{1F465}", "Seu time")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${p.colegas.map((c) => `<tr>
+      <td width="40" style="padding:0 10px 10px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${cor};color:#fff;text-align:center;font-weight:bold;font-size:12px">${escapeHtml(inic(c.nome))}</div></td>
+      <td style="padding:0 0 10px;font-size:14px"><b style="color:${COR.texto}">${escapeHtml(c.nome)}</b>${c.departamento ? `<span style="color:${COR.muted};font-size:12px"> \xB7 ${escapeHtml(c.departamento)}</span>` : ""}</td></tr>`).join("")}</table>
+    <p style="font-size:13px;color:#555;margin:4px 0 0">\u{1F4AC} Combinem com o time quando e onde v\xE3o se reunir para trabalhar nas entregas.</p>` : ""}
+
+    ${secao("\u{1F9E9}", "O desafio")}
+    ${cartaoDesafio(d)}
+
+    ${tabelaPrazos(d)}
+
+    ${botaoCentral(p.link, `Entrar na sala do Time ${p.time.nome} \u2192`, "L\xE1 est\xE3o as entregas do seu time. Entre com a sua conta Google <b>@lti.net.br</b>.")}
+
+    <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Juntos, viramos o jogo. \u{1F499}</p>`;
+    return { assunto: `\u{1F389} Pivotando: voc\xEA est\xE1 no Time ${p.time.nome}! \xB7 Desafio #${d.numero}`, corpo };
   }
   function mailConvitePivotando(email, c) {
     send(email, c.assunto, c.corpo);
@@ -1318,7 +1342,7 @@ ${APP_PUBLICO}`),
       desafio: desafioPublico(d),
       participantes: parts.map((x) => {
         const u = porEmail.get(x.email);
-        return { email: x.email, timeId: x.timeId, convidadoEm: x.convidadoEm || "", nome: u?.nome || x.email, departamento: u?.departamento || "", funcao: u?.funcao || "" };
+        return { email: x.email, timeId: x.timeId, convidadoEm: x.convidadoEm || "", avisoTimeEm: x.avisoTimeEm || "", nome: u?.nome || x.email, departamento: u?.departamento || "", funcao: u?.funcao || "" };
       }),
       times: where("Times", (t) => t.desafioId === id).map((t) => ({
         id: t.id,
@@ -1440,42 +1464,55 @@ ${APP_PUBLICO}`),
             novosNoTime.push({ email, timeId: id });
           } else if (timeDe.get(email) !== id) {
             const part = partes.find((x) => x.email === email);
-            update("Participacoes", part.id, { timeId: id });
+            update("Participacoes", part.id, { timeId: id, avisoTimeEm: "" });
             novosNoTime.push({ email, timeId: id });
           }
         }
       }
       for (const x of partes)
         if (!vistos.has(x.email) && x.timeId)
-          update("Participacoes", x.id, { timeId: "" });
+          update("Participacoes", x.id, { timeId: "", avisoTimeEm: "" });
       if (d.status === "em_andamento" || d.status === "apresentacao")
-        enviarConvites(d, novosNoTime);
+        enviarAvisos(d, novosNoTime.map((x) => x.email), "", p.nome);
       audit(p.email, "times_salvos", desafioId, "", { times: (times || []).length });
       return api_desafio(desafioId);
     });
   }
   function temConteudo(timeId) {
-    return ["GutItens", "CsdCards", "PlanoAcoes", "Ideias"].some((t) => where(t, (r) => r.timeId === timeId).length > 0);
+    return ["GutItens", "CsdCards", "PlanoCards", "PlanoAcoes", "Ideias"].some((t) => where(t, (r) => r.timeId === timeId).length > 0);
   }
-  function enviarConvites(d, quem) {
+  function avisoDe(d, email, mensagem, remetente) {
     const usuarios = new Map(all("Usuarios").map((u) => [u.email, u]));
     const partes = where("Participacoes", (x) => x.desafioId === d.id);
-    let n = 0;
-    for (const { email, timeId } of quem) {
-      const t = get("Times", timeId);
-      if (!t)
+    const timeId = partes.find((x) => x.email === email)?.timeId || "";
+    const t = timeId ? get("Times", timeId) : null;
+    if (!t)
+      return null;
+    const colegas = partes.filter((x) => x.timeId === timeId && x.email !== email).map((x) => ({ nome: usuarios.get(x.email)?.nome || x.email, departamento: usuarios.get(x.email)?.departamento || "" }));
+    const nome = (usuarios.get(email)?.nome || email).split(" ")[0];
+    return conteudoAvisoTime({ nome, desafio: d, time: { nome: t.nome, cor: t.cor }, colegas, mensagem: txt(mensagem, 1500), remetente, link: linkTime(timeId) });
+  }
+  function enviarAvisos(d, emails, mensagem, remetente) {
+    const partes = where("Participacoes", (x) => x.desafioId === d.id);
+    let enviados = 0;
+    const falhas = [];
+    for (const email of emails) {
+      const part = partes.find((x) => x.email === email);
+      const c = part && avisoDe(d, email, mensagem, remetente);
+      if (!part || !c)
         continue;
-      const colegas = partes.filter((x) => x.timeId === timeId && x.email !== email).map((x) => usuarios.get(x.email)?.nome || x.email);
       try {
-        mailConvite({ email, nome: usuarios.get(email)?.nome || email, desafio: d, time: { nome: t.nome, cor: t.cor }, colegas, link: linkTime(timeId) });
-        n++;
+        mailConvitePivotando(email, c);
+        update("Participacoes", part.id, { avisoTimeEm: nowIso() });
+        enviados++;
       } catch (e) {
-        audit("sistema", "erro_email", d.id, timeId, { email, erro: String(e) });
+        falhas.push(email);
+        audit("sistema", "erro_email", d.id, part.timeId, { email, erro: String(e) });
       }
     }
-    return n;
+    return { enviados, falhas };
   }
-  function api_desafioIniciar(id) {
+  function api_desafioIniciar(id, mensagem) {
     const p = requireFacilitador();
     return withLock(() => {
       const d = mustGet("Desafios", id, "Desafio");
@@ -1494,9 +1531,9 @@ ${APP_PUBLICO}`),
       if (!d.prazoGut)
         throw new Error("Defina ao menos o prazo da Matriz GUT.");
       update("Desafios", id, { status: "em_andamento", iniciadoEm: nowIso() });
-      const enviados = enviarConvites(d, partes.map((x) => ({ email: x.email, timeId: x.timeId })));
-      audit(p.email, "desafio_iniciado", id, "", { convites: enviados });
-      return { enviados, ...api_desafio(id) };
+      const { enviados, falhas } = enviarAvisos(d, partes.map((x) => x.email), mensagem || "", p.nome);
+      audit(p.email, "desafio_iniciado", id, "", { avisos: enviados, falhas: falhas.length });
+      return { enviados, falhas, ...api_desafio(id) };
     });
   }
   var TRANSICOES = {
@@ -1576,6 +1613,37 @@ ${APP_PUBLICO}`),
       return { enviados, falhas, ...api_desafio(desafioId) };
     });
   }
+  function api_avisoTimesPrevia(desafioId, mensagem) {
+    const p = requireFacilitador();
+    const d = mustGet("Desafios", desafioId, "Desafio");
+    const comTime = where("Participacoes", (x) => x.desafioId === desafioId && !!x.timeId);
+    const c = comTime.length ? avisoDe(d, comTime[0].email, mensagem, p.nome) : null;
+    if (!c)
+      throw new Error("Sorteie e salve os times antes de avisar.");
+    return {
+      assunto: c.assunto,
+      html: previaEmail(c),
+      total: comTime.length,
+      pendentes: comTime.filter((x) => !x.avisoTimeEm).length,
+      exemplo: usuarioPorEmail(comTime[0].email)?.nome || comTime[0].email
+    };
+  }
+  function api_avisoTimesEnviar(desafioId, mensagem, apenasPendentes) {
+    const p = requireFacilitador();
+    return withLock(() => {
+      const d = mustGet("Desafios", desafioId, "Desafio");
+      if (d.status === "rascunho")
+        throw new Error("Inicie o desafio para avisar os times.");
+      if (d.status === "encerrado")
+        throw new Error("Este desafio j\xE1 foi encerrado.");
+      const alvo = where("Participacoes", (x) => x.desafioId === desafioId && !!x.timeId && (!apenasPendentes || !x.avisoTimeEm));
+      if (!alvo.length)
+        throw new Error("Todos os participantes j\xE1 receberam o aviso do time.");
+      const r = enviarAvisos(d, alvo.map((x) => x.email), mensagem, p.nome);
+      audit(p.email, "aviso_times_enviado", desafioId, "", { enviados: r.enviados, falhas: r.falhas.length });
+      return { ...r, ...api_desafio(desafioId) };
+    });
+  }
 
   // src/server/painel.ts
   function api_boot() {
@@ -1595,7 +1663,7 @@ ${APP_PUBLICO}`),
     return {
       gut: where("GutItens", (r) => r.timeId === timeId).length,
       csd: where("CsdCards", (r) => r.timeId === timeId).length,
-      acoes: where("PlanoAcoes", (r) => r.timeId === timeId).length,
+      acoes: where("PlanoCards", (r) => r.timeId === timeId).length,
       ideias: where("Ideias", (r) => r.timeId === timeId).length
     };
   }
@@ -1841,6 +1909,7 @@ ${APP_PUBLICO}`),
       marcarOnline(timeId, p.email);
     const on = new Set(online(timeId, membros));
     const autor = (r) => ({ autor: r.autor, autorNome: nome(r.autor) });
+    const postits = (tabela) => where(tabela, (r) => r.timeId === timeId).sort((a, b) => Number(a.ordem) - Number(b.ordem) || a.criadoEm.localeCompare(b.criadoEm)).map((r) => ({ id: r.id, coluna: r.coluna, texto: r.texto, ...autor(r) }));
     const ideias = where("Ideias", (r) => r.timeId === timeId).sort((a, b) => Number(a.ordem) - Number(b.ordem) || a.criadoEm.localeCompare(b.criadoEm));
     const apoios = where("IdeiaApoios", (r) => r.timeId === timeId).sort((a, b) => a.criadoEm.localeCompare(b.criadoEm));
     return {
@@ -1851,8 +1920,8 @@ ${APP_PUBLICO}`),
       etapas: etapas(d, t, p, membro),
       membros: membros.map((e) => ({ email: e, nome: nome(e), departamento: usuarios.get(e)?.departamento || "", online: on.has(e) })),
       gut: where("GutItens", (r) => r.timeId === timeId).map((r) => ({ id: r.id, texto: r.texto, g: +r.g, u: +r.u, t: +r.t, grau: grau(+r.g, +r.u, +r.t), ...autor(r) })).sort((a, b) => b.grau - a.grau),
-      csd: where("CsdCards", (r) => r.timeId === timeId).sort((a, b) => Number(a.ordem) - Number(b.ordem) || a.criadoEm.localeCompare(b.criadoEm)).map((r) => ({ id: r.id, coluna: r.coluna, texto: r.texto, plano: r.plano === "1", ...autor(r) })),
-      plano: where("PlanoAcoes", (r) => r.timeId === timeId).sort((a, b) => a.criadoEm.localeCompare(b.criadoEm)).map((r) => ({ id: r.id, csdCardId: r.csdCardId, oQue: r.oQue, como: r.como, onde: r.onde, quando: r.quando, quem: r.quem, ...autor(r) })),
+      csd: postits("CsdCards"),
+      plano: postits("PlanoCards"),
       ideias: ideias.map((r) => ({
         id: r.id,
         titulo: r.titulo,
@@ -1862,7 +1931,35 @@ ${APP_PUBLICO}`),
       }))
     };
   }
+  function migrarPlanoAntigo(timeId) {
+    const antigas = where("PlanoAcoes", (r) => r.timeId === timeId).sort((a, b) => a.criadoEm.localeCompare(b.criadoEm));
+    if (!antigas.length)
+      return;
+    withLock(() => {
+      const ainda = where("PlanoAcoes", (r) => r.timeId === timeId).sort((a, b) => a.criadoEm.localeCompare(b.criadoEm));
+      if (!ainda.length)
+        return;
+      const novos = [];
+      for (const [campo, coluna] of [["oQue", "oque"], ["como", "como"], ["onde", "onde"], ["quando", "quando"], ["quem", "quem"]]) {
+        let ordem = where("PlanoCards", (r) => r.timeId === timeId && r.coluna === coluna).length;
+        for (const a of ainda) {
+          let texto = String(a[campo] || "").trim();
+          if (!texto)
+            continue;
+          if (campo === "quando" && /^\d{4}-\d{2}-\d{2}$/.test(texto))
+            texto = texto.slice(8, 10) + "/" + texto.slice(5, 7) + "/" + texto.slice(0, 4);
+          const quando = a.criadoEm || nowIso();
+          novos.push({ id: uuid(), timeId, coluna, texto: texto.slice(0, 300), ordem: String(ordem++), autor: a.autor, criadoEm: quando, atualizadoEm: a.atualizadoEm || quando });
+        }
+      }
+      if (novos.length)
+        insert("PlanoCards", novos);
+      remove("PlanoAcoes", (r) => r.timeId === timeId);
+    });
+  }
   function api_time(timeId) {
+    requireTime(timeId, "ver");
+    migrarPlanoAntigo(timeId);
     return estado(timeId);
   }
   function api_timePoll(timeId, versao) {
@@ -1875,8 +1972,10 @@ ${APP_PUBLICO}`),
     const membros = where("Participacoes", (x) => x.timeId === timeId).map((x) => x.email);
     return { mudou: false, online: online(timeId, membros) };
   }
-  var COLUNAS = ["certeza", "suposicao", "duvida"];
-  var CAMPOS_PLANO = ["oQue", "como", "onde", "quando", "quem"];
+  var QUADROS = {
+    csd: { tabela: "CsdCards", colunas: ["certeza", "suposicao", "duvida"] },
+    plano: { tabela: "PlanoCards", colunas: ["oque", "como", "onde", "quando", "quem"] }
+  };
   function etapaDaAcao(acao, dados) {
     if (acao === "etapa.concluir")
       return dados.etapa;
@@ -1928,65 +2027,44 @@ ${APP_PUBLICO}`),
           detalhe = meu("GutItens", dados.id).texto;
           update("Times", timeId, { microproblemaId: dados.id });
           break;
-        case "csd.salvar": {
+        case "csd.salvar":
+        case "plano.salvar": {
+          const { tabela, colunas } = QUADROS[etapa];
           const texto = txt(dados.texto, 300);
           if (!texto)
             throw new Error("Escreva o post-it.");
           if (dados.id) {
-            meu("CsdCards", dados.id);
-            update("CsdCards", dados.id, { texto, atualizadoEm: agora });
+            meu(tabela, dados.id);
+            update(tabela, dados.id, { texto, atualizadoEm: agora });
           } else {
-            const coluna = COLUNAS.includes(dados.coluna) ? dados.coluna : "certeza";
-            const ordem = where("CsdCards", (r) => r.timeId === timeId && r.coluna === coluna).length;
-            insert("CsdCards", [{ id: uuid(), timeId, coluna, texto, plano: "", ordem: String(ordem), autor: p.email, criadoEm: agora, atualizadoEm: agora }]);
+            const coluna = colunas.includes(dados.coluna) ? dados.coluna : colunas[0];
+            const ordem = where(tabela, (r) => r.timeId === timeId && r.coluna === coluna).length;
+            insert(tabela, [{ id: uuid(), timeId, coluna, texto, ordem: String(ordem), autor: p.email, criadoEm: agora, atualizadoEm: agora }]);
           }
           detalhe = texto;
           break;
         }
-        case "csd.plano": {
-          const c = meu("CsdCards", dados.id);
-          if (c.coluna === "certeza" && dados.plano)
-            throw new Error("S\xF3 suposi\xE7\xF5es e d\xFAvidas v\xE3o para o Plano de A\xE7\xE3o.");
-          update("CsdCards", c.id, { plano: dados.plano ? "1" : "" });
-          detalhe = c.texto;
-          break;
-        }
-        case "csd.mover": {
-          const cards = new Map(where("CsdCards", (r) => r.timeId === timeId).map((r) => [r.id, r]));
-          for (const col of COLUNAS) {
+        case "csd.mover":
+        case "plano.mover": {
+          const { tabela, colunas } = QUADROS[etapa];
+          const cards = new Map(where(tabela, (r) => r.timeId === timeId).map((r) => [r.id, r]));
+          for (const col of colunas) {
             (dados.colunas?.[col] || []).forEach((id, i) => {
               const c = cards.get(id);
               if (!c || c.coluna === col && c.ordem === String(i))
                 return;
-              update("CsdCards", id, { coluna: col, ordem: String(i), plano: col === "certeza" ? "" : c.plano });
+              update(tabela, id, { coluna: col, ordem: String(i) });
             });
           }
           break;
         }
         case "csd.remover":
-          meu("CsdCards", dados.id);
-          remove("CsdCards", (r) => r.id === dados.id);
-          break;
-        case "plano.salvar": {
-          const campos = { atualizadoEm: agora };
-          for (const k of CAMPOS_PLANO)
-            if (k in dados)
-              campos[k] = txt(dados[k], 500);
-          let id = dados.id ? meu("PlanoAcoes", dados.id).id : "";
-          if (!id && dados.csdCardId) {
-            meu("CsdCards", dados.csdCardId);
-            id = where("PlanoAcoes", (r) => r.timeId === timeId && r.csdCardId === dados.csdCardId)[0]?.id || "";
-          }
-          if (id)
-            update("PlanoAcoes", id, campos);
-          else
-            insert("PlanoAcoes", [{ id: uuid(), timeId, csdCardId: dados.csdCardId || "", autor: p.email, criadoEm: agora, ...campos }]);
+        case "plano.remover": {
+          const { tabela } = QUADROS[etapa];
+          meu(tabela, dados.id);
+          remove(tabela, (r) => r.id === dados.id);
           break;
         }
-        case "plano.remover":
-          meu("PlanoAcoes", dados.id);
-          remove("PlanoAcoes", (r) => r.id === dados.id);
-          break;
         case "ideia.salvar": {
           const campos = { titulo: txt(dados.titulo, 160), descricao: txt(dados.descricao, 600), atualizadoEm: agora };
           if (!campos.titulo)
@@ -2038,7 +2116,7 @@ ${APP_PUBLICO}`),
           remove("IdeiaApoios", (r) => r.id === dados.id);
           break;
         case "etapa.concluir": {
-          const tabela = { gut: "GutItens", csd: "CsdCards", plano: "PlanoAcoes", ideias: "Ideias" }[etapa];
+          const tabela = { gut: "GutItens", csd: "CsdCards", plano: "PlanoCards", ideias: "Ideias" }[etapa];
           if (!where(tabela, (r) => r.timeId === timeId).length)
             throw new Error("Preencha a etapa antes de concluir.");
           if (etapa === "gut" && !mustGet("Times", timeId).microproblemaId)
@@ -2052,8 +2130,7 @@ ${APP_PUBLICO}`),
           throw new Error("A\xE7\xE3o desconhecida.");
       }
       novaVersao(t);
-      if (!(acao === "plano.salvar" && dados.id))
-        audit(p.email, acao, d.id, timeId, detalhe ? { etapa, texto: detalhe.slice(0, 80) } : { etapa });
+      audit(p.email, acao, d.id, timeId, detalhe ? { etapa, texto: detalhe.slice(0, 80) } : { etapa });
       return estado(timeId);
     });
   }
@@ -2111,9 +2188,9 @@ function semearDemo(S, mock) {
     acaoComo(m[0], t.id, 'gut.escolher', { id: s.gut[0].id });
     acaoComo(m[0], t.id, 'etapa.concluir', { etapa: 'gut' });
     s = acaoComo(m[2], t.id, 'csd.salvar', { coluna: 'duvida', texto: duvida });
-    acaoComo(m[2], t.id, 'csd.plano', { id: s.csd[0].id, plano: true });
     acaoComo(m[2], t.id, 'etapa.concluir', { etapa: 'csd' });
-    acaoComo(m[3], t.id, 'plano.salvar', { csdCardId: s.csd[0].id, oQue: acaoTxt, quem: 'RH', quando: dia(-20) });
+    acaoComo(m[3], t.id, 'plano.salvar', { coluna: 'oque', texto: acaoTxt });
+    acaoComo(m[3], t.id, 'plano.salvar', { coluna: 'quem', texto: 'RH' });
     acaoComo(m[3], t.id, 'etapa.concluir', { etapa: 'plano' });
     ideias.forEach((ti, i) => acaoComo(m[i % m.length], t.id, 'ideia.salvar', { titulo: ti, descricao: '' }));
     acaoComo(m[0], t.id, 'etapa.concluir', { etapa: 'ideias' });
@@ -2151,15 +2228,15 @@ function semearDemo(S, mock) {
   [['certeza', 'Migração manual leva em média 12 dias', 1], ['certeza', '68% dos chamados no 1º mês são sobre dados importados', 3], ['certeza', 'Cada cliente envia planilhas em formatos diferentes', 2],
     ['suposicao', 'Um template padrão de importação reduziria metade do retrabalho', 0], ['suposicao', 'Clientes topariam validar os dados antes do go-live', 4], ['suposicao', 'Dá para automatizar 80% dos campos', 1],
     ['duvida', 'Quais sistemas de origem são mais comuns?', 3], ['duvida', 'Quanto custa um importador automático?', 4]].forEach(([coluna, texto, i]) => (s = acaoComo(A[i], aur.id, 'csd.salvar', { coluna, texto })));
-  const card = (txt) => s.csd.find((c) => c.texto.startsWith(txt)).id;
-  const planos = [
-    ['Um template', { oQue: 'Criar template piloto de importação', como: 'Mapear as 3 últimas implantações e unificar os campos', onde: 'Drive da Implantação', quando: dia(5), quem: 'Elisa Prado' }],
-    ['Dá para', { oQue: 'Medir quantos campos podem ser automatizados', como: 'Amostra de 5 clientes com o time de Desenvolvimento', onde: 'Ambiente de homologação', quando: dia(6), quem: 'Carla Mendes' }],
-    ['Quais sistemas', { oQue: 'Levantar os sistemas de origem dos clientes', como: 'Consulta no CRM + 10 entrevistas rápidas', onde: 'CRM / Teams', quando: dia(3), quem: 'Ana Souza' }],
-  ];
-  planos.forEach(([txt]) => acaoComo(A[0], aur.id, 'csd.plano', { id: card(txt), plano: true }));
   acaoComo(A[3], aur.id, 'etapa.concluir', { etapa: 'csd' });
-  planos.forEach(([txt, dados], i) => acaoComo(A[i + 1], aur.id, 'plano.salvar', { csdCardId: card(txt), ...dados }));
+  const ddmm = (d) => dia(d).slice(8, 10) + '/' + dia(d).slice(5, 7);
+  // Plano de Ação: post-its livres nas 5 colunas
+  [['oque', 'Criar template piloto de importação', 1], ['oque', 'Medir quantos campos dá para automatizar', 4], ['oque', 'Levantar os sistemas de origem dos clientes', 3],
+    ['como', 'Mapear as 3 últimas implantações e unificar os campos', 1], ['como', 'Consulta no CRM + 10 entrevistas rápidas', 3],
+    ['onde', 'Drive da Implantação', 1], ['onde', 'Ambiente de homologação', 4],
+    ['quando', `Piloto até ${ddmm(5)}`, 2], ['quando', `Entrevistas até ${ddmm(3)}`, 3],
+    ['quem', 'Elisa Prado (template)', 1], ['quem', 'Carla Mendes + Desenvolvimento', 4], ['quem', 'Ana Souza (CRM)', 0]]
+    .forEach(([coluna, texto, i]) => acaoComo(A[i], aur.id, 'plano.salvar', { coluna, texto }));
   acaoComo(A[2], aur.id, 'etapa.concluir', { etapa: 'plano' });
   [['Portal de autoatendimento para importação', 'O cliente sobe a planilha, o sistema valida e aponta os erros na hora.', 1, ['Validação automática dos campos', 'Barra de progresso para o cliente']],
     ['Templates de importação por segmento', 'Kit pronto por tipo de cliente, enviado já junto com o contrato.', 0, ['Vídeo curto explicando cada template']],
@@ -2187,7 +2264,6 @@ function semearDemo(S, mock) {
   acaoComo(C[1], com.id, 'etapa.concluir', { etapa: 'gut' });
   s = acaoComo(C[2], com.id, 'csd.salvar', { coluna: 'suposicao', texto: 'Treinar desde a 1ª semana reduz chamados' });
   acaoComo(C[3], com.id, 'csd.salvar', { coluna: 'certeza', texto: 'Treinamento hoje é feito em 2 dias seguidos' });
-  acaoComo(C[3], com.id, 'csd.plano', { id: s.csd[0].id, plano: true });
   acaoComo(C[4], com.id, 'etapa.concluir', { etapa: 'csd' });
 
   // Órbita: começando a Matriz GUT
@@ -2226,8 +2302,8 @@ function criarSimulador(S, mock, dados) {
       ['certeza', 'Implantações com checklist atrasam menos'], ['duvida', 'Qual etapa concentra mais retrabalho?'],
     ],
     plano: [
-      { oQue: 'Montar checklist de kickoff', como: 'Oficina de 1h com a Implantação', onde: 'Sala de reuniões', quem: 'Coordenação' },
-      { oQue: 'Pesquisa rápida com 5 clientes', como: 'Formulário de 3 perguntas', onde: 'E-mail', quem: 'Comercial' },
+      ['oque', 'Montar checklist de kickoff'], ['como', 'Oficina de 1h com a Implantação'], ['onde', 'Sala de reuniões'], ['quem', 'Coordenação'],
+      ['oque', 'Pesquisa rápida com 5 clientes'], ['como', 'Formulário de 3 perguntas'], ['quando', 'Na próxima sprint'], ['quem', 'Comercial'],
     ],
     ideias: [['Mapa da jornada do cliente na implantação', 'Linha do tempo visual compartilhada com o cliente.'], ['Padrinho de implantação', 'Um veterano acompanha cada consultor novo.']],
     apoios: ['Começar com um piloto de 2 clientes', 'Medir o tempo antes e depois', 'Usar o que já existe no CRM', 'Pedir feedback no 1º mês', 'Integrar com o portal do cliente', 'Envolver o suporte desde o início'],
@@ -2265,7 +2341,8 @@ function criarSimulador(S, mock, dados) {
         const [coluna, texto] = proximo(k + 'csd', FRASES.csd);
         S.api_timeAcao(t.id, 'csd.salvar', { coluna, texto });
       } else if (etapa === 'plano') {
-        S.api_timeAcao(t.id, 'plano.salvar', { ...proximo(k + 'pl', FRASES.plano) });
+        const [coluna, texto] = proximo(k + 'pl', FRASES.plano);
+        S.api_timeAcao(t.id, 'plano.salvar', { coluna, texto });
       } else {
         const [titulo, descricao] = proximo(k + 'id', FRASES.ideias);
         S.api_timeAcao(t.id, 'ideia.salvar', { titulo, descricao });
@@ -2367,7 +2444,7 @@ function __demoIniciarUI() {
     ['fac', () => `/desafio/${d().desafio2}/andamento`, 'Acompanhamento e prazos', 'Cada etapa tem prazo. Quando vence, fica só leitura, e o facilitador pode reabrir para um time. Na véspera, sai um lembrete por e-mail.'],
     ['part', () => `/time/${d().aurora}/gut`, 'Matriz GUT', 'O time lista os microproblemas e dá notas de Gravidade, Urgência e Tendência. O mapa de calor mostra o mais crítico, e o time escolhe 👑 qual levar adiante.'],
     ['part', () => `/time/${d().aurora}/csd`, 'Matriz CSD', 'Post-its de Certezas, Suposições e Dúvidas sobre o microproblema. Dá para arrastar entre as colunas; o que precisa ser validado vai para o Plano.'],
-    ['part', () => `/time/${d().aurora}/plano`, 'Plano de Ação', 'Cada suposição ou dúvida vira uma ação concreta: o quê, como, onde, quando e quem.'],
+    ['part', () => `/time/${d().aurora}/plano`, 'Plano de Ação', 'Quadro livre em 5 colunas, como a CSD: o time escolhe o que leva para o plano — o que, como, onde, quando e quem.'],
     ['part', () => `/time/${d().aurora}/priorizar`, 'Brainstorm round-robin', 'Cada pessoa dá uma ideia principal e os colegas reforçam com ideias de apoio. Depois o time arrasta para definir a ordem de importância.'],
     ['fac', () => `/painel/${d().desafio2}`, 'Painel ao vivo', 'No telão, o facilitador vê todos os times avançando em tempo real. Repare nos colegas trabalhando agora mesmo.'],
     ['fac', () => `/apresentar/${d().aurora}`, 'Pitch', 'Os slides do time são montados automaticamente para a apresentação ao vivo. Use as setas ← → ou clique no slide.'],
@@ -2751,7 +2828,7 @@ const ESC_GUT = {
   t: ['Não vai mudar nada', 'Piora em longo prazo', 'Piora em médio prazo', 'Piora em curto prazo', 'Piora rapidamente'],
 };
 const COLS_CSD = [['certeza', 'Certezas', 'o que já sabemos'], ['suposicao', 'Suposições', 'o que supomos, mas precisamos confirmar'], ['duvida', 'Dúvidas', 'o que precisamos descobrir']];
-const WS = [['oQue', 'O quê?', 'Atividade a realizar'], ['como', 'Como?', 'De que forma'], ['onde', 'Onde?', 'Local, sistema ou área'], ['quando', 'Quando?', ''], ['quem', 'Quem?', 'Responsável']];
+const COLS_PLANO = [['oque', 'O que?', 'o que vamos fazer'], ['como', 'Como?', 'de que forma'], ['onde', 'Onde?', 'local, sistema ou área'], ['quando', 'Quando?', 'prazo ou momento'], ['quem', 'Quem?', 'responsáveis']];
 const QC = ['#ffb000', '#3b9ff0', '#5520c4', '#41c463', '#ec2f8f', '#103C9B', '#0d9488', '#ea580c'];
 const CONQ = { gut: ['🎯', 'Problema na mira!', 'Matriz GUT concluída'], csd: ['🔍', 'Detetives da verdade', 'Matriz CSD concluída'], plano: ['🗺️', 'Rota traçada', 'Plano de Ação concluído'], ideias: ['💡', 'Fábrica de ideias', 'Brainstorm concluído'] };
 const grauCor = (v) => (v >= 100 ? 'var(--g5)' : v >= 48 ? 'var(--g4)' : v >= 18 ? 'var(--g3)' : v >= 6 ? 'var(--g2)' : 'var(--g1)');
@@ -3073,110 +3150,72 @@ function desenharMapa() {
   svg.innerHTML = s;
 }
 
-/* ---------------------------- CSD ---------------------------- */
-function desenharCSD(el, aviso) {
-  const ed = T.s.etapas.csd.editavel;
+/* ---------------------------- QUADROS DE POST-ITS (CSD e Plano) ---------------------------- */
+// Os dois instrumentos funcionam igual: colunas coloridas, post-its livres, arrastar entre colunas,
+// dois cliques para editar. Muda só a etapa (csd | plano), as colunas e os textos.
+function desenharQuadro(el, aviso, etapa, { titulo, ajuda, cols, classe }) {
+  const ed = T.s.etapas[etapa].editavel;
   const micro = T.s.gut.find((g) => g.id === T.s.time.microproblemaId);
+  const cor = etapa === 'csd' ? 'c' : 'p';
   el.innerHTML = `${aviso}
-    <div class="inst-head"><h2>Matriz CSD</h2><span class="chip">Definir</span><span class="muted">${ed ? 'Arraste os post-its entre as colunas. Dois cliques para editar. Marque "→ Plano" no que precisa virar ação.' : ''}</span></div>
+    <div class="inst-head"><h2>${titulo}</h2><span class="chip">Definir</span><span class="muted">${ed ? ajuda : ''}</span></div>
     <div class="foco"><span style="font-size:24px">👑</span><div><div class="k">Microproblema escolhido</div><b>${esc(micro ? micro.texto : '—')}</b></div></div>
-    <div class="csd">${COLS_CSD.map(([k, t, s]) => {
-      const cards = T.s.csd.filter((c) => c.coluna === k);
-      return `<div class="coluna" style="--cc:var(--c-${k})"><div class="coluna-head"><h3>${t}<span>${cards.length}</span></h3><p>${s}</p></div>
-        <div class="notas" data-col="${k}">${cards.map((c) => notaCSD(c, ed)).join('')}</div>
+    <div class="csd ${classe || ''}">${cols.map(([k, t, sub]) => {
+      const cards = T.s[etapa].filter((c) => c.coluna === k);
+      return `<div class="coluna" style="--cc:var(--${cor}-${k})"><div class="coluna-head"><h3>${t}<span>${cards.length}</span></h3><p>${sub}</p></div>
+        <div class="notas" data-col="${k}">${cards.map((c) => notaQuadro(c, ed)).join('')}</div>
         <form class="add-nota so-edicao" data-col="${k}"><input maxlength="300" placeholder="+ Novo post-it"></form></div>`;
     }).join('')}</div>
-    ${rodapeEtapa('csd')}`;
-  if (ed) $$('.notas', el).forEach((n) => Sortable.create(n, { group: 'csd', animation: 220, ghostClass: 'sortable-ghost', filter: '.x, .plano-btn', preventOnFilter: false, onEnd: moverCSD }));
+    ${rodapeEtapa(etapa)}`;
+  const mover = () => {
+    const colunas = {};
+    cols.forEach(([k]) => (colunas[k] = $$(`.notas[data-col="${k}"] .nota`, el).map((n) => n.dataset.id)));
+    for (const [k, ids] of Object.entries(colunas)) ids.forEach((id) => { const c = T.s[etapa].find((x) => x.id === id); if (c) c.coluna = k; });
+    T.s[etapa].sort((a, b) => colunas[a.coluna].indexOf(a.id) - colunas[b.coluna].indexOf(b.id));
+    enviar(etapa + '.mover', { colunas });
+    desenharInst();
+  };
+  if (ed) $$('.notas', el).forEach((n) => Sortable.create(n, { group: etapa, animation: 220, ghostClass: 'sortable-ghost', filter: '.x', preventOnFilter: false, onEnd: mover }));
   $$('.add-nota', el).forEach((f) => (f.onsubmit = (ev) => {
     ev.preventDefault();
     const i = f.querySelector('input');
     const texto = i.value.trim();
     if (!texto) return;
     i.value = '';
-    enviar('csd.salvar', { coluna: f.dataset.col, texto });
+    enviar(etapa + '.salvar', { coluna: f.dataset.col, texto });
   }));
-  const csd = $('.csd', el);
-  csd.onclick = (ev) => {
-    if (!ed) return;
+  const quadro = $('.csd', el);
+  quadro.onclick = (ev) => {
+    if (!ed || !ev.target.closest('.x')) return;
     const n = ev.target.closest('.nota');
-    if (!n) return;
-    const c = T.s.csd.find((x) => x.id === n.dataset.id);
-    if (ev.target.closest('.plano-btn')) {
-      c.plano = !c.plano;
-      ev.target.closest('.plano-btn').classList.toggle('on', c.plano);
-      if (c.plano) { n.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08) rotate(3deg)' }, { transform: 'scale(1)' }], { duration: 400 }); toast('🗺️ Enviado para o Plano de Ação'); }
-      enviar('csd.plano', { id: c.id, plano: c.plano });
-    } else if (ev.target.closest('.x')) {
-      dialogo({ titulo: 'Remover post-it?', texto: c.texto, ok: 'Remover', perigo: true }).then((ok) => ok && enviar('csd.remover', { id: c.id }));
-    }
+    const c = n && T.s[etapa].find((x) => x.id === n.dataset.id);
+    if (c) dialogo({ titulo: 'Remover post-it?', texto: c.texto, ok: 'Remover', perigo: true }).then((ok) => ok && enviar(etapa + '.remover', { id: c.id }));
   };
-  csd.ondblclick = async (ev) => {
+  quadro.ondblclick = async (ev) => {
     if (!ed) return;
     const n = ev.target.closest('.nota');
-    if (!n) return;
-    const c = T.s.csd.find((x) => x.id === n.dataset.id);
+    const c = n && T.s[etapa].find((x) => x.id === n.dataset.id);
+    if (!c) return;
     const novo = await dialogo({ titulo: 'Editar post-it', campo: 'Texto', valor: c.texto, ok: 'Salvar' });
-    if (novo && novo.trim() && novo.trim() !== c.texto) enviar('csd.salvar', { id: c.id, texto: novo.trim() });
+    if (novo && novo.trim() && novo.trim() !== c.texto) enviar(etapa + '.salvar', { id: c.id, texto: novo.trim() });
   };
 }
-function notaCSD(c, ed) {
+function notaQuadro(c, ed) {
   return `<div class="nota" data-id="${c.id}" style="--nc:var(--n-${c.coluna});--rot:${rot()}">${esc(c.texto)}
-    <div class="rodape"><span style="display:flex;gap:6px;align-items:center">${av(c.autorNome, 'mini')}${esc(primeiro(c.autorNome))}</span>
-    ${c.coluna !== 'certeza' ? (ed ? `<button class="plano-btn ${c.plano ? 'on' : ''}" type="button">→ Plano</button>` : c.plano ? '<span class="plano-btn on">→ Plano</span>' : '') : ''}</div>
+    <div class="rodape"><span style="display:flex;gap:6px;align-items:center">${av(c.autorNome, 'mini')}${esc(primeiro(c.autorNome))}</span></div>
     ${ed ? '<button class="x" type="button" title="Remover">×</button>' : ''}</div>`;
 }
-function moverCSD() {
-  const colunas = {};
-  COLS_CSD.forEach(([k]) => (colunas[k] = $$(`.notas[data-col="${k}"] .nota`).map((n) => n.dataset.id)));
-  for (const [k, ids] of Object.entries(colunas)) ids.forEach((id) => { const c = T.s.csd.find((x) => x.id === id); if (c) { c.coluna = k; if (k === 'certeza') c.plano = false; } });
-  T.s.csd.sort((a, b) => colunas[a.coluna].indexOf(a.id) - colunas[b.coluna].indexOf(b.id));
-  enviar('csd.mover', { colunas });
-  desenharInst();
+
+function desenharCSD(el, aviso) {
+  desenharQuadro(el, aviso, 'csd', { titulo: 'Matriz CSD', cols: COLS_CSD, ajuda: 'Arraste os post-its entre as colunas. Dois cliques para editar.' });
 }
 
 /* ---------------------------- PLANO ---------------------------- */
 function desenharPlano(el, aviso) {
-  const ed = T.s.etapas.plano.editavel;
-  const marcados = T.s.csd.filter((c) => c.plano);
-  const itens = marcados.map((card) => ({ card, a: T.s.plano.find((p) => p.csdCardId === card.id) || null }));
-  T.s.plano.filter((p) => !marcados.some((c) => c.id === p.csdCardId)).forEach((a) => itens.push({ card: T.s.csd.find((c) => c.id === a.csdCardId) || null, a }));
-  const rotulo = { suposicao: 'Suposição', duvida: 'Dúvida', certeza: 'Certeza' };
-  el.innerHTML = `${aviso}
-    <div class="inst-head"><h2>Plano de Ação</h2><span class="chip">Definir</span><span class="muted">Cada suposição ou dúvida marcada na CSD vira uma ação.</span><span class="espaco"></span>
-      <button class="btn sec peq so-edicao" id="add-plano">+ Ação avulsa</button></div>
-    <datalist id="dl-membros">${T.s.membros.map((m) => `<option value="${esc(m.nome)}">`).join('')}</datalist>
-    <div class="planos">${itens.length ? itens.map(({ card, a }) => `<div class="plano" data-card="${card ? card.id : ''}" data-id="${a ? a.id : ''}">
-      <div class="origem"><span class="tag" style="background:${card ? `var(--c-${card.coluna})` : 'var(--muted)'}">${card ? rotulo[card.coluna] : 'Avulsa'}</span><span>${esc(card ? card.texto : 'Ação proposta pelo time')}</span></div>
-      ${WS.map(([k, l, ph]) => `<div class="w" style="--wc:var(--p-${k.toLowerCase()})"><div class="k">${l}</div>${ed
-        ? k === 'quando' ? `<input type="date" data-campo="${k}" value="${esc(a ? a[k] : '')}">`
-        : k === 'quem' ? `<input list="dl-membros" data-campo="${k}" maxlength="200" placeholder="${ph}…" value="${esc(a ? a[k] : '')}">`
-        : `<textarea rows="1" data-campo="${k}" maxlength="500" placeholder="${ph}…">${esc(a ? a[k] : '')}</textarea>`
-        : `<div class="v-ro">${esc(a ? (k === 'quando' ? fmtDia(a[k]) : a[k]) || '—' : '—')}</div>`}</div>`).join('')}
-      ${ed && a && !card ? '<button class="x" title="Remover">×</button>' : ''}
-    </div>`).join('') : '<div class="card vazio"><div class="ico">🗺️</div>Nenhum post-it marcado com "→ Plano" na Matriz CSD.<br>Volte à CSD e marque as suposições e dúvidas que precisam virar ação.</div>'}</div>
-    ${rodapeEtapa('plano')}`;
-  const ajustar = (t) => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; };
-  $$('.planos textarea', el).forEach(ajustar);
-  el.oninput = (ev) => ev.target.matches('textarea') && ajustar(ev.target);
-  el.onchange = (ev) => {
-    const inp = ev.target.closest('[data-campo]');
-    if (!inp) return;
-    const card = inp.closest('.plano');
-    const dados = { [inp.dataset.campo]: inp.value };
-    if (card.dataset.id) dados.id = card.dataset.id; else if (card.dataset.card) dados.csdCardId = card.dataset.card;
-    enviar('plano.salvar', dados).then((s) => {
-      if (!s) return;
-      const salvo = s.plano.find((p) => (dados.id ? p.id === dados.id : p.csdCardId === dados.csdCardId));
-      if (salvo && card.isConnected) card.dataset.id = salvo.id;
-    });
-  };
-  const add = $('#add-plano', el);
-  if (add) add.onclick = () => enviar('plano.salvar', { oQue: '' }).then((s) => s && toast('➕ Ação avulsa criada'));
-  el.onclick = (ev) => {
-    const x = ev.target.closest('.plano .x');
-    if (x) dialogo({ titulo: 'Remover esta ação?', ok: 'Remover', perigo: true }).then((ok) => ok && enviar('plano.remover', { id: x.closest('.plano').dataset.id }));
-  };
+  desenharQuadro(el, aviso, 'plano', {
+    titulo: 'Plano de Ação', cols: COLS_PLANO, classe: 'quadro5',
+    ajuda: 'Coloquem nas colunas o que o time quer levar para o plano. Arraste entre as colunas; dois cliques para editar.',
+  });
 }
 
 /* ---------------------------- BRAINSTORM ---------------------------- */
@@ -3437,37 +3476,101 @@ function cartaoConvite() {
     <button class="btn ${pend ? 'grad' : 'sec'}" id="abrir-convite">${pend ? '✉️ Ver prévia e enviar' : '✉️ Reenviar convite'}</button></div>`;
 }
 
-async function abrirConvite() {
-  const d = D.d.desafio;
+function abrirConvite() {
   const pend = D.d.participantes.filter((p) => !p.convidadoEm).length;
-  const m = modal(`<h2>✉️ Convite para o Pivotando</h2>
+  return modalEmail({
+    titulo: '✉️ Convite para o Pivotando',
+    exemploMsg: 'Ex.: Pessoal, conto com vocês no nosso primeiro Pivotando! O encontro será na sala de treinamento, às 14h.',
+    pend, total: D.d.participantes.length,
+    previa: (msg) => gs('api_convitePrevia', D.d.desafio.id, msg),
+    enviar: (msg, soPend) => gs('api_conviteEnviar', D.d.desafio.id, msg, soPend),
+    feito: (r) => conquista('✉️', 'Convites enviados!', `${r.enviados} pessoa(s) convidada(s)${r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`),
+  });
+}
+
+/* ---------- aviso dos times (depois do sorteio): cada um recebe o link da sala do seu time ---------- */
+function cartaoAvisoTimes() {
+  const st = D.d.desafio.status;
+  if (st !== 'em_andamento' && st !== 'apresentacao') return '';
+  const ps = D.d.participantes.filter((p) => p.timeId);
+  if (!ps.length) return '';
+  const ok = ps.filter((p) => p.avisoTimeEm).length;
+  const pend = ps.length - ok;
+  const ultimo = ps.map((p) => p.avisoTimeEm).filter(Boolean).sort().pop();
+  return `<div class="card convite-card" style="margin-bottom:16px">
+    <div class="convite-ico">📣</div>
+    <div style="flex:1;min-width:220px"><b style="font-size:16px">Aviso dos times</b>
+      <div class="muted">${ok === 0 ? 'Ninguém recebeu o aviso do time ainda.'
+        : pend ? `${ok} de ${ps.length} já receberam · <b>${pend} ainda não</b>.` : `Todos os ${ps.length} participantes já receberam ✓`}
+        ${ultimo ? `<span class="small"> Último envio: ${fmtDataHora(ultimo)}.</span>` : ''}</div>
+      <div class="convite-barra"><i style="width:${Math.round((ok / ps.length) * 100)}%"></i></div>
+      <div class="small muted">Cada pessoa recebe o seu time, os colegas, os prazos e o link direto para a sala do time.</div></div>
+    <button class="btn ${pend ? 'grad' : 'sec'}" id="abrir-aviso">${pend ? '📣 Ver prévia e enviar' : '📣 Reenviar aviso'}</button></div>`;
+}
+
+const EXEMPLO_AVISO = 'Ex.: Times formados! Combinem a primeira reunião ainda esta semana. Boa sorte a todos! 🚀';
+
+function abrirAvisoTimes() {
+  const ps = D.d.participantes.filter((p) => p.timeId);
+  return modalEmail({
+    titulo: '📣 Aviso dos times',
+    exemploMsg: EXEMPLO_AVISO,
+    pend: ps.filter((p) => !p.avisoTimeEm).length, total: ps.length,
+    previa: (msg) => gs('api_avisoTimesPrevia', D.d.desafio.id, msg),
+    enviar: (msg, soPend) => gs('api_avisoTimesEnviar', D.d.desafio.id, msg, soPend),
+    feito: (r) => conquista('📣', 'Times avisados!', `${r.enviados} pessoa(s) receberam o link da sala${r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`),
+  });
+}
+
+/** Ao iniciar: a mesma prévia; o aviso vai para todos junto com o início do desafio. */
+function abrirIniciar() {
+  const n = D.d.participantes.length;
+  return modalEmail({
+    titulo: '🚀 Iniciar o desafio e avisar os times',
+    exemploMsg: EXEMPLO_AVISO,
+    pend: n, total: n, semEscolha: true,
+    rotulo: (k) => `🚀 Iniciar e enviar para ${k} pessoa${k === 1 ? '' : 's'}`,
+    nota: 'Ao iniciar, o desafio sai do rascunho e cada participante recebe este e-mail com o link direto para a sala do seu time.',
+    previa: (msg) => gs('api_avisoTimesPrevia', D.d.desafio.id, msg),
+    enviar: (msg) => gs('api_desafioIniciar', D.d.desafio.id, msg),
+    feito: (r) => conquista('🚀', 'Desafio lançado!', `${r.enviados} pessoa(s) receberam o link da sala do time${r.falhas && r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`),
+  });
+}
+
+/**
+ * Modal de e-mail com mensagem pessoal, prévia ao vivo e escolha de quem recebe.
+ * Serve ao convite (antes do sorteio), ao aviso dos times e ao início do desafio.
+ */
+async function modalEmail(o) {
+  const { pend, total } = o;
+  const m = modal(`<h2>${o.titulo}</h2>
     <div class="convite-grid">
       <div>
         <label class="campo">Mensagem pessoal <small>(opcional, aparece em destaque no e-mail)</small></label>
-        <textarea id="cv-msg" rows="5" maxlength="1500" placeholder="Ex.: Pessoal, conto com vocês no nosso primeiro Pivotando! O encontro será na sala de treinamento, às 14h."></textarea>
-        <label class="campo">Enviar para</label>
+        <textarea id="cv-msg" rows="5" maxlength="1500" placeholder="${esc(o.exemploMsg)}"></textarea>
+        ${o.semEscolha ? `<p class="small muted" style="margin-top:12px">${esc(o.nota || '')}</p>` : `<label class="campo">Enviar para</label>
         <label class="sel-pessoa ${pend ? 'on' : ''}" style="cursor:pointer"><input type="radio" name="cv-quem" value="pend" ${pend ? 'checked' : 'disabled'}>
           <div><b>Quem ainda não recebeu</b><div class="small muted">${pend} pessoa(s)</div></div></label>
         <label class="sel-pessoa ${pend ? '' : 'on'}" style="cursor:pointer"><input type="radio" name="cv-quem" value="todos" ${pend ? '' : 'checked'}>
-          <div><b>Todos os participantes</b><div class="small muted">${D.d.participantes.length} pessoa(s) · reenvia a quem já recebeu</div></div></label>
+          <div><b>Todos os participantes</b><div class="small muted">${total} pessoa(s) · reenvia a quem já recebeu</div></div></label>`}
         <p class="small muted" style="margin-top:12px">Assunto: <b id="cv-assunto">…</b></p>
       </div>
       <div><div class="small muted" style="margin:14px 0 6px">Prévia <span id="cv-exemplo"></span></div>
         <iframe id="cv-previa" class="convite-previa" title="Prévia do e-mail" sandbox></iframe></div>
     </div>
-    <div class="acoes-form"><button class="btn sec" id="cv-cancelar">Cancelar</button><button class="btn grad" id="cv-enviar">Enviar convite</button></div>`, 980);
+    <div class="acoes-form"><button class="btn sec" id="cv-cancelar">Cancelar</button><button class="btn grad" id="cv-enviar">Enviar</button></div>`, 980);
   const msg = $('#cv-msg', m.el);
-  const quem = () => $('input[name="cv-quem"]:checked', m.el).value;
+  const quem = () => (o.semEscolha ? 'todos' : $('input[name="cv-quem"]:checked', m.el).value);
   const rotuloBotao = () => {
-    const n = quem() === 'pend' ? pend : D.d.participantes.length;
-    $('#cv-enviar', m.el).textContent = `Enviar para ${n} pessoa${n === 1 ? '' : 's'} →`;
+    const n = quem() === 'pend' ? pend : total;
+    $('#cv-enviar', m.el).textContent = o.rotulo ? o.rotulo(n) : `Enviar para ${n} pessoa${n === 1 ? '' : 's'} →`;
     $$('.sel-pessoa', m.el).forEach((l) => l.classList.toggle('on', l.querySelector('input').checked));
   };
   let pedido = 0;
   const atualizar = async () => {
     const meu = ++pedido;
     try {
-      const r = await gs('api_convitePrevia', d.id, msg.value);
+      const r = await o.previa(msg.value);
       if (meu !== pedido || !m.el.isConnected) return;
       $('#cv-previa', m.el).srcdoc = r.html;
       $('#cv-assunto', m.el).textContent = r.assunto;
@@ -3479,11 +3582,11 @@ async function abrirConvite() {
   m.el.onchange = (ev) => { if (ev.target.name === 'cv-quem') rotuloBotao(); };
   $('#cv-cancelar', m.el).onclick = m.fechar;
   $('#cv-enviar', m.el).onclick = async (ev) => {
-    const r = await acao(ev.target, () => gs('api_conviteEnviar', d.id, msg.value, quem() === 'pend'));
+    const r = await acao(ev.target, () => o.enviar(msg.value, quem() === 'pend'));
     m.fechar();
     D.d = r;
     confete();
-    conquista('✉️', 'Convites enviados!', `${r.enviados} pessoa(s) convidada(s)${r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`);
+    o.feito(r);
     desenharDesafio();
   };
   rotuloBotao();
@@ -3524,7 +3627,7 @@ function passoTimes(el) {
     lerTimesEdit();
     const r = await acao(salvar, () => gs('api_timesSalvar', d.desafio.id, D.rascunhoTimes));
     D.d = r; D.rascunhoTimes = null;
-    toast(rasc ? '✅ Times salvos! Agora é só iniciar o desafio.' : '✅ Times atualizados (quem mudou de time recebeu o convite)');
+    toast(rasc ? '✅ Times salvos! Agora inicie o desafio e avise os times.' : '✅ Times atualizados (quem mudou de time recebeu o aviso com o link da sala)');
     if (rasc) D.passo = 'andamento';
     desenharDesafio();
   };
@@ -3616,13 +3719,13 @@ function passoAndamento(el) {
   const x = d.desafio;
   const st = x.status;
   const botoes = {
-    rascunho: `<button class="btn grad" data-st="iniciar">🚀 Iniciar desafio e enviar convites</button>`,
+    rascunho: `<button class="btn grad" data-st="iniciar" ${d.times.length ? '' : 'disabled'}>🚀 Iniciar desafio e avisar os times</button>`,
     em_andamento: `<a class="btn" data-go="/painel/${esc(x.id)}">📡 Painel ao vivo</a><button class="btn sec" data-st="apresentacao">🎤 Abrir apresentações</button><button class="btn sec" data-st="encerrado">🏁 Encerrar desafio</button>`,
     apresentacao: `<a class="btn" data-go="/painel/${esc(x.id)}">📡 Painel ao vivo</a><button class="btn sec" data-st="em_andamento">↩ Voltar ao andamento</button><button class="btn grad" data-st="encerrado">🏁 Encerrar desafio</button>`,
     encerrado: `<button class="btn sec" data-st="apresentacao">↩ Reabrir para apresentação</button><a class="btn grad" data-go="/desafio/novo">+ Novo desafio</a>`,
   }[st];
   const dica = {
-    rascunho: 'Ao iniciar, cada participante recebe por e-mail o problema, o time, os colegas, os prazos e o link da sala do time.',
+    rascunho: 'Ao iniciar, cada participante recebe por e-mail o seu time, os colegas, os prazos e o link direto para a sala do time (você vê a prévia antes).',
     em_andamento: 'Os times estão trabalhando. Etapas com prazo vencido ficam somente leitura; clique numa etapa vermelha para reabri-la para o time.',
     apresentacao: 'Hora do pitch! Todos os participantes podem ver o trabalho dos outros times. As etapas estão somente leitura.',
     encerrado: 'Desafio encerrado: tudo foi guardado no Acervo de ideias.',
@@ -3631,6 +3734,7 @@ function passoAndamento(el) {
   const prazo = { gut: x.prazoGut, csd: x.prazoCsd, plano: x.prazoPlano, ideias: x.prazoIdeias };
   el.innerHTML = `<div class="card" style="margin-bottom:16px"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">${statusTag(st)}<span class="muted">${dica}</span></div>
       <div class="acoes-form" style="justify-content:flex-start">${botoes}</div></div>
+    ${cartaoAvisoTimes()}
     ${d.times.length ? `<div class="times-grid">${d.times.map((t) => `<div class="time-card" style="--tc:${esc(t.cor)}">
       <h4>Time ${esc(t.nome)}<span class="small">${t.emails.length} pessoa(s)</span></h4>
       <ul>${t.emails.map(liPessoa).join('')}</ul>
@@ -3643,6 +3747,7 @@ function passoAndamento(el) {
       ${st !== 'rascunho' ? `<div class="acoes-time"><a class="btn sec peq" data-go="/time/${esc(t.id)}">Abrir sala</a><a class="btn sec peq" data-go="/apresentar/${esc(t.id)}">🎤 Slides</a></div>` : ''}
     </div>`).join('')}</div>` : '<div class="card vazio"><div class="ico">🎲</div>Os times ainda não foram formados.</div>'}`;
   el.onclick = async (ev) => {
+    if (ev.target.closest('#abrir-aviso')) return abrirAvisoTimes();
     const r = ev.target.closest('[data-reabrir]');
     if (r) {
       D.d = await acao(null, () => gs('api_etapaReabrir', r.dataset.reabrir, r.dataset.etapa, !!r.dataset.abrir));
@@ -3652,14 +3757,7 @@ function passoAndamento(el) {
     const b = ev.target.closest('[data-st]');
     if (!b) return;
     const alvo = b.dataset.st;
-    if (alvo === 'iniciar') {
-      if (!(await dialogo({ titulo: 'Iniciar o desafio?', texto: `${d.participantes.length} pessoa(s) vão receber o convite por e-mail agora.`, ok: '🚀 Iniciar' }))) return;
-      const r2 = await acao(b, () => gs('api_desafioIniciar', x.id));
-      D.d = r2;
-      confete();
-      conquista('🚀', 'Desafio lançado!', `${r2.enviados} convite(s) enviado(s)`);
-      return desenharDesafio();
-    }
+    if (alvo === 'iniciar') return abrirIniciar();
     const txt = { apresentacao: ['Abrir as apresentações?', 'As etapas ficam somente leitura e todos podem ver os outros times.'], encerrado: ['Encerrar o desafio?', 'Tudo fica somente leitura e vai para o Acervo de ideias.'], em_andamento: ['Voltar ao andamento?', 'Os times poderão editar de novo dentro dos prazos.'] }[alvo];
     if (!(await dialogo({ titulo: txt[0], texto: txt[1], ok: 'Confirmar' }))) return;
     D.d = await acao(b, () => gs('api_desafioStatus', x.id, alvo));
@@ -3735,8 +3833,8 @@ ROTAS.usuarios = async (el) => {
 /* ============================== PAINEL AO VIVO ============================== */
 const ACAO_TXT = {
   'gut.salvar': 'avaliou um microproblema na GUT', 'gut.remover': 'removeu um microproblema', 'gut.escolher': 'escolheu o microproblema 👑',
-  'csd.salvar': 'escreveu um post-it na CSD', 'csd.plano': 'marcou um post-it para o Plano', 'csd.mover': 'reorganizou a Matriz CSD', 'csd.remover': 'removeu um post-it',
-  'plano.salvar': 'criou uma ação no Plano', 'plano.remover': 'removeu uma ação do Plano',
+  'csd.salvar': 'escreveu um post-it na CSD', 'csd.mover': 'reorganizou a Matriz CSD', 'csd.remover': 'removeu um post-it',
+  'plano.salvar': 'escreveu um post-it no Plano', 'plano.mover': 'reorganizou o Plano de Ação', 'plano.remover': 'removeu um post-it do Plano',
   'ideia.salvar': 'deu uma ideia principal 💡', 'ideia.remover': 'removeu uma ideia', 'ideia.ordenar': 'reordenou as ideias 🏆',
   'apoio.salvar': 'escreveu uma ideia de apoio', 'apoio.mover': 'moveu uma ideia de apoio', 'apoio.remover': 'removeu uma ideia de apoio',
   'etapa.concluir': 'concluiu uma etapa ⭐', etapa_reaberta: 'reabriu uma etapa para o time 🔓', etapa_fechada: 'fechou de novo uma etapa 🔒',
@@ -3791,15 +3889,14 @@ ROTAS.apresentar = async (el, timeId) => {
   if (!el.isConnected) return; // o usuário já foi para outra tela
   const rot = { certeza: 'Certezas', suposicao: 'Suposições', duvida: 'Dúvidas' };
   const micro = s.gut.find((g) => g.id === s.time.microproblemaId);
-  const marcados = s.csd.filter((c) => c.plano).map((c) => c.id);
-  const acoes = [...s.plano].sort((a, b) => (marcados.indexOf(a.csdCardId) + 1 || 99) - (marcados.indexOf(b.csdCardId) + 1 || 99));
+  const colsPlano = [['oque', 'O que?'], ['como', 'Como?'], ['onde', 'Onde?'], ['quando', 'Quando?'], ['quem', 'Quem?']];
   const S = [
     `<div class="k">Pivotando · Desafio #${esc(s.desafio.numero)} · Time ${esc(s.time.nome)}</div><h2>${esc(s.desafio.titulo)}</h2>${s.desafio.problema ? `<p>${esc(resumoTexto(s.desafio.problema))}</p>` : ''}
       <div class="avs" style="margin-top:3vh">${s.membros.map((m) => av(m.nome)).join('')}</div><p style="margin-top:1vh;opacity:.75;font-size:clamp(11px,1.2vw,15px)">${s.membros.map((m) => esc(m.nome)).join(' · ')}</p>`,
     `<div class="k">Matriz GUT · microproblemas</div><h2>O que mais dói</h2><div class="lista">${s.gut.slice(0, 5).map((it) => `<div><b class="n">${it.grau}</b>${it.id === s.time.microproblemaId ? '👑 ' : ''}${esc(it.texto)}</div>`).join('') || '<div>—</div>'}</div>`,
     `<div class="k">Microproblema escolhido 👑</div><h2>${esc(micro ? micro.texto : '—')}</h2>${micro ? `<p>Gravidade ${micro.g} × Urgência ${micro.u} × Tendência ${micro.t} = <b>${micro.grau}</b> de 125</p>` : ''}`,
     `<div class="k">Matriz CSD</div><h2>O que sabemos e o que não sabemos</h2><div class="cols3">${['certeza', 'suposicao', 'duvida'].map((k) => `<div style="border-top:4px solid var(--c-${k})"><h5>${rot[k]}</h5>${s.csd.filter((c) => c.coluna === k).slice(0, 5).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
-    `<div class="k">Plano de Ação</div><h2>Próximos passos</h2><div class="lista">${acoes.slice(0, 6).map((a) => `<div><b class="n">→</b><span style="flex:1">${esc(a.oQue || a.como || '—')}</span><span style="opacity:.8">${esc(a.quem || '')}${a.quando ? ' · ' + fmtDia(a.quando) : ''}</span></div>`).join('') || '<div>—</div>'}</div>`,
+    `<div class="k">Plano de Ação</div><h2>Próximos passos</h2><div class="cols3 c5">${colsPlano.map(([k, t]) => `<div style="border-top:4px solid var(--p-${k})"><h5>${t}</h5>${s.plano.filter((c) => c.coluna === k).slice(0, 4).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
     `<div class="k">Brainstorm · ranking do time</div><h2>Nossas ideias</h2><div class="lista">${s.ideias.slice(0, 6).map((it, i) => `<div><b class="n">${['🥇', '🥈', '🥉'][i] || i + 1}</b><span>${esc(it.titulo)}${it.apoios.length ? `<span style="opacity:.7"> · ${it.apoios.length} apoio(s)</span>` : ''}</span></div>`).join('') || '<div>—</div>'}</div>`,
     s.ideias[0] ? `<div class="k">Nossa proposta</div><h2>💡 ${esc(s.ideias[0].titulo)}</h2>${s.ideias[0].descricao ? `<p>${esc(s.ideias[0].descricao)}</p>` : ''}
       ${s.ideias[0].apoios.length ? `<div class="lista">${s.ideias[0].apoios.slice(0, 4).map((a) => `<div>✦ ${esc(a.texto)}</div>`).join('')}</div>` : ''}<p style="margin-top:3vh;opacity:.7">Obrigado! · Time ${esc(s.time.nome)}</p>`
