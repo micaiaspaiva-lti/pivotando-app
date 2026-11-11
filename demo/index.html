@@ -1337,7 +1337,9 @@ var PIVDEMO = (() => {
       me: { email: p.email, nome: p.nome, papel: p.papel, facilita: p.facilita, admin: p.admin },
       inicio: api_inicio(),
       // link da demonstração (página pública, sem login): só o Admin vê o botão para abrir/copiar
-      demoUrl: p.admin ? APP_PUBLICO + "demo/" : ""
+      demoUrl: p.admin ? APP_PUBLICO + "demo/" : "",
+      // endereço do app no Google: é para onde o login/troca de conta pode voltar
+      execUrl: appUrl()
     };
   }
   function contar(timeId) {
@@ -2410,7 +2412,7 @@ function menuConta() {
       <span class="mc-papel">${esc(PAPEL_NOME[ME.papel] || ME.papel)}</span></div></div>
     ${BOOT.demo
       ? '<div class="mc-nota">🎬 Você está na demonstração. Use a barra no rodapé para trocar de visão ou sair.</div>'
-      : `<a class="mc-item" role="menuitem" target="_top" href="https://accounts.google.com/AccountChooser?continue=${encodeURIComponent(APP_PUBLICO)}">🔄 Trocar de conta</a>
+      : `<a class="mc-item" role="menuitem" target="_top" href="https://accounts.google.com/AccountChooser?continue=${encodeURIComponent(BOOT.execUrl || APP_PUBLICO)}">🔄 Trocar de conta</a>
          <button class="mc-item sair" role="menuitem" id="mc-sair">🚪 Sair</button>`}`;
   document.body.appendChild(m);
   const sair = $('#mc-sair', m);
@@ -2421,8 +2423,9 @@ function menuConta() {
       texto: 'O Pivotando usa a sua conta Google da LTI. Sair desconecta a conta Google neste navegador (Gmail, Drive e outros também pedirão login de novo).',
       ok: 'Sair', perigo: true,
     });
-    // depois de sair, o Google volta para a página pública do Pivotando
-    if (ok) window.open('https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue=' + encodeURIComponent(APP_PUBLICO), '_top');
+    // depois de sair, o Google mostra a tela de login; ao entrar de novo, abre o Pivotando
+    // (o Google só aceita voltar para endereços do próprio Google)
+    if (ok) window.open('https://accounts.google.com/Logout?continue=' + encodeURIComponent(BOOT.execUrl || 'https://accounts.google.com/'), '_top');
   };
   const fechar = (ev) => { if (!m.contains(ev.target)) { m.remove(); document.removeEventListener('click', fechar); document.removeEventListener('keydown', tecla); } };
   const tecla = (ev) => { if (ev.key === 'Escape') { m.remove(); document.removeEventListener('click', fechar); document.removeEventListener('keydown', tecla); } };

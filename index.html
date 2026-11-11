@@ -119,9 +119,10 @@
       });
       window.addEventListener('hashchange', carregar);
       window.addEventListener('online', function () { if (!help.hidden) carregar(); });
-      // login na mesma aba: o Google volta para esta página (com a mesma rota) depois de entrar
+      // login na mesma aba
       document.getElementById('btnLogin').addEventListener('click', function () {
-        location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(location.href);
+        // o Google só aceita voltar para endereços do próprio Google: depois de entrar, abre o app direto nele
+        location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(EXEC + rota());
       });
       // se a pessoa entrar em outra aba e voltar para esta, tenta abrir de novo sozinho
       window.addEventListener('focus', function () { if (!help.hidden) carregar(); });
