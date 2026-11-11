@@ -58,11 +58,9 @@
     <div class="card">
       <img src="icons/icon-192.png" alt="" style="width:60px;height:60px;border-radius:14px">
       <h1 id="helpTitle">Entre com sua conta da LTI</h1>
-      <p id="helpText">O Pivotando é exclusivo para colaboradores. Entre com sua conta Google <b>@lti.net.br</b> neste navegador e tente novamente.</p>
+      <p id="helpText">O Pivotando é exclusivo para colaboradores. Entre com sua conta Google <b>@lti.net.br</b> para continuar.</p>
       <div class="btns">
         <button class="btn primary" id="btnLogin">Entrar com Google</button>
-        <button class="btn" id="btnRetry">Tentar novamente</button>
-        <a class="btn" id="btnBrowser" target="_blank" rel="noopener">Abrir direto no Google</a>
       </div>
     </div>
     <p class="demo">Quer só conhecer? <a href="demo/">Veja a demonstração</a></p>
@@ -102,7 +100,7 @@
         var on = navigator.onLine;
         document.getElementById('helpTitle').textContent = on ? 'Entre com sua conta da LTI' : 'Você está sem conexão';
         document.getElementById('helpText').innerHTML = on
-          ? 'O Pivotando é exclusivo para colaboradores. Entre com sua conta Google <b>@lti.net.br</b> neste navegador e tente novamente.'
+          ? 'O Pivotando é exclusivo para colaboradores. Entre com sua conta Google <b>@lti.net.br</b> para continuar.'
           : 'Conecte-se à internet para usar o Pivotando.';
         document.getElementById('btnLogin').hidden = !on;
         help.hidden = false;
@@ -121,11 +119,12 @@
       });
       window.addEventListener('hashchange', carregar);
       window.addEventListener('online', function () { if (!help.hidden) carregar(); });
-      document.getElementById('btnRetry').addEventListener('click', carregar);
+      // login na mesma aba: o Google volta para esta página (com a mesma rota) depois de entrar
       document.getElementById('btnLogin').addEventListener('click', function () {
-        window.open('https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(EXEC), '_blank', 'noopener');
+        location.href = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(location.href);
       });
-      document.getElementById('btnBrowser').href = EXEC;
+      // se a pessoa entrar em outra aba e voltar para esta, tenta abrir de novo sozinho
+      window.addEventListener('focus', function () { if (!help.hidden) carregar(); });
 
       carregar();
       if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js'); });
