@@ -102,7 +102,16 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
 .hero > * { position:relative; z-index:1; }
 .hero .kicker { text-transform:uppercase; letter-spacing:1.4px; font-size:11px; font-weight:700; opacity:.8; }
 .hero h1 { margin:4px 0 6px; font-size:26px; letter-spacing:-.5px; }
-.hero .problema { opacity:.9; max-width:640px; }
+.hero .problema { opacity:.9; max-width:680px; }
+/* texto do problema com subtítulos e listas */
+.tr-sub { font-weight:700; text-transform:uppercase; letter-spacing:.8px; font-size:11px; opacity:.85; margin:12px 0 4px; }
+.tr-sub:first-child { margin-top:0; }
+.tr-p { margin:0 0 6px; line-height:1.55; }
+.tr-lista { margin:2px 0 8px; padding-left:20px; line-height:1.5; }
+.problema-rico { position:relative; max-height:7.5em; overflow:hidden; transition:max-height .4s ease; }
+.problema-rico.aberto { max-height:1200px; }
+.problema-rico:not(.aberto)::after { content:""; position:absolute; left:0; right:0; bottom:0; height:2.6em; background:linear-gradient(transparent, #3d0a91); pointer-events:none; }
+.ver-mais { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); color:#fff; border-radius:99px; padding:4px 12px; font-size:12px; font-weight:600; cursor:pointer; margin-top:8px; }
 .hero .avs .av { border-color:#3d0a91; }
 .hero-dir { display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
 .countdown { display:flex; gap:6px; }
@@ -834,6 +843,24 @@ var PIVDEMO = (() => {
   function escapeHtml(s) {
     return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   }
+  function textoRico(s, cor = "#103C9B") {
+    const linhas = String(s || "").replace(/\r/g, "").split("\n").map((l) => l.trim());
+    const out = [];
+    linhas.forEach((l, i) => {
+      if (!l)
+        return;
+      const prox = linhas.slice(i + 1).find((x) => x) || "";
+      const item = /^[-•*–]\s+/.exec(l);
+      if (item) {
+        out.push(`<div style="padding:2px 0 2px 18px;text-indent:-12px;line-height:1.5">\u2022&nbsp; ${escapeHtml(l.slice(item[0].length))}</div>`);
+      } else if (l.length <= 40 && !/[.!?;,]$/.test(l) && prox) {
+        out.push(`<div style="font-weight:bold;color:${cor};margin:${out.length ? 12 : 0}px 0 3px;font-size:14px">${escapeHtml(l.replace(/:$/, ""))}</div>`);
+      } else {
+        out.push(`<div style="margin:0 0 6px;line-height:1.55">${escapeHtml(l)}</div>`);
+      }
+    });
+    return out.join("");
+  }
   function isEmail(s) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
   }
@@ -962,7 +989,7 @@ var PIVDEMO = (() => {
      <div style="background:#f5f8fd;border-left:4px solid #6a11b8;border-radius:8px;padding:14px 16px;margin:18px 0">
        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6a11b8;font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
        <div style="font-size:18px;font-weight:bold;margin:4px 0">${escapeHtml(d.titulo)}</div>
-       ${d.problema ? `<div style="color:#444">${escapeHtml(d.problema)}</div>` : ""}
+       ${d.problema ? `<div style="color:#444">${textoRico(d.problema)}</div>` : ""}
      </div>
      ${p.colegas.length ? `<p><b>Seus colegas de time:</b> ${p.colegas.map(escapeHtml).join(", ")}</p>` : ""}
      ${prazos.length ? `<table style="border-collapse:collapse;font-size:13px">${prazos.map(([k, v]) => `<tr><td style="padding:3px 14px 3px 0;color:#666">${k}</td><td style="padding:3px 0"><b>${fmtDia(v)}</b></td></tr>`).join("")}</table>` : ""}
@@ -1040,11 +1067,11 @@ ${APP_PUBLICO}`),
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:${COR.fundo};border-left:4px solid ${COR.roxo};border-radius:8px;padding:16px 18px">
       <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:${COR.roxo};font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
       <div style="font-size:19px;font-weight:bold;margin:6px 0 4px;color:${COR.texto};line-height:1.3">${escapeHtml(d.titulo)}</div>
-      ${d.problema ? `<div style="color:#444;line-height:1.55">${escapeHtml(d.problema)}</div>` : ""}</td></tr></table>
+      ${d.problema ? `<div style="color:#444;margin-top:8px">${textoRico(d.problema)}</div>` : ""}</td></tr></table>
 
     ${ab ? `${secao("\u{1F4CD}", "Encontro de abertura")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:linear-gradient(120deg,#103C9B,#3d0a91 60%,#6a11b8);background-color:#103C9B;border-radius:12px;padding:18px 20px;color:#ffffff">
-      <div style="font-size:13px;opacity:.85;text-transform:capitalize">${ab.semana}</div>
+      <div style="font-size:13px;opacity:.85">${ab.semana.charAt(0).toUpperCase() + ab.semana.slice(1)}</div>
       <div style="font-size:22px;font-weight:bold;margin:2px 0 6px">${ab.data}</div>
       ${horario ? `<div style="font-size:15px">\u{1F551} ${horario}</div>` : ""}
       ${d.localAbertura ? `<div style="font-size:15px;margin-top:4px">\u{1F4CD} ${escapeHtml(d.localAbertura)}</div>` : ""}
@@ -1312,7 +1339,7 @@ ${APP_PUBLICO}`),
     return withLock(() => {
       const campos = {
         titulo: txt(dados.titulo, 160),
-        problema: txt(dados.problema, 1e3),
+        problema: txt(dados.problema, 5e3),
         descricao: txt(dados.descricao, 3e3),
         tamanhoTime: String(Math.max(2, Math.min(12, Number(dados.tamanhoTime) || 5))),
         prazoGut: data(dados.prazoGut),
@@ -2457,6 +2484,30 @@ const av = (n, cls = '') => `<div class="av ${cls}" style="--c:${corDe(n)}" titl
 const primeiro = (n) => String(n || '').split(' ')[0];
 const rot = () => (Math.random() * 4 - 2).toFixed(1) + 'deg';
 
+/** Texto do facilitador com subtítulos, listas e parágrafos (mesmas regras do e-mail). */
+function textoRico(s) {
+  const linhas = String(s || '').replace(/\r/g, '').split('\n').map((l) => l.trim());
+  let html = '', lista = false;
+  const fechaLista = () => { if (lista) { html += '</ul>'; lista = false; } };
+  linhas.forEach((l, i) => {
+    if (!l) return fechaLista();
+    const prox = linhas.slice(i + 1).find((x) => x) || '';
+    const item = /^[-•*–]\s+/.exec(l);
+    if (item) { if (!lista) { html += '<ul class="tr-lista">'; lista = true; } html += `<li>${esc(l.slice(item[0].length))}</li>`; return; }
+    fechaLista();
+    if (l.length <= 40 && !/[.!?;,]$/.test(l) && prox) html += `<div class="tr-sub">${esc(l.replace(/:$/, ''))}</div>`;
+    else html += `<p class="tr-p">${esc(l)}</p>`;
+  });
+  fechaLista();
+  return html;
+}
+/** Primeiro parágrafo de verdade (sem subtítulos), para resumos curtos. */
+function resumoTexto(s, max = 260) {
+  const linhas = String(s || '').split('\n').map((l) => l.trim()).filter((l) => l && !(l.length <= 40 && !/[.!?;,]$/.test(l)));
+  const t = linhas[0] || '';
+  return t.length > max ? t.slice(0, max).replace(/\s+\S*$/, '') + '…' : t;
+}
+
 function fmtDia(d) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || ''); return m ? `${m[3]}/${m[2]}/${m[1]}` : '—'; }
 function fmtHora(iso) { return iso ? new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''; }
 function fmtDataHora(iso) { return iso ? new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : ''; }
@@ -2783,7 +2834,8 @@ function montarSala() {
       <div>
         <div class="kicker">Desafio #${esc(s.desafio.numero)} · <span style="display:inline-flex;align-items:center;gap:6px"><i style="width:10px;height:10px;border-radius:50%;background:${esc(s.time.cor)};display:inline-block;box-shadow:0 0 0 2px rgba(255,255,255,.5)"></i>Time ${esc(s.time.nome)}</span></div>
         <h1>${esc(s.desafio.titulo)}</h1>
-        ${s.desafio.problema ? `<div class="problema">${esc(s.desafio.problema)}</div>` : ''}
+        ${s.desafio.problema ? `<div class="problema problema-rico" id="problema">${textoRico(s.desafio.problema)}</div>
+          <button class="ver-mais" id="ver-mais" hidden>Ver contexto completo ▾</button>` : ''}
         <div class="progresso"><div style="display:flex;justify-content:space-between;font-size:12px;opacity:.85;margin-bottom:6px"><span>Progresso do time</span><span id="pct">0%</span></div><div class="barra"><i id="barra"></i></div></div>
       </div>
       <div class="hero-dir">
@@ -2795,6 +2847,12 @@ function montarSala() {
     <div class="trilha" id="trilha"><div class="linha-prog" id="linha-prog"></div></div>
     <div id="inst"></div>`;
   desenharTudo();
+  // contexto longo: mostra o começo e um botão para abrir tudo
+  const pr = $('#problema'), vm = $('#ver-mais');
+  if (pr && vm && pr.scrollHeight > pr.clientHeight + 4) {
+    vm.hidden = false;
+    vm.onclick = () => { const a = pr.classList.toggle('aberto'); vm.textContent = a ? 'Mostrar menos ▴' : 'Ver contexto completo ▾'; };
+  }
 }
 
 function desenharTudo() {
@@ -3286,7 +3344,8 @@ function passoDados(el) {
     <label class="campo">Problema central <small>— escreva como uma pergunta desafiadora</small></label>
     <input type="text" name="titulo" maxlength="160" required placeholder="Ex.: Como reduzir o tempo de implantação de novos clientes?" value="${esc(x.titulo)}">
     <label class="campo">Contexto do problema <small>— o que está acontecendo hoje</small></label>
-    <textarea name="problema" maxlength="1000" rows="3" placeholder="Dados, sintomas, impacto…">${esc(x.problema)}</textarea>
+    <textarea name="problema" maxlength="5000" rows="9" placeholder="Contexto&#10;Quando um novo cliente fecha contrato…&#10;&#10;Dados&#10;- Tempo médio de implantação: 4 a 6 meses&#10;- Chamados nos primeiros 90 dias: …">${esc(x.problema)}</textarea>
+    <p class="muted small" style="margin:6px 0 0">💡 Organize em partes: uma linha curta vira <b>subtítulo</b> (ex.: "Contexto", "Dados"), linhas com <b>-</b> viram <b>lista</b> e uma linha em branco separa parágrafos. Fica assim no e-mail e na sala dos times.</p>
     <label class="campo">Orientações para os times <small>(opcional)</small></label>
     <textarea name="descricao" maxlength="3000" rows="3" placeholder="Regras, materiais de apoio, quem procurar…">${esc(x.descricao)}</textarea>
     <div class="cols3"><div><label class="campo">Pessoas por time</label><input type="number" name="tamanhoTime" min="2" max="12" value="${esc(x.tamanhoTime || 5)}"></div></div>
@@ -3735,7 +3794,7 @@ ROTAS.apresentar = async (el, timeId) => {
   const marcados = s.csd.filter((c) => c.plano).map((c) => c.id);
   const acoes = [...s.plano].sort((a, b) => (marcados.indexOf(a.csdCardId) + 1 || 99) - (marcados.indexOf(b.csdCardId) + 1 || 99));
   const S = [
-    `<div class="k">Pivotando · Desafio #${esc(s.desafio.numero)} · Time ${esc(s.time.nome)}</div><h2>${esc(s.desafio.titulo)}</h2>${s.desafio.problema ? `<p>${esc(s.desafio.problema)}</p>` : ''}
+    `<div class="k">Pivotando · Desafio #${esc(s.desafio.numero)} · Time ${esc(s.time.nome)}</div><h2>${esc(s.desafio.titulo)}</h2>${s.desafio.problema ? `<p>${esc(resumoTexto(s.desafio.problema))}</p>` : ''}
       <div class="avs" style="margin-top:3vh">${s.membros.map((m) => av(m.nome)).join('')}</div><p style="margin-top:1vh;opacity:.75;font-size:clamp(11px,1.2vw,15px)">${s.membros.map((m) => esc(m.nome)).join(' · ')}</p>`,
     `<div class="k">Matriz GUT · microproblemas</div><h2>O que mais dói</h2><div class="lista">${s.gut.slice(0, 5).map((it) => `<div><b class="n">${it.grau}</b>${it.id === s.time.microproblemaId ? '👑 ' : ''}${esc(it.texto)}</div>`).join('') || '<div>—</div>'}</div>`,
     `<div class="k">Microproblema escolhido 👑</div><h2>${esc(micro ? micro.texto : '—')}</h2>${micro ? `<p>Gravidade ${micro.g} × Urgência ${micro.u} × Tendência ${micro.t} = <b>${micro.grau}</b> de 125</p>` : ''}`,
@@ -3797,7 +3856,7 @@ ROTAS.historico = async (el) => {
     $('#hist').innerHTML = vis.map((d) => `<div class="card" style="margin-bottom:16px">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="num muted small" style="font-weight:800;letter-spacing:1px">DESAFIO #${esc(d.numero)}</span>${statusTag(d.status)}
         <span class="muted small">${d.encerradoEm ? 'encerrado em ' + fmtDataHora(d.encerradoEm) : ''}</span></div>
-      <h3 style="margin:6px 0 4px;font-size:19px">${marcar(d.titulo, q)}</h3>${d.problema ? `<p class="muted" style="margin:0 0 10px">${marcar(d.problema, q)}</p>` : ''}
+      <h3 style="margin:6px 0 4px;font-size:19px">${marcar(d.titulo, q)}</h3>${d.problema ? `<p class="muted" style="margin:0 0 10px">${marcar(resumoTexto(d.problema, 400), q)}</p>` : ''}
       ${d.times.map((t) => `<div class="hist-time"><div><b style="color:${esc(t.cor)}">● Time ${esc(t.nome)}</b><div class="small muted">${t.microproblemas} microproblema(s) · ${t.postits} post-it(s)</div>
           <a class="btn sec peq" style="margin-top:8px" data-go="/apresentar/${esc(t.id)}">🎤 Ver slides</a></div>
         <div>${t.microproblema ? `<div style="margin-bottom:8px"><span class="small muted">👑 Microproblema</span><div><b>${marcar(t.microproblema.texto, q)}</b> <span class="small muted">(grau ${t.microproblema.grau})</span></div></div>` : ''}
