@@ -204,6 +204,7 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
 .nota .rodape { display:flex; align-items:center; justify-content:space-between; margin-top:8px; font-family:Inter; font-size:11px; color:var(--muted); }
 .sortable-ghost { opacity:.35; } .sortable-chosen { cursor:grabbing; }
 .add-nota { display:flex; margin-top:10px; }
+.nota.salvando { opacity:.6; }
 
 /* ---------- Plano (quadro de 5 colunas) ---------- */
 .csd.quadro5 { grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
@@ -352,13 +353,34 @@ h1.pag { font-size:26px; letter-spacing:-.5px; margin:0; }
 
 label.campo { display:block; font-weight:600; font-size:13px; margin:14px 0 6px; }
 label.campo small { font-weight:400; color:var(--muted); }
-.inp, .card input[type=text], .card input[type=email], .card input[type=number], .card input[type=date], .card textarea, .card select, .modal input, .modal textarea, .modal select {
+.inp, .card input[type=text], .card input[type=email], .card input[type=number], .card input[type=date], .card input[type=time], .card textarea, .card select, .modal input, .modal textarea, .modal select {
   width:100%; padding:10px 12px; border:1.5px solid var(--borda); border-radius:12px; font:inherit; background:var(--card); color:var(--texto); transition:.15s; }
 .inp:focus, .card input:focus, .card textarea:focus, .card select:focus, .modal input:focus, .modal textarea:focus, .modal select:focus {
   outline:0; border-color:var(--azul); box-shadow:0 0 0 3px color-mix(in srgb,var(--azul) 20%,transparent); }
 textarea { resize:vertical; min-height:72px; }
 .cols2 { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; } .cols3 { display:grid; grid-template-columns:repeat(3,1fr); gap:0 16px; }
 .cols5 { display:grid; grid-template-columns:repeat(5,1fr); gap:0 12px; }
+/* escolha dos instrumentos do desafio: cada cartão liga/desliga a etapa e guarda o prazo */
+.inst-cards { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.inst-card { --fc:var(--azul); position:relative; border:1.5px solid var(--borda); border-top:4px solid var(--fc); border-radius:14px; padding:12px; background:var(--card); transition:.18s; display:flex; flex-direction:column; gap:8px; }
+.inst-card .topo { display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:13px; }
+.inst-card .topo .ic { font-size:18px; }
+.inst-card .topo input { position:absolute; opacity:0; pointer-events:none; }
+.inst-card .desc { font-size:11.5px; color:var(--muted); line-height:1.35; min-height:31px; }
+.inst-card .chave { margin-left:auto; width:34px; height:20px; border-radius:20px; background:var(--borda); position:relative; flex:none; transition:.18s; }
+.inst-card .chave::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.25); transition:.18s; }
+.inst-card.on { box-shadow:0 4px 14px color-mix(in srgb,var(--fc) 18%,transparent); }
+.inst-card.on .chave { background:var(--fc); }
+.inst-card.on .chave::after { left:16px; }
+.inst-card:not(.on) { background:var(--card-2); border-top-color:var(--borda); }
+.inst-card:not(.on) .topo .ic { filter:grayscale(1); opacity:.6; }
+.inst-card:not(.on) .topo span:not(.chave) { color:var(--muted); }
+.inst-card .fora { display:none; font-size:12px; color:var(--muted); padding:10px 0; text-align:center; border:1.5px dashed var(--borda); border-radius:12px; }
+.inst-card:not(.on) input[type=date] { display:none; }
+.inst-card:not(.on) .fora { display:block; }
+.inst-card.fixo .topo { cursor:default; }
+.inst-card.travado .topo { cursor:not-allowed; }
+.inst-card .topo:focus-visible { outline:2px solid var(--azul); outline-offset:3px; border-radius:6px; }
 .acoes-form { display:flex; gap:10px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; }
 .btn.perigo { background:var(--erro); box-shadow:0 4px 14px rgba(217,48,37,.28); }
 .btn.ok { background:var(--ok); box-shadow:0 4px 14px rgba(27,138,74,.28); }
@@ -451,7 +473,8 @@ textarea { resize:vertical; min-height:72px; }
 .hist-time:first-of-type { border-top:0; }
 .hist-ideias { display:flex; flex-direction:column; gap:4px; }
 mark { background:color-mix(in srgb,#ffd54a 60%,transparent); color:inherit; border-radius:3px; padding:0 2px; }
-@media (max-width: 900px) { .cols2, .cols3, .cols5 { grid-template-columns:1fr; } .hist-time { grid-template-columns:1fr; } }
+@media (max-width: 1100px) { .inst-cards { grid-template-columns:repeat(3,1fr); } }
+@media (max-width: 900px) { .inst-cards { grid-template-columns:1fr 1fr; } .cols2, .cols3, .cols5 { grid-template-columns:1fr; } .hist-time { grid-template-columns:1fr; } }
 
 /* menu da conta (clique no avatar) */
 button.av.eu { padding:0; cursor:pointer; font:inherit; font-weight:700; font-size:12px; transition:transform .15s, box-shadow .15s; }
@@ -710,7 +733,9 @@ var PIVDEMO = (() => {
       "dataAbertura",
       "horaAbertura",
       "horaFimAbertura",
-      "localAbertura"
+      "localAbertura",
+      // instrumentos usados (gut,csd,plano,ideias separados por vírgula); vazio = todos
+      "instrumentos"
     ],
     // convidadoEm: quando recebeu o convite para o desafio (antes do sorteio)
     // avisoTimeEm: quando recebeu o aviso do seu time (com o link da sala)
@@ -955,185 +980,13 @@ var PIVDEMO = (() => {
     throw new Error("Voc\xEA n\xE3o faz parte deste time.");
   }
 
-  // src/server/mail.ts
-  var logoBlob = () => Utilities.newBlob(Utilities.base64Decode(""), "image/png", "pivotando.png");
-  function layout(conteudo) {
-    return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:580px;margin:auto;color:#1b1e2e;background:#f5f8fd;padding:16px">
-  <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e3e6f0">
-    <div style="padding:18px 22px;border-bottom:4px solid #0164C8"><img src="cid:logo" alt="Pivotando \u2014 Juntos, viramos o jogo." height="46"></div>
-    <div style="height:6px;background:linear-gradient(90deg,#ec2f8f,#6a11b8,#3b4fd8,#3fb8ee)"></div>
-    <div style="padding:22px">${conteudo}</div>
-  </div>
-  <p style="font-size:11px;color:#888;padding:8px 6px;margin:0">Mensagem autom\xE1tica do ${APP_NAME}. N\xE3o responda este e-mail.</p></div>`;
-  }
-  function botao(url, texto) {
-    return `<p style="margin:26px 0"><a href="${escapeHtml(url)}" style="background:#0164C8;color:#fff;padding:13px 24px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold">${escapeHtml(texto)}</a></p>`;
-  }
-  function send(to, subject, html) {
-    MailApp.sendEmail({ to, subject, htmlBody: layout(html), name: APP_NAME, inlineImages: { logo: logoBlob() } });
-  }
-  var ETAPA_NOME = { gut: "Matriz GUT", csd: "Matriz CSD", plano: "Plano de A\xE7\xE3o", ideias: "Brainstorm round-robin" };
-  function mailLembrete(p) {
-    send(
-      p.email,
-      `\u23F0 Amanh\xE3 termina o prazo da ${ETAPA_NOME[p.etapa]} \u2014 Time ${p.timeNome}`,
-      `<p>Ol\xE1, ${escapeHtml(p.nome)}!</p>
-     <p>O prazo da <b>${ETAPA_NOME[p.etapa]}</b> do <b>Time ${escapeHtml(p.timeNome)}</b> termina amanh\xE3 (${fmtDia(p.prazo)}), e a etapa ainda n\xE3o foi conclu\xEDda.</p>
-     ${botao(p.link, "Continuar com o time")}`
-    );
-  }
-  function linkAgenda(d) {
-    if (!d.dataAbertura)
-      return "";
-    const dia = d.dataAbertura.replace(/-/g, "");
-    const ini = (d.horaAbertura || "09:00").replace(":", "") + "00";
-    const fimPadrao = (() => {
-      const [h, m] = (d.horaAbertura || "09:00").split(":").map(Number);
-      return `${String(Math.min(23, h + 2)).padStart(2, "0")}${String(m).padStart(2, "0")}00`;
-    })();
-    const fim = d.horaFimAbertura ? d.horaFimAbertura.replace(":", "") + "00" : fimPadrao;
-    const q = [
-      "action=TEMPLATE",
-      "text=" + encodeURIComponent(`Pivotando \xB7 Abertura do Desafio #${d.numero}`),
-      `dates=${dia}T${ini}/${dia}T${fim}`,
-      "ctz=America/Sao_Paulo",
-      "details=" + encodeURIComponent(`${d.titulo}
-
-Encontro de abertura do Pivotando: apresenta\xE7\xE3o do desafio e sorteio dos times.
-${APP_PUBLICO}`),
-      d.localAbertura ? "location=" + encodeURIComponent(d.localAbertura) : ""
-    ].filter(Boolean).join("&");
-    return "https://calendar.google.com/calendar/render?" + q;
-  }
-  var COR = { azul: "#0164C8", escuro: "#103C9B", roxo: "#6a11b8", texto: "#1b1e2e", muted: "#6b7088", borda: "#e3e6f0", fundo: "#f5f8fd" };
-  function secao(icone, titulo) {
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:26px 0 12px"><tr>
-    <td style="font-size:12px;font-weight:bold;letter-spacing:1.2px;text-transform:uppercase;color:${COR.escuro};white-space:nowrap;padding-right:10px">${icone}&nbsp; ${titulo}</td>
-    <td width="100%" style="border-bottom:2px solid ${COR.borda}"></td></tr></table>`;
-  }
-  function blocoMensagem(mensagem, remetente) {
-    if (!mensagem)
-      return "";
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 0"><tr><td style="background:#fff8e6;border-left:4px solid #f59e0b;border-radius:8px;padding:14px 16px">
-      <div style="white-space:pre-wrap;line-height:1.55;color:#3d3420">${escapeHtml(mensagem)}</div>
-      <div style="margin-top:8px;font-size:12px;color:#8a6d1f">\u2014 ${escapeHtml(remetente)}</div></td></tr></table>`;
-  }
-  function cartaoDesafio(d) {
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:${COR.fundo};border-left:4px solid ${COR.roxo};border-radius:8px;padding:16px 18px">
-      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:${COR.roxo};font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
-      <div style="font-size:19px;font-weight:bold;margin:6px 0 4px;color:${COR.texto};line-height:1.3">${escapeHtml(d.titulo)}</div>
-      ${d.problema ? `<div style="color:#444;margin-top:8px">${textoRico(d.problema)}</div>` : ""}</td></tr></table>`;
-  }
-  function tabelaPrazos(d) {
-    const etapas2 = [
-      ["\u{1F3AF}", "Matriz GUT", "listar e priorizar os microproblemas", d.prazoGut],
-      ["\u{1F50D}", "Matriz CSD", "certezas, suposi\xE7\xF5es e d\xFAvidas", d.prazoCsd],
-      ["\u{1F5FA}\uFE0F", "Plano de A\xE7\xE3o", "o qu\xEA, como, onde, quando e quem", d.prazoPlano],
-      ["\u{1F4A1}", "Brainstorm", "ideias para resolver o problema", d.prazoIdeias],
-      ["\u{1F3A4}", "Apresenta\xE7\xE3o ao vivo", "cada time apresenta sua proposta", d.dataApresentacao]
-    ].filter((e) => e[3]);
-    if (!etapas2.length)
-      return "";
-    return `${secao("\u{1F5D3}\uFE0F", "Prazos das entregas")}
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${COR.borda};border-radius:10px;border-collapse:separate;overflow:hidden">
-      ${etapas2.map(([ic, nome, desc, dt], i) => `<tr style="background:${i % 2 ? "#ffffff" : COR.fundo}">
-        <td style="padding:11px 14px;font-size:14px"><b>${ic}&nbsp; ${nome}</b><div style="font-size:12px;color:${COR.muted};margin-top:2px">${desc}</div></td>
-        <td align="right" style="padding:11px 14px;font-size:14px;white-space:nowrap"><b style="color:${COR.azul}">${fmtDia(dt)}</b>
-          <div style="font-size:11px;color:${COR.muted};margin-top:2px">${(diaPorExtenso(dt) || { semana: "" }).semana}</div></td></tr>`).join("")}
-    </table>
-    <p style="font-size:12px;color:${COR.muted};margin:8px 0 0">Cada entrega fica aberta at\xE9 as 23h59 do dia do prazo. Na v\xE9spera, quem ainda n\xE3o concluiu recebe um lembrete.</p>`;
-  }
-  function botaoCentral(url, texto, nota) {
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 8px"><tr><td align="center">
-      <a href="${escapeHtml(url)}" style="background:${COR.azul};color:#fff;padding:14px 28px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold;font-size:15px">${escapeHtml(texto)}</a>
-      ${nota ? `<div style="font-size:12px;color:${COR.muted};margin-top:10px">${nota}</div>` : ""}</td></tr></table>`;
-  }
-  function conteudoConvitePivotando(p) {
-    const d = p.desafio;
-    const mensagem = (p.mensagem || "").trim();
-    const ab = diaPorExtenso(d.dataAbertura);
-    const horario = d.horaAbertura ? d.horaFimAbertura ? `das ${d.horaAbertura} \xE0s ${d.horaFimAbertura}` : `\xE0s ${d.horaAbertura}` : "";
-    const agenda = linkAgenda(d);
-    const passos = [
-      ["Encontro de abertura", "Apresentamos o desafio e os times s\xE3o <b>sorteados ao vivo</b>, misturando pessoas de \xE1reas diferentes."],
-      ["Times em a\xE7\xE3o", "Cada time, ao ser sorteado, <b>se organiza para se reunir</b> e trabalhar nas entregas, cumprindo os prazos."],
-      ["Entregas", "Pelo Pivotando, o time preenche a Matriz GUT, a Matriz CSD, o Plano de A\xE7\xE3o e o Brainstorm."],
-      ["Apresenta\xE7\xE3o", "No final, cada time apresenta ao vivo a sua proposta para virar o jogo."]
-    ];
-    const corpo = `
-    <p style="font-size:17px;margin:0 0 10px">Ol\xE1, <b>${escapeHtml(p.nome)}</b>! \u{1F44B}</p>
-    <p style="margin:0;line-height:1.6;color:#333">Voc\xEA foi convidado(a) para o <b>Pivotando</b>: a iniciativa da LTI em que colaboradores de \xE1reas diferentes
-      se juntam em times para resolver <b>problemas reais</b> da empresa com ideias inovadoras.</p>
-
-    ${blocoMensagem(mensagem, p.remetente)}
-
-    ${secao("\u{1F9E9}", "O desafio")}
-    ${cartaoDesafio(d)}
-
-    ${ab ? `${secao("\u{1F4CD}", "Encontro de abertura")}
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:linear-gradient(120deg,#103C9B,#3d0a91 60%,#6a11b8);background-color:#103C9B;border-radius:12px;padding:18px 20px;color:#ffffff">
-      <div style="font-size:13px;opacity:.85">${ab.semana.charAt(0).toUpperCase() + ab.semana.slice(1)}</div>
-      <div style="font-size:22px;font-weight:bold;margin:2px 0 6px">${ab.data}</div>
-      ${horario ? `<div style="font-size:15px">\u{1F551} ${horario}</div>` : ""}
-      ${d.localAbertura ? `<div style="font-size:15px;margin-top:4px">\u{1F4CD} ${escapeHtml(d.localAbertura)}</div>` : ""}
-      <div style="font-size:13px;opacity:.9;margin-top:10px">\xC9 no encontro que os times ser\xE3o sorteados. N\xE3o falte! \u{1F3B2}</div>
-      ${agenda ? `<div style="margin-top:14px"><a href="${escapeHtml(agenda)}" style="background:#19FAFF;color:#103C9B;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;display:inline-block">\u{1F4C5} Adicionar \xE0 minha agenda</a></div>` : ""}
-    </td></tr></table>` : ""}
-
-    ${secao("\u{1F680}", "Como vai funcionar")}
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${passos.map(([t, txt2], i) => `<tr>
-      <td valign="top" width="40" style="padding:0 12px 14px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${COR.azul};color:#fff;text-align:center;font-weight:bold;font-size:14px">${i + 1}</div></td>
-      <td valign="top" style="padding:4px 0 14px"><b style="color:${COR.texto}">${t}</b><div style="color:#555;line-height:1.5;margin-top:2px">${txt2}</div></td></tr>`).join("")}</table>
-
-    ${tabelaPrazos(d)}
-
-    ${botaoCentral(p.link, "Conhecer o Pivotando \u2192", "Entre com a sua conta Google <b>@lti.net.br</b>.")}
-
-    <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Juntos, viramos o jogo. \u{1F499}</p>`;
-    return { assunto: `\u{1F680} Convite: Pivotando \xB7 Desafio #${d.numero}${ab ? ` \xB7 abertura em ${fmtDia(d.dataAbertura)}` : ""}`, corpo };
-  }
-  function conteudoAvisoTime(p) {
-    const d = p.desafio;
-    const cor = /^#[0-9a-f]{6}$/i.test(p.time.cor) ? p.time.cor : COR.azul;
-    const inic = (n) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]).join("").toUpperCase();
-    const corpo = `
-    <p style="font-size:17px;margin:0 0 10px">Ol\xE1, <b>${escapeHtml(p.nome)}</b>! \u{1F44B}</p>
-    <p style="margin:0;line-height:1.6;color:#333">Os times do <b>Desafio #${escapeHtml(d.numero)}</b> do Pivotando foram sorteados, e o desafio come\xE7ou!</p>
-
-    ${blocoMensagem((p.mensagem || "").trim(), p.remetente)}
-
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 0"><tr><td align="center" style="background:${cor};border-radius:14px;padding:22px 20px;color:#ffffff">
-      <div style="font-size:13px;opacity:.9;letter-spacing:1px;text-transform:uppercase">Voc\xEA est\xE1 no</div>
-      <div style="font-size:28px;font-weight:bold;margin:4px 0">Time ${escapeHtml(p.time.nome)} \u{1F389}</div>
-      <div style="font-size:13px;opacity:.9">${p.colegas.length + 1} pessoas \xB7 \xE1reas diferentes, um s\xF3 objetivo</div>
-    </td></tr></table>
-
-    ${p.colegas.length ? `${secao("\u{1F465}", "Seu time")}
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${p.colegas.map((c) => `<tr>
-      <td width="40" style="padding:0 10px 10px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${cor};color:#fff;text-align:center;font-weight:bold;font-size:12px">${escapeHtml(inic(c.nome))}</div></td>
-      <td style="padding:0 0 10px;font-size:14px"><b style="color:${COR.texto}">${escapeHtml(c.nome)}</b>${c.departamento ? `<span style="color:${COR.muted};font-size:12px"> \xB7 ${escapeHtml(c.departamento)}</span>` : ""}</td></tr>`).join("")}</table>
-    <p style="font-size:13px;color:#555;margin:4px 0 0">\u{1F4AC} Combinem com o time quando e onde v\xE3o se reunir para trabalhar nas entregas.</p>` : ""}
-
-    ${secao("\u{1F9E9}", "O desafio")}
-    ${cartaoDesafio(d)}
-
-    ${tabelaPrazos(d)}
-
-    ${botaoCentral(p.link, `Entrar na sala do Time ${p.time.nome} \u2192`, "L\xE1 est\xE3o as entregas do seu time. Entre com a sua conta Google <b>@lti.net.br</b>.")}
-
-    <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Juntos, viramos o jogo. \u{1F499}</p>`;
-    return { assunto: `\u{1F389} Pivotando: voc\xEA est\xE1 no Time ${p.time.nome}! \xB7 Desafio #${d.numero}`, corpo };
-  }
-  function mailConvitePivotando(email, c) {
-    send(email, c.assunto, c.corpo);
-  }
-  function previaEmail(c) {
-    const logo = "" ? "data:image/png;base64," : APP_PUBLICO + "capa.png";
-    return layout(c.corpo).replace("cid:logo", logo);
-  }
-
   // src/server/nucleo.ts
   var ETAPAS = ["gut", "csd", "plano", "ideias"];
+  function etapasDo(d) {
+    const sel = String(d.instrumentos || "").split(",");
+    const r = ETAPAS.filter((e) => sel.includes(e));
+    return r.length ? r : [...ETAPAS];
+  }
   var PRAZO_CAMPO = { gut: "prazoGut", csd: "prazoCsd", plano: "prazoPlano", ideias: "prazoIdeias" };
   var NOMES_TIMES = [
     ["Aurora", "#ec2f8f"],
@@ -1216,6 +1069,185 @@ ${APP_PUBLICO}`),
     if (depois.length >= 2)
       return { email, nome, departamento: depois[0], funcao: depois[1] };
     return { email, nome, departamento: "", funcao: depois[0] || "" };
+  }
+
+  // src/server/mail.ts
+  var listaNatural = (xs) => xs.length > 1 ? xs.slice(0, -1).join(", ") + " e " + xs[xs.length - 1] : xs[0] || "";
+  var logoBlob = () => Utilities.newBlob(Utilities.base64Decode(""), "image/png", "pivotando.png");
+  function layout(conteudo) {
+    return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:580px;margin:auto;color:#1b1e2e;background:#f5f8fd;padding:16px">
+  <div style="background:#fff;border-radius:14px;overflow:hidden;border:1px solid #e3e6f0">
+    <div style="padding:18px 22px;border-bottom:4px solid #0164C8"><img src="cid:logo" alt="Pivotando \u2014 Juntos, viramos o jogo." height="46"></div>
+    <div style="height:6px;background:linear-gradient(90deg,#ec2f8f,#6a11b8,#3b4fd8,#3fb8ee)"></div>
+    <div style="padding:22px">${conteudo}</div>
+  </div>
+  <p style="font-size:11px;color:#888;padding:8px 6px;margin:0">Mensagem autom\xE1tica do ${APP_NAME}. N\xE3o responda este e-mail.</p></div>`;
+  }
+  function botao(url, texto) {
+    return `<p style="margin:26px 0"><a href="${escapeHtml(url)}" style="background:#0164C8;color:#fff;padding:13px 24px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold">${escapeHtml(texto)}</a></p>`;
+  }
+  function send(to, subject, html) {
+    MailApp.sendEmail({ to, subject, htmlBody: layout(html), name: APP_NAME, inlineImages: { logo: logoBlob() } });
+  }
+  var ETAPA_NOME = { gut: "Matriz GUT", csd: "Matriz CSD", plano: "Plano de A\xE7\xE3o", ideias: "Brainstorm round-robin" };
+  function mailLembrete(p) {
+    send(
+      p.email,
+      `\u23F0 Amanh\xE3 termina o prazo da ${ETAPA_NOME[p.etapa]} \u2014 Time ${p.timeNome}`,
+      `<p>Ol\xE1, ${escapeHtml(p.nome)}!</p>
+     <p>O prazo da <b>${ETAPA_NOME[p.etapa]}</b> do <b>Time ${escapeHtml(p.timeNome)}</b> termina amanh\xE3 (${fmtDia(p.prazo)}), e a etapa ainda n\xE3o foi conclu\xEDda.</p>
+     ${botao(p.link, "Continuar com o time")}`
+    );
+  }
+  function linkAgenda(d) {
+    if (!d.dataAbertura)
+      return "";
+    const dia = d.dataAbertura.replace(/-/g, "");
+    const ini = (d.horaAbertura || "09:00").replace(":", "") + "00";
+    const fimPadrao = (() => {
+      const [h, m] = (d.horaAbertura || "09:00").split(":").map(Number);
+      return `${String(Math.min(23, h + 2)).padStart(2, "0")}${String(m).padStart(2, "0")}00`;
+    })();
+    const fim = d.horaFimAbertura ? d.horaFimAbertura.replace(":", "") + "00" : fimPadrao;
+    const q = [
+      "action=TEMPLATE",
+      "text=" + encodeURIComponent(`Pivotando \xB7 Abertura do Desafio #${d.numero}`),
+      `dates=${dia}T${ini}/${dia}T${fim}`,
+      "ctz=America/Sao_Paulo",
+      "details=" + encodeURIComponent(`${d.titulo}
+
+Encontro de abertura do Pivotando: apresenta\xE7\xE3o do desafio e sorteio dos times.
+${APP_PUBLICO}`),
+      d.localAbertura ? "location=" + encodeURIComponent(d.localAbertura) : ""
+    ].filter(Boolean).join("&");
+    return "https://calendar.google.com/calendar/render?" + q;
+  }
+  var COR = { azul: "#0164C8", escuro: "#103C9B", roxo: "#6a11b8", texto: "#1b1e2e", muted: "#6b7088", borda: "#e3e6f0", fundo: "#f5f8fd" };
+  function secao(icone, titulo) {
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:26px 0 12px"><tr>
+    <td style="font-size:12px;font-weight:bold;letter-spacing:1.2px;text-transform:uppercase;color:${COR.escuro};white-space:nowrap;padding-right:10px">${icone}&nbsp; ${titulo}</td>
+    <td width="100%" style="border-bottom:2px solid ${COR.borda}"></td></tr></table>`;
+  }
+  function blocoMensagem(mensagem, remetente) {
+    if (!mensagem)
+      return "";
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 0"><tr><td style="background:#fff8e6;border-left:4px solid #f59e0b;border-radius:8px;padding:14px 16px">
+      <div style="white-space:pre-wrap;line-height:1.55;color:#3d3420">${escapeHtml(mensagem)}</div>
+      <div style="margin-top:8px;font-size:12px;color:#8a6d1f">\u2014 ${escapeHtml(remetente)}</div></td></tr></table>`;
+  }
+  function cartaoDesafio(d) {
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:${COR.fundo};border-left:4px solid ${COR.roxo};border-radius:8px;padding:16px 18px">
+      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:${COR.roxo};font-weight:bold">Desafio #${escapeHtml(d.numero)}</div>
+      <div style="font-size:19px;font-weight:bold;margin:6px 0 4px;color:${COR.texto};line-height:1.3">${escapeHtml(d.titulo)}</div>
+      ${d.problema ? `<div style="color:#444;margin-top:8px">${textoRico(d.problema)}</div>` : ""}</td></tr></table>`;
+  }
+  function tabelaPrazos(d) {
+    const usadas = etapasDo(d);
+    const etapas2 = [
+      ["gut", "\u{1F3AF}", "Matriz GUT", "listar e priorizar os microproblemas", d.prazoGut],
+      ["csd", "\u{1F50D}", "Matriz CSD", "certezas, suposi\xE7\xF5es e d\xFAvidas", d.prazoCsd],
+      ["plano", "\u{1F5FA}\uFE0F", "Plano de A\xE7\xE3o", "o qu\xEA, como, onde, quando e quem", d.prazoPlano],
+      ["ideias", "\u{1F4A1}", "Brainstorm", "ideias para resolver o problema", d.prazoIdeias],
+      ["pitch", "\u{1F3A4}", "Apresenta\xE7\xE3o ao vivo", "cada time apresenta sua proposta", d.dataApresentacao]
+    ].filter((e) => e[4] && (e[0] === "pitch" || usadas.includes(e[0]))).map((e) => e.slice(1));
+    if (!etapas2.length)
+      return "";
+    return `${secao("\u{1F5D3}\uFE0F", "Prazos das entregas")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${COR.borda};border-radius:10px;border-collapse:separate;overflow:hidden">
+      ${etapas2.map(([ic, nome, desc, dt], i) => `<tr style="background:${i % 2 ? "#ffffff" : COR.fundo}">
+        <td style="padding:11px 14px;font-size:14px"><b>${ic}&nbsp; ${nome}</b><div style="font-size:12px;color:${COR.muted};margin-top:2px">${desc}</div></td>
+        <td align="right" style="padding:11px 14px;font-size:14px;white-space:nowrap"><b style="color:${COR.azul}">${fmtDia(dt)}</b>
+          <div style="font-size:11px;color:${COR.muted};margin-top:2px">${(diaPorExtenso(dt) || { semana: "" }).semana}</div></td></tr>`).join("")}
+    </table>
+    <p style="font-size:12px;color:${COR.muted};margin:8px 0 0">Cada entrega fica aberta at\xE9 as 23h59 do dia do prazo. Na v\xE9spera, quem ainda n\xE3o concluiu recebe um lembrete.</p>`;
+  }
+  function botaoCentral(url, texto, nota) {
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 8px"><tr><td align="center">
+      <a href="${escapeHtml(url)}" style="background:${COR.azul};color:#fff;padding:14px 28px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold;font-size:15px">${escapeHtml(texto)}</a>
+      ${nota ? `<div style="font-size:12px;color:${COR.muted};margin-top:10px">${nota}</div>` : ""}</td></tr></table>`;
+  }
+  function conteudoConvitePivotando(p) {
+    const d = p.desafio;
+    const mensagem = (p.mensagem || "").trim();
+    const ab = diaPorExtenso(d.dataAbertura);
+    const horario = d.horaAbertura ? d.horaFimAbertura ? `das ${d.horaAbertura} \xE0s ${d.horaFimAbertura}` : `\xE0s ${d.horaAbertura}` : "";
+    const agenda = linkAgenda(d);
+    const passos = [
+      ["Encontro de abertura", "Apresentamos o desafio e os times s\xE3o <b>sorteados ao vivo</b>, misturando pessoas de \xE1reas diferentes."],
+      ["Times em a\xE7\xE3o", "Cada time, ao ser sorteado, <b>se organiza para se reunir</b> e trabalhar nas entregas, cumprindo os prazos."],
+      ["Entregas", `Pelo Pivotando, o time preenche ${listaNatural(etapasDo(d).map((e) => e === "ideias" ? "o Brainstorm" : (e === "plano" ? "o " : "a ") + ETAPA_NOME[e]))}.`],
+      ["Apresenta\xE7\xE3o", "No final, cada time apresenta ao vivo a sua proposta para virar o jogo."]
+    ];
+    const corpo = `
+    <p style="font-size:17px;margin:0 0 10px">Ol\xE1, <b>${escapeHtml(p.nome)}</b>! \u{1F44B}</p>
+    <p style="margin:0;line-height:1.6;color:#333">Voc\xEA foi convidado(a) para o <b>Pivotando</b>: a iniciativa da LTI em que colaboradores de \xE1reas diferentes
+      se juntam em times para resolver <b>problemas reais</b> da empresa com ideias inovadoras.</p>
+
+    ${blocoMensagem(mensagem, p.remetente)}
+
+    ${secao("\u{1F9E9}", "O desafio")}
+    ${cartaoDesafio(d)}
+
+    ${ab ? `${secao("\u{1F4CD}", "Encontro de abertura")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:linear-gradient(120deg,#103C9B,#3d0a91 60%,#6a11b8);background-color:#103C9B;border-radius:12px;padding:18px 20px;color:#ffffff">
+      <div style="font-size:13px;opacity:.85">${ab.semana.charAt(0).toUpperCase() + ab.semana.slice(1)}</div>
+      <div style="font-size:22px;font-weight:bold;margin:2px 0 6px">${ab.data}</div>
+      ${horario ? `<div style="font-size:15px">\u{1F551} ${horario}</div>` : ""}
+      ${d.localAbertura ? `<div style="font-size:15px;margin-top:4px">\u{1F4CD} ${escapeHtml(d.localAbertura)}</div>` : ""}
+      <div style="font-size:13px;opacity:.9;margin-top:10px">\xC9 no encontro que os times ser\xE3o sorteados. N\xE3o falte! \u{1F3B2}</div>
+      ${agenda ? `<div style="margin-top:14px"><a href="${escapeHtml(agenda)}" style="background:#19FAFF;color:#103C9B;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;display:inline-block">\u{1F4C5} Adicionar \xE0 minha agenda</a></div>` : ""}
+    </td></tr></table>` : ""}
+
+    ${secao("\u{1F680}", "Como vai funcionar")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${passos.map(([t, txt2], i) => `<tr>
+      <td valign="top" width="40" style="padding:0 12px 14px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${COR.azul};color:#fff;text-align:center;font-weight:bold;font-size:14px">${i + 1}</div></td>
+      <td valign="top" style="padding:4px 0 14px"><b style="color:${COR.texto}">${t}</b><div style="color:#555;line-height:1.5;margin-top:2px">${txt2}</div></td></tr>`).join("")}</table>
+
+    ${tabelaPrazos(d)}
+
+    ${botaoCentral(p.link, "Conhecer o Pivotando \u2192", "Entre com a sua conta Google <b>@lti.net.br</b>.")}
+
+    <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Juntos, viramos o jogo. \u{1F499}</p>`;
+    return { assunto: `\u{1F680} Convite: Pivotando \xB7 Desafio #${d.numero}${ab ? ` \xB7 abertura em ${fmtDia(d.dataAbertura)}` : ""}`, corpo };
+  }
+  function conteudoAvisoTime(p) {
+    const d = p.desafio;
+    const cor = /^#[0-9a-f]{6}$/i.test(p.time.cor) ? p.time.cor : COR.azul;
+    const inic = (n) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]).join("").toUpperCase();
+    const corpo = `
+    <p style="font-size:17px;margin:0 0 10px">Ol\xE1, <b>${escapeHtml(p.nome)}</b>! \u{1F44B}</p>
+    <p style="margin:0;line-height:1.6;color:#333">Os times do <b>Desafio #${escapeHtml(d.numero)}</b> do Pivotando foram sorteados, e o desafio come\xE7ou!</p>
+
+    ${blocoMensagem((p.mensagem || "").trim(), p.remetente)}
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 0"><tr><td align="center" style="background:${cor};border-radius:14px;padding:22px 20px;color:#ffffff">
+      <div style="font-size:13px;opacity:.9;letter-spacing:1px;text-transform:uppercase">Voc\xEA est\xE1 no</div>
+      <div style="font-size:28px;font-weight:bold;margin:4px 0">Time ${escapeHtml(p.time.nome)} \u{1F389}</div>
+      <div style="font-size:13px;opacity:.9">${p.colegas.length + 1} pessoas \xB7 \xE1reas diferentes, um s\xF3 objetivo</div>
+    </td></tr></table>
+
+    ${p.colegas.length ? `${secao("\u{1F465}", "Seu time")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${p.colegas.map((c) => `<tr>
+      <td width="40" style="padding:0 10px 10px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${cor};color:#fff;text-align:center;font-weight:bold;font-size:12px">${escapeHtml(inic(c.nome))}</div></td>
+      <td style="padding:0 0 10px;font-size:14px"><b style="color:${COR.texto}">${escapeHtml(c.nome)}</b>${c.departamento ? `<span style="color:${COR.muted};font-size:12px"> \xB7 ${escapeHtml(c.departamento)}</span>` : ""}</td></tr>`).join("")}</table>
+    <p style="font-size:13px;color:#555;margin:4px 0 0">\u{1F4AC} Combinem com o time quando e onde v\xE3o se reunir para trabalhar nas entregas.</p>` : ""}
+
+    ${secao("\u{1F9E9}", "O desafio")}
+    ${cartaoDesafio(d)}
+
+    ${tabelaPrazos(d)}
+
+    ${botaoCentral(p.link, `Entrar na sala do Time ${p.time.nome} \u2192`, "L\xE1 est\xE3o as entregas do seu time. Entre com a sua conta Google <b>@lti.net.br</b>.")}
+
+    <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Juntos, viramos o jogo. \u{1F499}</p>`;
+    return { assunto: `\u{1F389} Pivotando: voc\xEA est\xE1 no Time ${p.time.nome}! \xB7 Desafio #${d.numero}`, corpo };
+  }
+  function mailConvitePivotando(email, c) {
+    send(email, c.assunto, c.corpo);
+  }
+  function previaEmail(c) {
+    const logo = "" ? "data:image/png;base64," : APP_PUBLICO + "capa.png";
+    return layout(c.corpo).replace("cid:logo", logo);
   }
 
   // src/server/usuarios.ts
@@ -1323,6 +1355,7 @@ ${APP_PUBLICO}`),
       horaAbertura: d.horaAbertura,
       horaFimAbertura: d.horaFimAbertura,
       localAbertura: d.localAbertura,
+      instrumentos: etapasDo(d),
       criadoEm: d.criadoEm,
       iniciadoEm: d.iniciadoEm,
       encerradoEm: d.encerradoEm
@@ -1379,8 +1412,19 @@ ${APP_PUBLICO}`),
       if (!campos.titulo)
         throw new Error("D\xEA um t\xEDtulo ao desafio (a pergunta do problema central).");
       let id = dados.id;
+      const atual = id ? mustGet("Desafios", id, "Desafio") : null;
+      if (dados.instrumentos !== void 0 && (!atual || atual.status === "rascunho")) {
+        const sel = ETAPAS.filter((e) => String(dados.instrumentos || "").split(",").includes(e));
+        if (!sel.length)
+          throw new Error("Escolha pelo menos um instrumento para o desafio.");
+        campos.instrumentos = sel.join(",");
+      }
+      const usados = etapasDo(atual && !campos.instrumentos ? atual : campos);
+      for (const e of ETAPAS)
+        if (!usados.includes(e))
+          campos[PRAZO_CAMPO[e]] = "";
       if (id) {
-        const d = mustGet("Desafios", id, "Desafio");
+        const d = atual;
         if (d.status === "encerrado")
           throw new Error("Este desafio j\xE1 foi encerrado.");
         update("Desafios", id, campos);
@@ -1555,9 +1599,9 @@ ${APP_PUBLICO}`),
   function api_etapaReabrir(timeId, etapa, abrir) {
     const p = requireFacilitador();
     return withLock(() => {
-      if (!ETAPAS.includes(etapa))
-        throw new Error("Etapa inv\xE1lida.");
       const t = mustGet("Times", timeId, "Time");
+      if (!etapasDo(mustGet("Desafios", t.desafioId, "Desafio")).includes(etapa))
+        throw new Error("Etapa inv\xE1lida.");
       const r = new Set(lista(t.reabertas));
       if (abrir)
         r.add(etapa);
@@ -1667,9 +1711,10 @@ ${APP_PUBLICO}`),
       ideias: where("Ideias", (r) => r.timeId === timeId).length
     };
   }
-  function resumoTime(t) {
-    const concl = lista(t.concluidas);
-    return { id: t.id, nome: t.nome, cor: t.cor, concluidas: concl, etapaAtual: ETAPAS.find((e) => !concl.includes(e)) || "pitch" };
+  function resumoTime(t, d) {
+    const usadas = etapasDo(d);
+    const concl = lista(t.concluidas).filter((e) => usadas.includes(e));
+    return { id: t.id, nome: t.nome, cor: t.cor, concluidas: concl, etapaAtual: usadas.find((e) => !concl.includes(e)) || "pitch" };
   }
   function api_inicio() {
     const p = requireUsuario();
@@ -1681,12 +1726,12 @@ ${APP_PUBLICO}`),
       const t = times.find((tt) => tt.id === x.timeId);
       if (!d || d.status === "rascunho")
         return null;
-      return { desafio: desafioPublico(d), time: t ? resumoTime(t) : null };
+      return { desafio: desafioPublico(d), time: t ? resumoTime(t, d) : null };
     }).filter(Boolean).sort((a, b) => Number(b.desafio.numero) - Number(a.desafio.numero));
     const gestao = p.facilita ? desafios.map((d) => ({
       ...desafioPublico(d),
       participantes: where("Participacoes", (x) => x.desafioId === d.id).length,
-      times: times.filter((t) => t.desafioId === d.id).map(resumoTime)
+      times: times.filter((t) => t.desafioId === d.id).map((t) => resumoTime(t, d))
     })).sort((a, b) => Number(b.numero) - Number(a.numero)) : [];
     return { meus, gestao };
   }
@@ -1718,7 +1763,7 @@ ${APP_PUBLICO}`),
         }
         const micro = t.microproblemaId ? where("GutItens", (r) => r.id === t.microproblemaId)[0] : null;
         return {
-          ...resumoTime(t),
+          ...resumoTime(t, d),
           microproblema: micro?.texto || "",
           membros: membros.map((e) => ({ email: e, nome: usuarios.get(e)?.nome || e, online: !!on[`on:${t.id}:${e}`] })),
           contagem: contar(t.id)
@@ -1793,7 +1838,7 @@ ${APP_PUBLICO}`),
     for (const d of where("Desafios", (x) => x.status === "em_andamento")) {
       for (const t of where("Times", (x) => x.desafioId === d.id)) {
         const concl = (t.concluidas || "").split(",");
-        for (const e of ETAPAS) {
+        for (const e of etapasDo(d)) {
           if (d[PRAZO_CAMPO[e]] !== amanha || concl.includes(e) || enviados.has(`${t.id}|${e}`))
             continue;
           for (const x of where("Participacoes", (pp) => pp.timeId === t.id)) {
@@ -1891,10 +1936,11 @@ ${APP_PUBLICO}`),
     const reab = new Set(lista(t.reabertas));
     const agora = Date.now();
     const out = {};
-    ETAPAS.forEach((e, i) => {
+    const usadas = etapasDo(d);
+    usadas.forEach((e, i) => {
       const prazo = d[PRAZO_CAMPO[e]];
       const vencido = agora > fimDoPrazo(prazo);
-      const liberada = i === 0 || concl.has(ETAPAS[i - 1]);
+      const liberada = i === 0 || concl.has(usadas[i - 1]);
       const editavel = d.status === "em_andamento" && liberada && (membro || p.facilita) && (p.facilita || !vencido || reab.has(e));
       out[e] = { prazo, vencido, liberada, concluida: concl.has(e), reaberta: reab.has(e), editavel };
     });
@@ -1986,9 +2032,9 @@ ${APP_PUBLICO}`),
     return withLock(() => {
       const { p, time: t, desafio: d, membro } = requireTime(timeId, "editar");
       const etapa = etapaDaAcao(acao, dados || {});
-      if (!ETAPAS.includes(etapa))
-        throw new Error("A\xE7\xE3o inv\xE1lida.");
       const info = etapas(d, t, p, membro)[etapa];
+      if (!info)
+        throw new Error(ETAPAS.includes(etapa) ? "Este instrumento n\xE3o faz parte do desafio." : "A\xE7\xE3o inv\xE1lida.");
       if (!info.editavel) {
         if (d.status !== "em_andamento")
           throw new Error("O desafio n\xE3o est\xE1 em andamento: as etapas est\xE3o somente leitura.");
@@ -2601,6 +2647,10 @@ const FASES = [
   { id: 'pitch', nome: 'Pitch', sub: 'Apresentação', cor: 'var(--f-testar)', ico: 'mic' },
 ];
 const FASE = Object.fromEntries(FASES.map((f) => [f.id, f]));
+/** Instrumentos que o desafio usa (na ordem da jornada); desafios antigos usam todos. */
+const etapasDe = (d) => (d && d.instrumentos && d.instrumentos.length ? ETAPAS.filter((e) => d.instrumentos.includes(e)) : ETAPAS);
+/** Trilha do desafio: os instrumentos escolhidos + o pitch. */
+const fasesDe = (d) => FASES.filter((f) => f.id === 'pitch' || etapasDe(d).includes(f.id));
 const ICO = {
   grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7M17.5 14v7"/></svg>',
   lupa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.5-4.5M8 10.5h5"/></svg>',
@@ -2852,11 +2902,19 @@ ROTAS.time = async (el, timeId, faseReq) => {
   aoSair(() => { T.timers.forEach(clearInterval); T = null; });
 };
 
+const usadas = () => etapasDe(T.s.desafio);
 function faseInicial() {
-  const e = T.s.etapas;
-  return ETAPAS.find((k) => e[k].liberada && !e[k].concluida) || (ETAPAS.every((k) => e[k].concluida) ? 'pitch' : 'gut');
+  const e = T.s.etapas, u = usadas();
+  return u.find((k) => e[k].liberada && !e[k].concluida) || (u.every((k) => e[k].concluida) ? 'pitch' : u[0]);
 }
-const faseLiberada = (f) => (f === 'pitch' ? T.s.etapas.ideias.concluida : T.s.etapas[f].liberada);
+/** O pitch libera quando o último instrumento do desafio é concluído. */
+const faseLiberada = (f) => {
+  const u = usadas();
+  if (f === 'pitch') return T.s.etapas[u[u.length - 1]].concluida;
+  return !!(T.s.etapas[f] && T.s.etapas[f].liberada);
+};
+/** Próxima fase da trilha depois de uma etapa (outro instrumento ou o pitch). */
+const proximaFase = (etapa) => { const fs = fasesDe(T.s.desafio); return fs[fs.findIndex((f) => f.id === etapa) + 1]; };
 
 async function poll() {
   if (!T || document.hidden) return;
@@ -2874,13 +2932,25 @@ function aplicar(estado) {
   T.s = estado;
   if (editando()) { T.adiado = true; return; }
   T.adiado = false;
-  desenharTudo();
+  redesenhar();
 }
+// Campos de "novo item" (+ Novo post-it, + Novo microproblema): vazios, não seguram o redesenho —
+// depois do Enter o cursor fica neles, e o item novo precisa aparecer na hora.
+const CAMPO_NOVO = '.add-nota input, #gut-form input';
 function editando() {
   const a = document.activeElement;
-  return a && T && T.el.contains(a) && (a.matches('input, textarea, select') || a.isContentEditable);
+  if (!a || !T || !T.el.contains(a)) return false;
+  if (a.matches(CAMPO_NOVO) && !a.value.trim()) return false;
+  return a.matches('input, textarea, select') || a.isContentEditable;
 }
-document.addEventListener('focusout', () => setTimeout(() => { if (T && T.adiado && !editando()) { T.adiado = false; desenharTudo(); } }, 50));
+/** Redesenha e devolve o cursor ao campo de "novo item" em que a pessoa estava. */
+function redesenhar() {
+  const a = document.activeElement;
+  const col = a && T.el.contains(a) && a.matches(CAMPO_NOVO) ? (a.closest('.add-nota')?.dataset.col || 'gut') : null;
+  desenharTudo();
+  if (col) $(col === 'gut' ? '#gut-form input' : `.add-nota[data-col="${col}"] input`, T.el)?.focus({ preventScroll: true });
+}
+document.addEventListener('focusout', () => setTimeout(() => { if (T && T.adiado && !editando()) { T.adiado = false; redesenhar(); } }, 50));
 
 /** Envia uma ação do instrumento. Respostas só redesenham quando não há outras na fila. */
 async function enviar(acaoNome, dados, { silencioso } = {}) {
@@ -2950,7 +3020,8 @@ function desenharTrilha() {
   const tr = $('#trilha');
   tr.querySelectorAll('.fase').forEach((e) => e.remove());
   const e = T.s.etapas;
-  FASES.forEach((f) => {
+  const fases = fasesDe(T.s.desafio);
+  fases.forEach((f) => {
     const b = document.createElement('button');
     const lib = faseLiberada(f.id);
     const ok = f.id !== 'pitch' && e[f.id].concluida;
@@ -2964,9 +3035,9 @@ function desenharTrilha() {
     };
     tr.appendChild(b);
   });
-  const n = ETAPAS.filter((k) => e[k].concluida).length;
-  const pct = Math.round((n / ETAPAS.length) * 100);
-  $('#linha-prog').style.width = (FASES.findIndex((f) => f.id === T.fase) / (FASES.length - 1)) * 88 + '%';
+  const n = usadas().filter((k) => e[k].concluida).length;
+  const pct = Math.round((n / usadas().length) * 100);
+  $('#linha-prog').style.width = (fases.findIndex((f) => f.id === T.fase) / (fases.length - 1)) * 88 + '%';
   requestAnimationFrame(() => { $('#barra').style.width = pct + '%'; });
   $('#pct').textContent = pct + '%';
 }
@@ -3006,7 +3077,7 @@ function desenharInst() {
 
 function rodapeEtapa(etapa, rotulo = 'Concluir etapa →') {
   const info = T.s.etapas[etapa];
-  const prox = FASES[FASES.findIndex((f) => f.id === etapa) + 1];
+  const prox = proximaFase(etapa);
   if (info.concluida) return `<div class="rodape-etapa"><span class="muted small">✓ Etapa concluída — vocês ainda podem ajustar até o prazo.</span><button class="btn sec" data-ir="${prox.id}">Ir para ${esc(prox.sub)} →</button></div>`;
   return `<div class="rodape-etapa so-edicao"><button class="btn grad" data-concluir="${etapa}">${rotulo}</button></div>`;
 }
@@ -3023,7 +3094,7 @@ document.addEventListener('click', async (ev) => {
   if (!s) return;
   confete();
   conquista(...CONQ[etapa].slice(0, 2), CONQ[etapa][2] + ' · +1 selo para o time');
-  setTimeout(() => { if (!T) return; T.fase = FASES[FASES.findIndex((f) => f.id === etapa) + 1].id; desenharTudo(); scrollTo({ top: 0, behavior: 'smooth' }); }, 900);
+  setTimeout(() => { if (!T) return; T.fase = proximaFase(etapa).id; desenharTudo(); scrollTo({ top: 0, behavior: 'smooth' }); }, 900);
 });
 
 /* ---------------------------- GUT ---------------------------- */
@@ -3061,7 +3132,7 @@ function desenharGUT(el, aviso) {
     if (!b) return;
     const it = T.s.gut.find((x) => x.id === b.dataset.id);
     if (!it) return;
-    if (b.dataset.coroa) { T.s.time.microproblemaId = it.id; listaGUT(false); enviar('gut.escolher', { id: it.id }).then((s) => s && toast('👑 Microproblema escolhido para a Matriz CSD')); return; }
+    if (b.dataset.coroa) { T.s.time.microproblemaId = it.id; listaGUT(false); enviar('gut.escolher', { id: it.id }).then((s) => s && toast('👑 Microproblema escolhido para levar adiante')); return; }
     if (b.classList.contains('x')) {
       dialogo({ titulo: 'Remover microproblema?', texto: it.texto, ok: 'Remover', perigo: true }).then((ok) => ok && enviar('gut.remover', { id: it.id }));
       return;
@@ -3182,6 +3253,8 @@ function desenharQuadro(el, aviso, etapa, { titulo, ajuda, cols, classe }) {
     const texto = i.value.trim();
     if (!texto) return;
     i.value = '';
+    const notas = $(`.notas[data-col="${f.dataset.col}"]`, el);
+    notas.insertAdjacentHTML('beforeend', notaQuadro({ id: '', coluna: f.dataset.col, texto, autorNome: ME.nome }, false).replace('class="nota"', 'class="nota salvando"'));
     enviar(etapa + '.salvar', { coluna: f.dataset.col, texto });
   }));
   const quadro = $('.csd', el);
@@ -3310,20 +3383,19 @@ ROTAS.inicio = async (el) => {
   const hora = new Date().getHours();
   const saud = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
   const cardMeu = ({ desafio: d, time: t }) => {
-    const n = t ? t.concluidas.length : 0;
     return `<div class="card dcard" style="--tc:${t ? esc(t.cor) : 'var(--borda)'}">
       <div style="display:flex;justify-content:space-between;align-items:center"><span class="num">Desafio #${esc(d.numero)}</span>${statusTag(d.status)}</div>
       <h3>${esc(d.titulo)}</h3>
       ${t ? `<div style="display:flex;align-items:center;gap:8px"><i style="width:12px;height:12px;border-radius:50%;background:${esc(t.cor)}"></i><b>Time ${esc(t.nome)}</b>
           <span class="muted small">· ${t.etapaAtual === 'pitch' ? 'pronto para o pitch 🎤' : 'etapa atual: ' + esc(FASE[t.etapaAtual].sub)}</span></div>
-        <div class="mini-trilha">${FASES.slice(0, 4).map((f, k) => `<span style="--fc:${f.cor}"><i style="--p:${k < n ? 100 : 0}%"></i></span>`).join('')}</div>` : '<span class="muted">Você ainda não está em um time.</span>'}
+        <div class="mini-trilha">${etapasDe(d).map((e) => `<span style="--fc:${FASE[e].cor}"><i style="--p:${t.concluidas.includes(e) ? 100 : 0}%"></i></span>`).join('')}</div>` : '<span class="muted">Você ainda não está em um time.</span>'}
       <div class="rod">${t ? `<a class="btn" data-go="/time/${esc(t.id)}">Entrar na sala do time →</a>` : ''}</div></div>`;
   };
   const cardGestao = (d) => `<div class="card dcard">
       <div style="display:flex;justify-content:space-between;align-items:center"><span class="num">Desafio #${esc(d.numero)}</span>${statusTag(d.status)}</div>
       <h3>${esc(d.titulo)}</h3>
-      <div class="muted small">${d.participantes} participante(s) · ${d.times.length} time(s)${d.prazoIdeias ? ' · brainstorm até ' + fmtDia(d.prazoIdeias) : ''}</div>
-      ${d.times.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${d.times.map((t) => `<span class="dep" style="--dc:${esc(t.cor)}">${esc(t.nome)} · ${t.concluidas.length}/4</span>`).join('')}</div>` : ''}
+      <div class="muted small">${d.participantes} participante(s) · ${d.times.length} time(s)${d.dataApresentacao ? ' · apresentação em ' + fmtDia(d.dataApresentacao) : ''}</div>
+      ${d.times.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${d.times.map((t) => `<span class="dep" style="--dc:${esc(t.cor)}">${esc(t.nome)} · ${t.concluidas.length}/${etapasDe(d).length}</span>`).join('')}</div>` : ''}
       <div class="rod"><a class="btn sec peq" data-go="/desafio/${esc(d.id)}">⚙️ Configurar</a>${d.status !== 'rascunho' ? `<a class="btn peq" data-go="/painel/${esc(d.id)}">📡 Painel ao vivo</a>` : ''}</div></div>`;
   el.innerHTML = `
     <div class="card hero boas-vindas">
@@ -3376,9 +3448,20 @@ function desenharDesafio() {
   ({ dados: passoDados, participantes: passoParticipantes, times: passoTimes, andamento: passoAndamento })[D.passo]($('#passo'));
 }
 
+// [etapa, campo do prazo, ícone, nome, para que serve]
+const INSTRUMENTOS = [
+  ['gut', 'prazoGut', '🎯', 'Matriz GUT', 'Listar e priorizar os microproblemas'],
+  ['csd', 'prazoCsd', '🔍', 'Matriz CSD', 'Certezas, suposições e dúvidas'],
+  ['plano', 'prazoPlano', '🗺️', 'Plano de Ação', 'O que, como, onde, quando e quem'],
+  ['ideias', 'prazoIdeias', '💡', 'Brainstorm', 'Ideias para resolver o problema'],
+  ['pitch', 'dataApresentacao', '🎤', 'Apresentação', 'Sempre acontece: cada time apresenta ao vivo'],
+];
+
 function passoDados(el) {
   const x = D.d.desafio;
   const ro = x.status === 'encerrado';
+  const usados = etapasDe(x);
+  const travado = x.status !== 'rascunho';
   el.innerHTML = `<form class="card" id="f-dados">
     <label class="campo">Problema central <small>— escreva como uma pergunta desafiadora</small></label>
     <input type="text" name="titulo" maxlength="160" required placeholder="Ex.: Como reduzir o tempo de implantação de novos clientes?" value="${esc(x.titulo)}">
@@ -3395,19 +3478,37 @@ function passoDados(el) {
         <div><label class="campo">Término <small>(opcional)</small></label><input type="time" name="horaFimAbertura" value="${esc(x.horaFimAbertura || '')}"></div>
         <div><label class="campo">Local</label><input type="text" name="localAbertura" maxlength="160" placeholder="Ex.: Sala de treinamento · 2º andar" value="${esc(x.localAbertura || '')}"></div>
       </div></div>
-    <div class="secao"><h3>Prazos de entrega</h3>
-      <div class="cols5">
-        ${[['prazoGut', '🎯 Matriz GUT'], ['prazoCsd', '🔍 Matriz CSD'], ['prazoPlano', '🗺️ Plano de Ação'], ['prazoIdeias', '💡 Brainstorm'], ['dataApresentacao', '🎤 Apresentação']]
-          .map(([k, t]) => `<div><label class="campo">${t}</label><input type="date" name="${k}" value="${esc(x[k] || '')}"></div>`).join('')}
+    <div class="secao"><h3>Instrumentos e prazos <small style="text-transform:none;letter-spacing:0;font-weight:400">— ligue só os que este desafio vai usar</small></h3>
+      <div class="inst-cards" id="inst-cards">
+        ${INSTRUMENTOS.map(([e, k, ic, nome, desc]) => {
+          const on = e === 'pitch' || usados.includes(e);
+          return `<div class="inst-card${on ? ' on' : ''}${e === 'pitch' ? ' fixo' : ''}${travado && e !== 'pitch' ? ' travado' : ''}" style="--fc:${FASE[e].cor}" data-e="${e}">
+            <label class="topo"${e === 'pitch' || travado ? '' : ' tabindex="0"'}>${e === 'pitch' ? '' : `<input type="checkbox" name="instr" value="${e}" ${on ? 'checked' : ''} ${travado ? 'disabled' : ''}>`}
+              <span class="ic">${ic}</span><span>${nome}</span>${e === 'pitch' ? '' : '<span class="chave"></span>'}</label>
+            <div class="desc">${desc}</div>
+            <input type="date" name="${k}" value="${esc(x[k] || '')}" aria-label="Prazo · ${nome}">
+            <div class="fora">Não será usado</div></div>`;
+        }).join('')}
       </div>
-      <p class="muted small">Cada etapa fica aberta até o fim do dia do prazo (horário de Brasília). Na véspera, quem ainda não concluiu recebe um lembrete por e-mail.</p></div>
+      <p class="muted small">${travado ? '🔒 Os instrumentos ficam fixos depois que o desafio começa; os prazos ainda podem mudar. ' : ''}Cada etapa fica aberta até o fim do dia do prazo (horário de Brasília). Na véspera, quem ainda não concluiu recebe um lembrete por e-mail.</p></div>
     ${ro ? '' : `<div class="acoes-form"><button class="btn">${D.novo ? 'Criar desafio →' : 'Salvar'}</button></div>`}</form>`;
   if (ro) $$('input, textarea', el).forEach((i) => (i.disabled = true));
+  $$('.inst-card input[type=checkbox]', el).forEach((cb) => (cb.onchange = () => cb.closest('.inst-card').classList.toggle('on', cb.checked)));
+  $$('.inst-card .topo[tabindex]', el).forEach((t) => (t.onkeydown = (ev) => {
+    if (ev.key !== ' ' && ev.key !== 'Enter') return;
+    ev.preventDefault();
+    const cb = $('input', t); cb.checked = !cb.checked; cb.onchange();
+  }));
   $('#f-dados').onsubmit = async (ev) => {
     ev.preventDefault();
     const f = ev.target;
-    const dados = Object.fromEntries(new FormData(f).entries());
-    const ordem = ['dataAbertura', 'prazoGut', 'prazoCsd', 'prazoPlano', 'prazoIdeias', 'dataApresentacao'].map((k) => dados[k]).filter(Boolean);
+    const fd = new FormData(f);
+    const escolhidos = travado ? usados : fd.getAll('instr');
+    if (!escolhidos.length) return toast('Ligue pelo menos um instrumento para o desafio.', true);
+    const dados = Object.fromEntries([...fd.entries()].filter(([k]) => k !== 'instr'));
+    dados.instrumentos = escolhidos.join(',');
+    INSTRUMENTOS.forEach(([e, k]) => { if (e !== 'pitch' && !escolhidos.includes(e)) dados[k] = ''; });
+    const ordem = ['dataAbertura', ...INSTRUMENTOS.map(([, k]) => k)].map((k) => dados[k]).filter(Boolean);
     if (dados.horaAbertura && dados.horaFimAbertura && dados.horaFimAbertura <= dados.horaAbertura) return toast('O término do encontro precisa ser depois do início.', true);
     if (ordem.some((v, i) => i && v < ordem[i - 1])) return toast('As datas precisam seguir a ordem: abertura, depois as etapas.', true);
     if (!D.novo) dados.id = D.d.desafio.id;
@@ -3738,7 +3839,7 @@ function passoAndamento(el) {
     ${d.times.length ? `<div class="times-grid">${d.times.map((t) => `<div class="time-card" style="--tc:${esc(t.cor)}">
       <h4>Time ${esc(t.nome)}<span class="small">${t.emails.length} pessoa(s)</span></h4>
       <ul>${t.emails.map(liPessoa).join('')}</ul>
-      <div class="etapas-mini">${ETAPAS.map((e) => {
+      <div class="etapas-mini">${etapasDe(x).map((e) => {
         const ok = t.concluidas.includes(e), reab = t.reabertas.includes(e), venc = !ok && prazo[e] && agora > fimDoPrazo(prazo[e]);
         const cls = ok ? 'ok' : reab ? 'reab' : venc ? 'venc' : '';
         const tip = ok ? 'Concluída' : reab ? 'Reaberta — clique para fechar' : venc ? 'Prazo vencido — clique para reabrir' : 'Em aberto';
@@ -3864,7 +3965,7 @@ ROTAS.painel = async (el, id) => {
       return `<div class="pt" style="--tc:${esc(t.cor)}">
         <h4>Time ${esc(t.nome)}<span class="dep" style="--dc:${esc(t.cor)}">${t.etapaAtual === 'pitch' ? 'Pronto p/ pitch 🎤' : esc(FASE[t.etapaAtual].sub)}</span></h4>
         <div class="avs">${t.membros.map((m) => av(m.nome, m.online ? 'on' : '')).join('')}</div>
-        <div class="mini-trilha">${FASES.slice(0, 4).map((f) => `<span style="--fc:${f.cor}"><i style="--p:${t.concluidas.includes(f.id) ? 100 : f.id === t.etapaAtual ? 35 : 0}%"></i></span>`).join('')}</div>
+        <div class="mini-trilha">${etapasDe(dados.desafio).map((e) => FASE[e]).map((f) => `<span style="--fc:${f.cor}"><i style="--p:${t.concluidas.includes(f.id) ? 100 : f.id === t.etapaAtual ? 35 : 0}%"></i></span>`).join('')}</div>
         ${t.microproblema ? `<div class="small" style="margin:8px 0"><b>👑</b> ${esc(t.microproblema)}</div>` : ''}
         <div class="contadores"><div><b class="${pulo('csd')}">${c.gut + c.csd}</b><span>post-its</span></div><div><b class="${pulo('acoes')}">${c.acoes}</b><span>ações</span></div><div><b class="${pulo('ideias')}">${c.ideias}</b><span>ideias</span></div></div>
         <div class="acoes-time" style="padding:10px 0 0"><a class="btn sec peq" data-go="/time/${esc(t.id)}">Ver sala</a><a class="btn sec peq" data-go="/apresentar/${esc(t.id)}">🎤 Slides</a></div></div>`;
@@ -3890,18 +3991,19 @@ ROTAS.apresentar = async (el, timeId) => {
   const rot = { certeza: 'Certezas', suposicao: 'Suposições', duvida: 'Dúvidas' };
   const micro = s.gut.find((g) => g.id === s.time.microproblemaId);
   const colsPlano = [['oque', 'O que?'], ['como', 'Como?'], ['onde', 'Onde?'], ['quando', 'Quando?'], ['quem', 'Quem?']];
+  const usa = etapasDe(s.desafio);
   const S = [
     `<div class="k">Pivotando · Desafio #${esc(s.desafio.numero)} · Time ${esc(s.time.nome)}</div><h2>${esc(s.desafio.titulo)}</h2>${s.desafio.problema ? `<p>${esc(resumoTexto(s.desafio.problema))}</p>` : ''}
       <div class="avs" style="margin-top:3vh">${s.membros.map((m) => av(m.nome)).join('')}</div><p style="margin-top:1vh;opacity:.75;font-size:clamp(11px,1.2vw,15px)">${s.membros.map((m) => esc(m.nome)).join(' · ')}</p>`,
-    `<div class="k">Matriz GUT · microproblemas</div><h2>O que mais dói</h2><div class="lista">${s.gut.slice(0, 5).map((it) => `<div><b class="n">${it.grau}</b>${it.id === s.time.microproblemaId ? '👑 ' : ''}${esc(it.texto)}</div>`).join('') || '<div>—</div>'}</div>`,
-    `<div class="k">Microproblema escolhido 👑</div><h2>${esc(micro ? micro.texto : '—')}</h2>${micro ? `<p>Gravidade ${micro.g} × Urgência ${micro.u} × Tendência ${micro.t} = <b>${micro.grau}</b> de 125</p>` : ''}`,
-    `<div class="k">Matriz CSD</div><h2>O que sabemos e o que não sabemos</h2><div class="cols3">${['certeza', 'suposicao', 'duvida'].map((k) => `<div style="border-top:4px solid var(--c-${k})"><h5>${rot[k]}</h5>${s.csd.filter((c) => c.coluna === k).slice(0, 5).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
-    `<div class="k">Plano de Ação</div><h2>Próximos passos</h2><div class="cols3 c5">${colsPlano.map(([k, t]) => `<div style="border-top:4px solid var(--p-${k})"><h5>${t}</h5>${s.plano.filter((c) => c.coluna === k).slice(0, 4).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
-    `<div class="k">Brainstorm · ranking do time</div><h2>Nossas ideias</h2><div class="lista">${s.ideias.slice(0, 6).map((it, i) => `<div><b class="n">${['🥇', '🥈', '🥉'][i] || i + 1}</b><span>${esc(it.titulo)}${it.apoios.length ? `<span style="opacity:.7"> · ${it.apoios.length} apoio(s)</span>` : ''}</span></div>`).join('') || '<div>—</div>'}</div>`,
-    s.ideias[0] ? `<div class="k">Nossa proposta</div><h2>💡 ${esc(s.ideias[0].titulo)}</h2>${s.ideias[0].descricao ? `<p>${esc(s.ideias[0].descricao)}</p>` : ''}
+    usa.includes('gut') && `<div class="k">Matriz GUT · microproblemas</div><h2>O que mais dói</h2><div class="lista">${s.gut.slice(0, 5).map((it) => `<div><b class="n">${it.grau}</b>${it.id === s.time.microproblemaId ? '👑 ' : ''}${esc(it.texto)}</div>`).join('') || '<div>—</div>'}</div>`,
+    usa.includes('gut') && `<div class="k">Microproblema escolhido 👑</div><h2>${esc(micro ? micro.texto : '—')}</h2>${micro ? `<p>Gravidade ${micro.g} × Urgência ${micro.u} × Tendência ${micro.t} = <b>${micro.grau}</b> de 125</p>` : ''}`,
+    usa.includes('csd') && `<div class="k">Matriz CSD</div><h2>O que sabemos e o que não sabemos</h2><div class="cols3">${['certeza', 'suposicao', 'duvida'].map((k) => `<div style="border-top:4px solid var(--c-${k})"><h5>${rot[k]}</h5>${s.csd.filter((c) => c.coluna === k).slice(0, 5).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
+    usa.includes('plano') && `<div class="k">Plano de Ação</div><h2>Próximos passos</h2><div class="cols3 c5">${colsPlano.map(([k, t]) => `<div style="border-top:4px solid var(--p-${k})"><h5>${t}</h5>${s.plano.filter((c) => c.coluna === k).slice(0, 4).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
+    usa.includes('ideias') && `<div class="k">Brainstorm · ranking do time</div><h2>Nossas ideias</h2><div class="lista">${s.ideias.slice(0, 6).map((it, i) => `<div><b class="n">${['🥇', '🥈', '🥉'][i] || i + 1}</b><span>${esc(it.titulo)}${it.apoios.length ? `<span style="opacity:.7"> · ${it.apoios.length} apoio(s)</span>` : ''}</span></div>`).join('') || '<div>—</div>'}</div>`,
+    usa.includes('ideias') && s.ideias[0] ? `<div class="k">Nossa proposta</div><h2>💡 ${esc(s.ideias[0].titulo)}</h2>${s.ideias[0].descricao ? `<p>${esc(s.ideias[0].descricao)}</p>` : ''}
       ${s.ideias[0].apoios.length ? `<div class="lista">${s.ideias[0].apoios.slice(0, 4).map((a) => `<div>✦ ${esc(a.texto)}</div>`).join('')}</div>` : ''}<p style="margin-top:3vh;opacity:.7">Obrigado! · Time ${esc(s.time.nome)}</p>`
       : `<div class="k">Obrigado!</div><h2>Time ${esc(s.time.nome)}</h2>`,
-  ];
+  ].filter(Boolean);
   let at = 0;
   el.innerHTML = `<button class="voltar" data-go="${s.eu.facilita ? '/desafio/' + esc(s.desafio.id) : '/time/' + esc(s.time.id)}">← Voltar</button>
     <div class="inst-head"><h2>Modo apresentação</h2><span class="chip" style="background:${esc(s.time.cor)};color:#fff">Time ${esc(s.time.nome)}</span><span class="muted">Use ← → no teclado. Tela cheia com F.</span></div>
