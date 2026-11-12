@@ -2056,9 +2056,20 @@ ${APP_PUBLICO}`),
           const campos = { texto: txt(dados.texto, 300), g: nivel(dados.g), u: nivel(dados.u), t: nivel(dados.t), atualizadoEm: agora };
           if (!campos.texto)
             throw new Error("Descreva o microproblema.");
-          if (dados.id)
-            meu("GutItens", dados.id) && update("GutItens", dados.id, campos);
-          else
+          if (dados.id) {
+            const antes = meu("GutItens", dados.id);
+            const grauDe = (r) => grau(Number(r.g), Number(r.u), Number(r.t));
+            const topo = (rs) => Math.max(...rs.map(grauDe));
+            const itens = where("GutItens", (r) => r.timeId === timeId);
+            const esc = t.microproblemaId && itens.find((r) => r.id === t.microproblemaId);
+            update("GutItens", dados.id, campos);
+            if (esc) {
+              const depois = itens.map((r) => r.id === antes.id ? { ...r, ...campos } : r);
+              const escDepois = depois.find((r) => r.id === esc.id);
+              if (grauDe(esc) >= topo(itens) && grauDe(escDepois) < topo(depois))
+                update("Times", timeId, { microproblemaId: "" });
+            }
+          } else
             insert("GutItens", [{ id: uuid(), timeId, autor: p.email, criadoEm: agora, ...campos }]);
           detalhe = campos.texto;
           break;
@@ -3137,8 +3148,16 @@ function desenharGUT(el, aviso) {
       dialogo({ titulo: 'Remover microproblema?', texto: it.texto, ok: 'Remover', perigo: true }).then((ok) => ok && enviar('gut.remover', { id: it.id }));
       return;
     }
+    const topo = () => Math.max(...T.s.gut.map((x) => x.grau));
+    const esc = T.s.gut.find((x) => x.id === T.s.time.microproblemaId);
+    const escNoTopo = esc && esc.grau >= topo();
     it[b.dataset.k] = +b.dataset.v;
     it.grau = it.g * it.u * it.t;
+    // Mesma regra do servidor: se a nota tirou o 👑 do topo, a escolha é desfeita.
+    if (escNoTopo && esc.grau < topo()) {
+      T.s.time.microproblemaId = '';
+      toast('👑 A pontuação mudou e o microproblema escolhido não é mais o mais crítico. Escolha de novo.');
+    }
     listaGUT(true);
     enviar('gut.salvar', { id: it.id, texto: it.texto, g: it.g, u: it.u, t: it.t });
   };
