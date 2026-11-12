@@ -377,7 +377,9 @@ textarea { resize:vertical; min-height:72px; }
 .inst-card:not(.on) .topo .ic { filter:grayscale(1); opacity:.6; }
 .inst-card:not(.on) .topo span:not(.chave) { color:var(--muted); }
 .inst-card .fora { display:none; font-size:12px; color:var(--muted); padding:10px 0; text-align:center; border:1.5px dashed var(--borda); border-radius:12px; }
-.inst-card:not(.on) input[type=date] { display:none; }
+.inst-card .datas { display:flex; flex-direction:column; gap:6px; }
+.inst-card .datas .rot { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-top:2px; }
+.inst-card:not(.on) .datas { display:none; }
 .inst-card:not(.on) .fora { display:block; }
 .inst-card.fixo .topo { cursor:default; }
 .inst-card.travado .topo { cursor:not-allowed; }
@@ -736,7 +738,17 @@ var PIVDEMO = (() => {
       "horaFimAbertura",
       "localAbertura",
       // instrumentos usados (gut,csd,plano,ideias separados por vírgula); vazio = todos
-      "instrumentos"
+      "instrumentos",
+      // realização de cada instrumento (data + horário do encontro) e horário da apresentação
+      "dataGut",
+      "horaGut",
+      "dataCsd",
+      "horaCsd",
+      "dataPlano",
+      "horaPlano",
+      "dataIdeias",
+      "horaIdeias",
+      "horaApresentacao"
     ],
     // convidadoEm: quando recebeu o convite para o desafio (antes do sorteio)
     // avisoTimeEm: quando recebeu o aviso do seu time (com o link da sala)
@@ -989,6 +1001,12 @@ var PIVDEMO = (() => {
     return r.length ? r : [...ETAPAS];
   }
   var PRAZO_CAMPO = { gut: "prazoGut", csd: "prazoCsd", plano: "prazoPlano", ideias: "prazoIdeias" };
+  var REALIZACAO_CAMPOS = {
+    gut: ["dataGut", "horaGut"],
+    csd: ["dataCsd", "horaCsd"],
+    plano: ["dataPlano", "horaPlano"],
+    ideias: ["dataIdeias", "horaIdeias"]
+  };
   var NOMES_TIMES = [
     ["Aurora", "#ec2f8f"],
     ["Nebulosa", "#6a11b8"],
@@ -1142,25 +1160,33 @@ ${APP_PUBLICO}`),
       <div style="font-size:19px;font-weight:bold;margin:6px 0 4px;color:${COR.texto};line-height:1.3">${escapeHtml(d.titulo)}</div>
       ${d.problema ? `<div style="color:#444;margin-top:8px">${textoRico(d.problema)}</div>` : ""}</td></tr></table>`;
   }
+  function quando(dt, hr) {
+    if (!dt)
+      return "";
+    const sem = (diaPorExtenso(dt) || { semana: "" }).semana.replace("-feira", "");
+    return `${sem}, ${fmtDia(dt).slice(0, 5)}${hr ? ` \xE0s ${hr}` : ""}`;
+  }
   function tabelaPrazos(d) {
     const usadas = etapasDo(d);
     const etapas2 = [
-      ["gut", "\u{1F3AF}", "Matriz GUT", "listar e priorizar os microproblemas", d.prazoGut],
-      ["csd", "\u{1F50D}", "Matriz CSD", "certezas, suposi\xE7\xF5es e d\xFAvidas", d.prazoCsd],
-      ["plano", "\u{1F5FA}\uFE0F", "Plano de A\xE7\xE3o", "o qu\xEA, como, onde, quando e quem", d.prazoPlano],
-      ["ideias", "\u{1F4A1}", "Brainstorm", "ideias para resolver o problema", d.prazoIdeias],
-      ["pitch", "\u{1F3A4}", "Apresenta\xE7\xE3o ao vivo", "cada time apresenta sua proposta", d.dataApresentacao]
-    ].filter((e) => e[4] && (e[0] === "pitch" || usadas.includes(e[0]))).map((e) => e.slice(1));
+      ["gut", "\u{1F3AF}", "Matriz GUT", "listar e priorizar os microproblemas", d.prazoGut, d.dataGut, d.horaGut],
+      ["csd", "\u{1F50D}", "Matriz CSD", "certezas, suposi\xE7\xF5es e d\xFAvidas", d.prazoCsd, d.dataCsd, d.horaCsd],
+      ["plano", "\u{1F5FA}\uFE0F", "Plano de A\xE7\xE3o", "o qu\xEA, como, onde, quando e quem", d.prazoPlano, d.dataPlano, d.horaPlano],
+      ["ideias", "\u{1F4A1}", "Brainstorm", "ideias para resolver o problema", d.prazoIdeias, d.dataIdeias, d.horaIdeias],
+      ["pitch", "\u{1F3A4}", "Apresenta\xE7\xE3o ao vivo", "cada time apresenta sua proposta", "", d.dataApresentacao, d.horaApresentacao]
+    ].filter((e) => (e[4] || e[5]) && (e[0] === "pitch" || usadas.includes(e[0]))).map((e) => e.slice(1));
     if (!etapas2.length)
       return "";
-    return `${secao("\u{1F5D3}\uFE0F", "Prazos das entregas")}
+    const temPrazo = etapas2.some((e) => e[3]);
+    return `${secao("\u{1F5D3}\uFE0F", "Agenda e prazos")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${COR.borda};border-radius:10px;border-collapse:separate;overflow:hidden">
-      ${etapas2.map(([ic, nome, desc, dt], i) => `<tr style="background:${i % 2 ? "#ffffff" : COR.fundo}">
-        <td style="padding:11px 14px;font-size:14px"><b>${ic}&nbsp; ${nome}</b><div style="font-size:12px;color:${COR.muted};margin-top:2px">${desc}</div></td>
-        <td align="right" style="padding:11px 14px;font-size:14px;white-space:nowrap"><b style="color:${COR.azul}">${fmtDia(dt)}</b>
-          <div style="font-size:11px;color:${COR.muted};margin-top:2px">${(diaPorExtenso(dt) || { semana: "" }).semana}</div></td></tr>`).join("")}
+      ${etapas2.map(([ic, nome, desc, prazo, dt, hr], i) => `<tr style="background:${i % 2 ? "#ffffff" : COR.fundo}">
+        <td style="padding:11px 14px;font-size:14px"><b>${ic}&nbsp; ${nome}</b><div style="font-size:12px;color:${COR.muted};margin-top:2px">${desc}</div>
+          ${dt ? `<div style="font-size:12px;color:${COR.texto};margin-top:4px">\u{1F4C5} ${prazo ? "Realiza\xE7\xE3o" : "Data"}: <b>${quando(dt, hr)}</b></div>` : ""}</td>
+        <td align="right" style="padding:11px 14px;font-size:14px;white-space:nowrap">${prazo ? `<div style="font-size:11px;color:${COR.muted}">prazo</div><b style="color:${COR.azul}">${fmtDia(prazo)}</b>
+          <div style="font-size:11px;color:${COR.muted};margin-top:2px">${(diaPorExtenso(prazo) || { semana: "" }).semana}</div>` : `<b style="color:${COR.azul}">${fmtDia(dt)}</b><div style="font-size:11px;color:${COR.muted};margin-top:2px">${hr ? "\xE0s " + hr : (diaPorExtenso(dt) || { semana: "" }).semana}</div>`}</td></tr>`).join("")}
     </table>
-    <p style="font-size:12px;color:${COR.muted};margin:8px 0 0">Cada entrega fica aberta at\xE9 as 23h59 do dia do prazo. Na v\xE9spera, quem ainda n\xE3o concluiu recebe um lembrete.</p>`;
+    ${temPrazo ? `<p style="font-size:12px;color:${COR.muted};margin:8px 0 0">Cada entrega fica aberta at\xE9 as 23h59 do dia do prazo. Na v\xE9spera, quem ainda n\xE3o concluiu recebe um lembrete.</p>` : ""}`;
   }
   function botaoCentral(url, texto, nota) {
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 8px"><tr><td align="center">
@@ -1357,6 +1383,15 @@ ${APP_PUBLICO}`),
       horaFimAbertura: d.horaFimAbertura,
       localAbertura: d.localAbertura,
       instrumentos: etapasDo(d),
+      dataGut: d.dataGut,
+      horaGut: d.horaGut,
+      dataCsd: d.dataCsd,
+      horaCsd: d.horaCsd,
+      dataPlano: d.dataPlano,
+      horaPlano: d.horaPlano,
+      dataIdeias: d.dataIdeias,
+      horaIdeias: d.horaIdeias,
+      horaApresentacao: d.horaApresentacao,
       criadoEm: d.criadoEm,
       iniciadoEm: d.iniciadoEm,
       encerradoEm: d.encerradoEm
@@ -1389,6 +1424,7 @@ ${APP_PUBLICO}`),
       usuarios: usuarios.filter((u) => u.ativo === "1").map(usuarioPublico).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
     };
   }
+  var NOME_INSTR = { gut: "Matriz GUT", csd: "Matriz CSD", plano: "Plano de A\xE7\xE3o", ideias: "Brainstorm" };
   var DATA = /^\d{4}-\d{2}-\d{2}$/;
   var data = (v) => DATA.test(String(v || "")) ? String(v) : "";
   var hora = (v) => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(v || "")) ? String(v) : "";
@@ -1405,11 +1441,21 @@ ${APP_PUBLICO}`),
         prazoPlano: data(dados.prazoPlano),
         prazoIdeias: data(dados.prazoIdeias),
         dataApresentacao: data(dados.dataApresentacao),
+        horaApresentacao: hora(dados.horaApresentacao),
         dataAbertura: data(dados.dataAbertura),
         horaAbertura: hora(dados.horaAbertura),
         horaFimAbertura: hora(dados.horaFimAbertura),
         localAbertura: txt(dados.localAbertura, 160)
       };
+      for (const e of ETAPAS) {
+        const [kd, kh] = REALIZACAO_CAMPOS[e];
+        campos[kd] = data(dados[kd]);
+        campos[kh] = campos[kd] ? hora(dados[kh]) : "";
+        if (campos[kd] && campos[PRAZO_CAMPO[e]] && campos[kd] > campos[PRAZO_CAMPO[e]])
+          throw new Error(`${NOME_INSTR[e]}: a data de realiza\xE7\xE3o precisa ser at\xE9 o prazo.`);
+        if (campos[kd] && campos.dataAbertura && campos[kd] < campos.dataAbertura)
+          throw new Error(`${NOME_INSTR[e]}: a data de realiza\xE7\xE3o precisa ser depois do encontro de abertura.`);
+      }
       if (!campos.titulo)
         throw new Error("D\xEA um t\xEDtulo ao desafio (a pergunta do problema central).");
       let id = dados.id;
@@ -1423,7 +1469,7 @@ ${APP_PUBLICO}`),
       const usados = etapasDo(atual && !campos.instrumentos ? atual : campos);
       for (const e of ETAPAS)
         if (!usados.includes(e))
-          campos[PRAZO_CAMPO[e]] = "";
+          [PRAZO_CAMPO[e], ...REALIZACAO_CAMPOS[e]].forEach((k) => campos[k] = "");
       if (id) {
         const d = atual;
         if (d.status === "encerrado")
@@ -1995,8 +2041,8 @@ ${APP_PUBLICO}`),
             continue;
           if (campo === "quando" && /^\d{4}-\d{2}-\d{2}$/.test(texto))
             texto = texto.slice(8, 10) + "/" + texto.slice(5, 7) + "/" + texto.slice(0, 4);
-          const quando = a.criadoEm || nowIso();
-          novos.push({ id: uuid(), timeId, coluna, texto: texto.slice(0, 300), ordem: String(ordem++), autor: a.autor, criadoEm: quando, atualizadoEm: a.atualizadoEm || quando });
+          const quando2 = a.criadoEm || nowIso();
+          novos.push({ id: uuid(), timeId, coluna, texto: texto.slice(0, 300), ordem: String(ordem++), autor: a.autor, criadoEm: quando2, atualizadoEm: a.atualizadoEm || quando2 });
         }
       }
       if (novos.length)
@@ -2250,7 +2296,8 @@ function semearDemo(S, mock) {
     titulo: 'Como reduzir o tempo de implantação de novos clientes?',
     problema: 'Hoje uma implantação leva em média 47 dias. Os clientes reclamam de retrabalho, e o suporte fica sobrecarregado nos primeiros meses.',
     descricao: 'Usem os dados do CRM e conversem com quem está na linha de frente. Toda ideia vale!',
-    tamanhoTime: '5', prazoGut: dia(2), prazoCsd: dia(4), prazoPlano: dia(6), prazoIdeias: dia(8), dataApresentacao: dia(10),
+    tamanhoTime: '5', prazoGut: dia(2), prazoCsd: dia(4), prazoPlano: dia(6), prazoIdeias: dia(8), dataApresentacao: dia(10), horaApresentacao: '15:00',
+    dataGut: dia(1), horaGut: '09:00', dataCsd: dia(3), horaCsd: '09:00', dataPlano: dia(5), horaPlano: '14:00', dataIdeias: dia(7), horaIdeias: '14:00',
     dataAbertura: dia(-1), horaAbertura: '14:00', horaFimAbertura: '16:00', localAbertura: 'Auditório · 2º andar',
   });
   const d2 = D.desafio;
@@ -2990,6 +3037,7 @@ function montarSala() {
         <div class="avs" id="avs-time"></div>
         <div style="font-size:12px;opacity:.85" id="prazo-label"></div>
         <div class="countdown" id="countdown"></div>
+        <div style="font-size:12px;opacity:.9;margin-top:6px" id="realizacao-label"></div>
       </div>
     </div>
     <div class="trilha" id="trilha"><div class="linha-prog" id="linha-prog"></div></div>
@@ -3048,8 +3096,13 @@ function tickPrazo() {
   const pitch = T.fase === 'pitch';
   const data = pitch ? T.s.desafio.dataApresentacao : T.s.etapas[T.fase].prazo;
   const c = $('#countdown');
+  // Realização: quando o time se reúne para fazer este instrumento (na apresentação, o horário dela)
+  const REAL = { gut: ['dataGut', 'horaGut'], csd: ['dataCsd', 'horaCsd'], plano: ['dataPlano', 'horaPlano'], ideias: ['dataIdeias', 'horaIdeias'], pitch: ['dataApresentacao', 'horaApresentacao'] };
+  const [kd, kh] = REAL[T.fase] || [];
+  const rd = T.s.desafio[kd], rh = T.s.desafio[kh];
+  $('#realizacao-label').textContent = rd && !pitch ? `📅 Realização: ${fmtDia(rd)}${rh ? ' às ' + rh : ''}` : pitch && rh ? `🕘 Às ${rh}` : '';
   if (!data) { $('#prazo-label').textContent = 'Sem prazo definido'; c.innerHTML = ''; return; }
-  const fim = pitch ? Date.parse(data + 'T08:00:00-03:00') : fimDoPrazo(data);
+  const fim = pitch ? Date.parse(data + 'T' + (T.s.desafio.horaApresentacao || '08:00') + ':00-03:00') : fimDoPrazo(data);
   let s = Math.max(0, Math.floor((fim - Date.now()) / 1000));
   $('#prazo-label').textContent = (pitch ? 'Apresentação ao vivo · ' : 'Prazo · ' + FASE[T.fase].sub + ' · ') + fmtDia(data);
   const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60;
@@ -3371,7 +3424,7 @@ function desenharPitch(el) {
   el.innerHTML = `<div class="card" style="text-align:center;padding:48px 20px">
     <div style="font-size:54px">🎤</div>
     <h2 style="margin:8px 0">Tudo pronto para o pitch!</h2>
-    <p class="muted">O resumo do Time ${esc(T.s.time.nome)} já está montado em slides para apresentar ao vivo${T.s.desafio.dataApresentacao ? ` em <b>${fmtDia(T.s.desafio.dataApresentacao)}</b>` : ''}.</p>
+    <p class="muted">O resumo do Time ${esc(T.s.time.nome)} já está montado em slides para apresentar ao vivo${T.s.desafio.dataApresentacao ? ` em <b>${fmtDia(T.s.desafio.dataApresentacao)}${T.s.desafio.horaApresentacao ? ' às ' + esc(T.s.desafio.horaApresentacao) : ''}</b>` : ''}.</p>
     ${top ? `<p style="margin:18px auto;max-width:560px">🥇 Ideia principal do time: <b>${esc(top.titulo)}</b></p>` : ''}
     <a class="btn grad" data-go="/apresentar/${esc(T.id)}">Abrir modo apresentação →</a></div>`;
 }
@@ -3452,13 +3505,14 @@ function desenharDesafio() {
   ({ dados: passoDados, participantes: passoParticipantes, times: passoTimes, andamento: passoAndamento })[D.passo]($('#passo'));
 }
 
-// [etapa, campo do prazo, ícone, nome, para que serve]
+// [etapa, campo do prazo, ícone, nome, para que serve, [data, horário] da realização]
+// Na apresentação não há prazo: a própria data dela é a realização.
 const INSTRUMENTOS = [
-  ['gut', 'prazoGut', '🎯', 'Matriz GUT', 'Listar e priorizar os microproblemas'],
-  ['csd', 'prazoCsd', '🔍', 'Matriz CSD', 'Certezas, suposições e dúvidas'],
-  ['plano', 'prazoPlano', '🗺️', 'Plano de Ação', 'O que, como, onde, quando e quem'],
-  ['ideias', 'prazoIdeias', '💡', 'Brainstorm', 'Ideias para resolver o problema'],
-  ['pitch', 'dataApresentacao', '🎤', 'Apresentação', 'Sempre acontece: cada time apresenta ao vivo'],
+  ['gut', 'prazoGut', '🎯', 'Matriz GUT', 'Listar e priorizar os microproblemas', ['dataGut', 'horaGut']],
+  ['csd', 'prazoCsd', '🔍', 'Matriz CSD', 'Certezas, suposições e dúvidas', ['dataCsd', 'horaCsd']],
+  ['plano', 'prazoPlano', '🗺️', 'Plano de Ação', 'O que, como, onde, quando e quem', ['dataPlano', 'horaPlano']],
+  ['ideias', 'prazoIdeias', '💡', 'Brainstorm', 'Ideias para resolver o problema', ['dataIdeias', 'horaIdeias']],
+  ['pitch', '', '🎤', 'Apresentação', 'Sempre acontece: cada time apresenta ao vivo', ['dataApresentacao', 'horaApresentacao']],
 ];
 
 function passoDados(el) {
@@ -3484,17 +3538,22 @@ function passoDados(el) {
       </div></div>
     <div class="secao"><h3>Instrumentos e prazos <small style="text-transform:none;letter-spacing:0;font-weight:400">— ligue só os que este desafio vai usar</small></h3>
       <div class="inst-cards" id="inst-cards">
-        ${INSTRUMENTOS.map(([e, k, ic, nome, desc]) => {
+        ${INSTRUMENTOS.map(([e, k, ic, nome, desc, [kd, kh]]) => {
           const on = e === 'pitch' || usados.includes(e);
           return `<div class="inst-card${on ? ' on' : ''}${e === 'pitch' ? ' fixo' : ''}${travado && e !== 'pitch' ? ' travado' : ''}" style="--fc:${FASE[e].cor}" data-e="${e}">
             <label class="topo"${e === 'pitch' || travado ? '' : ' tabindex="0"'}>${e === 'pitch' ? '' : `<input type="checkbox" name="instr" value="${e}" ${on ? 'checked' : ''} ${travado ? 'disabled' : ''}>`}
               <span class="ic">${ic}</span><span>${nome}</span>${e === 'pitch' ? '' : '<span class="chave"></span>'}</label>
             <div class="desc">${desc}</div>
-            <input type="date" name="${k}" value="${esc(x[k] || '')}" aria-label="Prazo · ${nome}">
+            <div class="datas">
+              <div class="rot">📅 Realização</div>
+              <input type="date" name="${kd}" value="${esc(x[kd] || '')}" aria-label="Data da realização · ${nome}">
+              <input type="time" name="${kh}" value="${esc(x[kh] || '')}" aria-label="Horário da realização · ${nome}">
+              ${k ? `<div class="rot">⏰ Prazo</div><input type="date" name="${k}" value="${esc(x[k] || '')}" aria-label="Prazo · ${nome}">` : ''}
+            </div>
             <div class="fora">Não será usado</div></div>`;
         }).join('')}
       </div>
-      <p class="muted small">${travado ? '🔒 Os instrumentos ficam fixos depois que o desafio começa; os prazos ainda podem mudar. ' : ''}Cada etapa fica aberta até o fim do dia do prazo (horário de Brasília). Na véspera, quem ainda não concluiu recebe um lembrete por e-mail.</p></div>
+      <p class="muted small">${travado ? '🔒 Os instrumentos ficam fixos depois que o desafio começa; datas e prazos ainda podem mudar. ' : ''}<b>Realização</b> é quando o time se reúne para fazer o instrumento; o <b>prazo</b> é até quando ele pode ser concluído: cada etapa fica aberta até o fim do dia do prazo (horário de Brasília). Na véspera, quem ainda não concluiu recebe um lembrete por e-mail.</p></div>
     ${ro ? '' : `<div class="acoes-form"><button class="btn">${D.novo ? 'Criar desafio →' : 'Salvar'}</button></div>`}</form>`;
   if (ro) $$('input, textarea', el).forEach((i) => (i.disabled = true));
   $$('.inst-card input[type=checkbox]', el).forEach((cb) => (cb.onchange = () => cb.closest('.inst-card').classList.toggle('on', cb.checked)));
@@ -3511,8 +3570,12 @@ function passoDados(el) {
     if (!escolhidos.length) return toast('Ligue pelo menos um instrumento para o desafio.', true);
     const dados = Object.fromEntries([...fd.entries()].filter(([k]) => k !== 'instr'));
     dados.instrumentos = escolhidos.join(',');
-    INSTRUMENTOS.forEach(([e, k]) => { if (e !== 'pitch' && !escolhidos.includes(e)) dados[k] = ''; });
-    const ordem = ['dataAbertura', ...INSTRUMENTOS.map(([, k]) => k)].map((k) => dados[k]).filter(Boolean);
+    INSTRUMENTOS.forEach(([e, k, , , , rk]) => { if (e !== 'pitch' && !escolhidos.includes(e)) [k, ...rk].forEach((c) => (dados[c] = '')); });
+    const ordem = ['dataAbertura', ...INSTRUMENTOS.map(([, k, , , , [kd]]) => k || kd)].map((k) => dados[k]).filter(Boolean);
+    const foraDoPrazo = INSTRUMENTOS.find(([, k, , , , [kd]]) => k && dados[kd] && dados[k] && dados[kd] > dados[k]);
+    if (foraDoPrazo) return toast(`${foraDoPrazo[3]}: a data de realização precisa ser até o prazo.`, true);
+    const antesAbertura = INSTRUMENTOS.find(([, , , , , [kd]]) => dados[kd] && dados.dataAbertura && dados[kd] < dados.dataAbertura);
+    if (antesAbertura) return toast(`${antesAbertura[3]}: a data de realização precisa ser depois do encontro de abertura.`, true);
     if (dados.horaAbertura && dados.horaFimAbertura && dados.horaFimAbertura <= dados.horaAbertura) return toast('O término do encontro precisa ser depois do início.', true);
     if (ordem.some((v, i) => i && v < ordem[i - 1])) return toast('As datas precisam seguir a ordem: abertura, depois as etapas.', true);
     if (!D.novo) dados.id = D.d.desafio.id;
