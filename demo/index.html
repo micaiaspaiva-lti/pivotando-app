@@ -175,7 +175,8 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
 .grau { text-align:center; min-width:76px; }
 .grau b { display:block; font-size:28px; font-weight:800; line-height:1; font-variant-numeric:tabular-nums; }
 .grau span { font-size:10px; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); }
-.grau .pill { display:inline-block; margin-top:6px; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700; }
+.grau .selo-critico { margin-top:6px; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:800; white-space:nowrap; color:#fff; background:linear-gradient(135deg, #f97316, var(--g5)); box-shadow:0 2px 8px color-mix(in srgb, var(--g5) 35%, transparent); }
+.grau .pill {display:inline-block; margin-top:6px; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700; }
 .coroa-btn { grid-column:1 / -1; justify-self:start; }
 .mapa { position:sticky; top:84px; }
 .mapa svg { width:100%; height:auto; display:block; }
@@ -2056,20 +2057,9 @@ ${APP_PUBLICO}`),
           const campos = { texto: txt(dados.texto, 300), g: nivel(dados.g), u: nivel(dados.u), t: nivel(dados.t), atualizadoEm: agora };
           if (!campos.texto)
             throw new Error("Descreva o microproblema.");
-          if (dados.id) {
-            const antes = meu("GutItens", dados.id);
-            const grauDe = (r) => grau(Number(r.g), Number(r.u), Number(r.t));
-            const topo = (rs) => Math.max(...rs.map(grauDe));
-            const itens = where("GutItens", (r) => r.timeId === timeId);
-            const esc = t.microproblemaId && itens.find((r) => r.id === t.microproblemaId);
-            update("GutItens", dados.id, campos);
-            if (esc) {
-              const depois = itens.map((r) => r.id === antes.id ? { ...r, ...campos } : r);
-              const escDepois = depois.find((r) => r.id === esc.id);
-              if (grauDe(esc) >= topo(itens) && grauDe(escDepois) < topo(depois))
-                update("Times", timeId, { microproblemaId: "" });
-            }
-          } else
+          if (dados.id)
+            meu("GutItens", dados.id) && update("GutItens", dados.id, campos);
+          else
             insert("GutItens", [{ id: uuid(), timeId, autor: p.email, criadoEm: agora, ...campos }]);
           detalhe = campos.texto;
           break;
@@ -2177,7 +2167,7 @@ ${APP_PUBLICO}`),
           if (!where(tabela, (r) => r.timeId === timeId).length)
             throw new Error("Preencha a etapa antes de concluir.");
           if (etapa === "gut" && !mustGet("Times", timeId).microproblemaId)
-            throw new Error("Escolha o microproblema que o time vai levar adiante. \u{1F451}");
+            throw new Error("Escolha o problema que o time vai trabalhar nos pr\xF3ximos instrumentos. \u{1F451}");
           const c = new Set(lista(mustGet("Times", timeId).concluidas));
           c.add(etapa);
           update("Times", timeId, { concluidas: ETAPAS.filter((e) => c.has(e)).join(",") });
@@ -2499,7 +2489,7 @@ function __demoIniciarUI() {
     ['fac', '/usuarios', 'Pessoas', 'Os colaboradores entram com a conta Google da LTI. Dá para cadastrar um a um ou colar uma lista inteira da planilha.'],
     ['fac', () => `/desafio/${d().desafio3}/times`, 'Sorteio dos times', 'Clique em 🎲 Sortear: o sistema equilibra os times e mistura departamentos e funções. Depois dá para ajustar arrastando as pessoas.'],
     ['fac', () => `/desafio/${d().desafio2}/andamento`, 'Acompanhamento e prazos', 'Cada etapa tem prazo. Quando vence, fica só leitura, e o facilitador pode reabrir para um time. Na véspera, sai um lembrete por e-mail.'],
-    ['part', () => `/time/${d().aurora}/gut`, 'Matriz GUT', 'O time lista os microproblemas e dá notas de Gravidade, Urgência e Tendência. O mapa de calor mostra o mais crítico, e o time escolhe 👑 qual levar adiante.'],
+    ['part', () => `/time/${d().aurora}/gut`, 'Matriz GUT', 'O time lista os microproblemas e dá notas de Gravidade, Urgência e Tendência. O 🔥 marca automaticamente o mais crítico, e o time escolhe 👑 o problema que vai trabalhar nos próximos instrumentos.'],
     ['part', () => `/time/${d().aurora}/csd`, 'Matriz CSD', 'Post-its de Certezas, Suposições e Dúvidas sobre o microproblema. Dá para arrastar entre as colunas; o que precisa ser validado vai para o Plano.'],
     ['part', () => `/time/${d().aurora}/plano`, 'Plano de Ação', 'Quadro livre em 5 colunas, como a CSD: o time escolhe o que leva para o plano — o que, como, onde, quando e quem.'],
     ['part', () => `/time/${d().aurora}/priorizar`, 'Brainstorm round-robin', 'Cada pessoa dá uma ideia principal e os colegas reforçam com ideias de apoio. Depois o time arrasta para definir a ordem de importância.'],
@@ -3143,21 +3133,13 @@ function desenharGUT(el, aviso) {
     if (!b) return;
     const it = T.s.gut.find((x) => x.id === b.dataset.id);
     if (!it) return;
-    if (b.dataset.coroa) { T.s.time.microproblemaId = it.id; listaGUT(false); enviar('gut.escolher', { id: it.id }).then((s) => s && toast('👑 Microproblema escolhido para levar adiante')); return; }
+    if (b.dataset.coroa) { T.s.time.microproblemaId = it.id; listaGUT(false); enviar('gut.escolher', { id: it.id }).then((s) => s && toast('👑 Problema escolhido pelo time')); return; }
     if (b.classList.contains('x')) {
       dialogo({ titulo: 'Remover microproblema?', texto: it.texto, ok: 'Remover', perigo: true }).then((ok) => ok && enviar('gut.remover', { id: it.id }));
       return;
     }
-    const topo = () => Math.max(...T.s.gut.map((x) => x.grau));
-    const esc = T.s.gut.find((x) => x.id === T.s.time.microproblemaId);
-    const escNoTopo = esc && esc.grau >= topo();
     it[b.dataset.k] = +b.dataset.v;
     it.grau = it.g * it.u * it.t;
-    // Mesma regra do servidor: se a nota tirou o 👑 do topo, a escolha é desfeita.
-    if (escNoTopo && esc.grau < topo()) {
-      T.s.time.microproblemaId = '';
-      toast('👑 A pontuação mudou e o microproblema escolhido não é mais o mais crítico. Escolha de novo.');
-    }
     listaGUT(true);
     enviar('gut.salvar', { id: it.id, texto: it.texto, g: it.g, u: it.u, t: it.t });
   };
@@ -3188,20 +3170,21 @@ function listaGUT(animar) {
   const ed = T.s.etapas.gut.editavel;
   const esc1 = T.s.time.microproblemaId;
   T.s.gut.sort((a, b) => b.grau - a.grau);
+  const max = T.s.gut.length ? T.s.gut[0].grau : 0;
   const antes = {};
   lista.querySelectorAll('.gut-item').forEach((e) => (antes[e.dataset.id] = e.getBoundingClientRect().top));
   lista.innerHTML = T.s.gut.map((it, i) => {
     const escala = (k, rotulo) => `<div class="escala"><div class="rot">${rotulo}</div><div class="chips">${[1, 2, 3, 4, 5].map((v) =>
       `<button type="button" data-id="${it.id}" data-k="${k}" data-v="${v}" data-tip="${v} · ${ESC_GUT[k][v - 1]}" class="${it[k] === v ? 'on' : ''}" style="${it[k] === v ? `background:var(--g${v})` : ''}" ${ed ? '' : 'disabled'}>${v}</button>`).join('')}</div></div>`;
-    const g = it.grau, eh = esc1 === it.id;
+    const g = it.grau, eh = esc1 === it.id, critico = max > 0 && g === max;
     return `<div class="gut-item ${eh ? 'escolhido' : ''}" data-id="${it.id}">
       <span class="rank">${i + 1}</span>
       <div><div class="txt">${eh ? '👑 ' : ''}<span data-texto="${it.id}" ${ed ? 'contenteditable="true" class="editavel"' : ''}>${esc(it.texto)}</span></div>
         <div class="small muted" style="display:flex;align-items:center;gap:6px;margin-top:4px">${av(it.autorNome, 'mini')} ${esc(primeiro(it.autorNome))}</div></div>
-      <div class="grau"><b>${g}</b><span>grau crítico</span><div class="pill" style="background:${grauCor(g)};color:${g >= 100 ? '#fff' : '#1b1e2e'}">${grauNome(g)}</div></div>
+      <div class="grau"><b>${g}</b><span>grau crítico</span><div class="pill" style="background:${grauCor(g)};color:${g >= 100 ? '#fff' : '#1b1e2e'}">${grauNome(g)}</div>${critico ? '<div class="selo-critico" title="Maior grau crítico da lista">🔥 Mais crítico</div>' : ''}</div>
       <div class="gut-escalas">${escala('g', 'Gravidade')}${escala('u', 'Urgência')}${escala('t', 'Tendência')}</div>
-      ${ed ? `<button type="button" class="btn ${eh ? '' : 'sec'} peq coroa-btn" data-id="${it.id}" data-coroa="1">${eh ? '👑 Microproblema escolhido' : 'Levar este adiante'}</button>
-        <button type="button" class="x" data-id="${it.id}" title="Remover">×</button>` : eh ? '<span class="coroa-btn small" style="font-weight:700;color:#b45309">👑 Microproblema escolhido</span>' : ''}
+      ${ed ? `<button type="button" class="btn ${eh ? '' : 'sec'} peq coroa-btn" data-id="${it.id}" data-coroa="1">${eh ? '👑 Problema escolhido pelo time' : '👑 Escolher este problema'}</button>
+        <button type="button" class="x" data-id="${it.id}" title="Remover">×</button>` : eh ? '<span class="coroa-btn small" style="font-weight:700;color:#b45309">👑 Problema escolhido pelo time</span>' : ''}
     </div>`;
   }).join('');
   if (animar) lista.querySelectorAll('.gut-item').forEach((e) => {
@@ -3212,7 +3195,7 @@ function listaGUT(animar) {
   });
   desenharMapa();
   const av1 = $('#gut-aviso');
-  if (av1) av1.textContent = T.s.gut.length && !esc1 && ed ? '👑 Escolha o microproblema que o time vai levar adiante para concluir.' : '';
+  if (av1) av1.textContent = T.s.gut.length && !esc1 && ed ? '👑 Escolha o problema que o time vai trabalhar nos próximos instrumentos.' : '';
 }
 
 function desenharMapa() {
@@ -3228,6 +3211,7 @@ function desenharMapa() {
   s += `<text x="${(W + P) / 2}" y="${H - 6}" font-size="11" font-weight="700" text-anchor="middle" fill="var(--muted)">GRAVIDADE →</text><text x="12" y="${(H - P) / 2}" font-size="11" font-weight="700" text-anchor="middle" fill="var(--muted)" transform="rotate(-90 12 ${(H - P) / 2})">URGÊNCIA →</text>`;
   const pos = {};
   const esc1 = T.s.time.microproblemaId;
+  const max = Math.max(0, ...T.s.gut.map((it) => it.grau));
   [...T.s.gut].sort((a, b) => a.grau - b.grau).forEach((it) => {
     const k = it.g + '-' + it.u;
     pos[k] = (pos[k] || 0) + 1;
@@ -3235,6 +3219,7 @@ function desenharMapa() {
     s += `<g><circle class="bolha" data-id="${it.id}" cx="${cx}" cy="${cy}" r="${r}" fill="${grauCor(g)}" stroke="${esc1 === it.id ? '#f59e0b' : 'rgba(0,0,0,.25)'}" stroke-width="${esc1 === it.id ? 3 : 1}" fill-opacity=".9"><title>${esc(it.texto)} — ${g}</title></circle>`;
     s += `<text x="${cx}" y="${cy + 4}" font-size="11" font-weight="800" text-anchor="middle" fill="${g >= 100 ? '#fff' : '#1b1e2e'}" pointer-events="none">${g}</text>`;
     if (esc1 === it.id) s += `<text x="${cx}" y="${cy - r - 3}" font-size="16" text-anchor="middle" pointer-events="none">👑</text>`;
+    if (max > 0 && g === max) s += `<text x="${cx + r * 0.75}" y="${cy + r * 0.85}" font-size="14" text-anchor="middle" pointer-events="none"><title>Mais crítico</title>🔥</text>`;
     s += '</g>';
   });
   svg.innerHTML = s;
@@ -3249,7 +3234,7 @@ function desenharQuadro(el, aviso, etapa, { titulo, ajuda, cols, classe }) {
   const cor = etapa === 'csd' ? 'c' : 'p';
   el.innerHTML = `${aviso}
     <div class="inst-head"><h2>${titulo}</h2><span class="chip">Definir</span><span class="muted">${ed ? ajuda : ''}</span></div>
-    <div class="foco"><span style="font-size:24px">👑</span><div><div class="k">Microproblema escolhido</div><b>${esc(micro ? micro.texto : '—')}</b></div></div>
+    <div class="foco"><span style="font-size:24px">👑</span><div><div class="k">Problema escolhido pelo time</div><b>${esc(micro ? micro.texto : '—')}</b></div></div>
     <div class="csd ${classe || ''}">${cols.map(([k, t, sub]) => {
       const cards = T.s[etapa].filter((c) => c.coluna === k);
       return `<div class="coluna" style="--cc:var(--${cor}-${k})"><div class="coluna-head"><h3>${t}<span>${cards.length}</span></h3><p>${sub}</p></div>
@@ -4015,7 +4000,7 @@ ROTAS.apresentar = async (el, timeId) => {
     `<div class="k">Pivotando · Desafio #${esc(s.desafio.numero)} · Time ${esc(s.time.nome)}</div><h2>${esc(s.desafio.titulo)}</h2>${s.desafio.problema ? `<p>${esc(resumoTexto(s.desafio.problema))}</p>` : ''}
       <div class="avs" style="margin-top:3vh">${s.membros.map((m) => av(m.nome)).join('')}</div><p style="margin-top:1vh;opacity:.75;font-size:clamp(11px,1.2vw,15px)">${s.membros.map((m) => esc(m.nome)).join(' · ')}</p>`,
     usa.includes('gut') && `<div class="k">Matriz GUT · microproblemas</div><h2>O que mais dói</h2><div class="lista">${s.gut.slice(0, 5).map((it) => `<div><b class="n">${it.grau}</b>${it.id === s.time.microproblemaId ? '👑 ' : ''}${esc(it.texto)}</div>`).join('') || '<div>—</div>'}</div>`,
-    usa.includes('gut') && `<div class="k">Microproblema escolhido 👑</div><h2>${esc(micro ? micro.texto : '—')}</h2>${micro ? `<p>Gravidade ${micro.g} × Urgência ${micro.u} × Tendência ${micro.t} = <b>${micro.grau}</b> de 125</p>` : ''}`,
+    usa.includes('gut') && `<div class="k">Problema escolhido pelo time 👑</div><h2>${esc(micro ? micro.texto : '—')}</h2>${micro ? `<p>Gravidade ${micro.g} × Urgência ${micro.u} × Tendência ${micro.t} = <b>${micro.grau}</b> de 125</p>` : ''}`,
     usa.includes('csd') && `<div class="k">Matriz CSD</div><h2>O que sabemos e o que não sabemos</h2><div class="cols3">${['certeza', 'suposicao', 'duvida'].map((k) => `<div style="border-top:4px solid var(--c-${k})"><h5>${rot[k]}</h5>${s.csd.filter((c) => c.coluna === k).slice(0, 5).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
     usa.includes('plano') && `<div class="k">Plano de Ação</div><h2>Próximos passos</h2><div class="cols3 c5">${colsPlano.map(([k, t]) => `<div style="border-top:4px solid var(--p-${k})"><h5>${t}</h5>${s.plano.filter((c) => c.coluna === k).slice(0, 4).map((c) => `<p>• ${esc(c.texto)}</p>`).join('') || '<p>—</p>'}</div>`).join('')}</div>`,
     usa.includes('ideias') && `<div class="k">Brainstorm · ranking do time</div><h2>Nossas ideias</h2><div class="lista">${s.ideias.slice(0, 6).map((it, i) => `<div><b class="n">${['🥇', '🥈', '🥉'][i] || i + 1}</b><span>${esc(it.titulo)}${it.apoios.length ? `<span style="opacity:.7"> · ${it.apoios.length} apoio(s)</span>` : ''}</span></div>`).join('') || '<div>—</div>'}</div>`,
