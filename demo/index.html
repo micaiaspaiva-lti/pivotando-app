@@ -546,13 +546,14 @@ button.av.eu:hover { transform:scale(1.06); box-shadow:0 0 0 3px color-mix(in sr
 .crit-tira:hover { background:var(--card); color:var(--erro); }
 .selo-banca { display:inline-block; margin-left:6px; padding:1px 8px; border-radius:99px; font-size:11px; font-weight:700; background:color-mix(in srgb,#f59e0b 18%, var(--card)); color:#b45309; }
 .check-banca { display:flex; gap:10px; align-items:flex-start; margin-top:16px; padding:12px; border-radius:12px; border:1px solid color-mix(in srgb,#f59e0b 40%, var(--borda)); background:color-mix(in srgb,#ffd54a 10%, var(--card)); cursor:pointer; }
-.modal .check-banca input { width:18px; height:18px; flex:none; padding:0; margin:2px 0 0; accent-color:#f59e0b; }
+.modal .check-banca input, .modal .check-banca input[type=checkbox] { width:18px; height:18px; flex:none; padding:0; margin:2px 0 0; accent-color:#f59e0b; }
 .check-banca span { display:flex; flex-direction:column; }
 .check-banca small { color:var(--muted); }
 .bk-card::before { background:linear-gradient(90deg,#ffd54a,#f59e0b,var(--f-empatizar)); }
 .chip-banca { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px; font-size:12px; font-weight:600; text-decoration:none; cursor:pointer;
   background:color-mix(in srgb,#f59e0b 16%, var(--card)); color:#b45309; border:1px solid color-mix(in srgb,#f59e0b 35%, var(--borda)); }
 .hist-pos { font-size:16px; }
+.nota-banca { margin-top:12px; padding:10px 12px; border-radius:12px; font-size:12px; line-height:1.5; background:color-mix(in srgb,#ffd54a 12%, var(--card)); border:1px solid color-mix(in srgb,#f59e0b 35%, var(--borda)); }
 .hist-nota { display:inline-block; margin-left:6px; padding:1px 8px; border-radius:99px; font-size:11px; font-weight:800; background:var(--card-2); color:var(--muted); }
 
 /* jurado (celular) */
@@ -836,6 +837,8 @@ var PIVDEMO = (() => {
     api_banca: () => api_banca,
     api_bancaDefinir: () => api_bancaDefinir,
     api_boot: () => api_boot,
+    api_conviteBancaEnviar: () => api_conviteBancaEnviar,
+    api_conviteBancaPrevia: () => api_conviteBancaPrevia,
     api_conviteEnviar: () => api_conviteEnviar,
     api_convitePrevia: () => api_convitePrevia,
     api_desafio: () => api_desafio,
@@ -948,8 +951,9 @@ var PIVDEMO = (() => {
     IdeiaApoios: ["id", "timeId", "ideiaId", "texto", "autor", "criadoEm"],
     Auditoria: ["id", "timestamp", "ator", "acao", "desafioId", "timeId", "detalhes"],
     Lembretes: ["id", "timeId", "etapa", "enviadoEm"],
-    // jurados da banca avaliadora de cada desafio
-    Banca: ["id", "desafioId", "email", "criadoEm"],
+    // jurados da banca avaliadora de cada desafio; convidadoEm: quando recebeu o convite da banca;
+    // notasAbertasEm: quando recebeu o aviso de que as notas abriram (no início das apresentações)
+    Banca: ["id", "desafioId", "email", "criadoEm", "convidadoEm", "notasAbertasEm"],
     // nota de um jurado para o pitch de um time; notas: JSON { criterioId: 1..5 }
     Avaliacoes: ["id", "desafioId", "timeId", "avaliador", "notas", "comentario", "criadoEm", "atualizadoEm"]
   };
@@ -1355,26 +1359,33 @@ var PIVDEMO = (() => {
      ${botao(p.link, "Continuar com o time")}`
     );
   }
-  function linkAgenda(d) {
-    if (!d.dataAbertura)
+  function linkAgenda(d, evento = "abertura") {
+    const abertura = evento === "abertura";
+    const data2 = abertura ? d.dataAbertura : d.dataApresentacao;
+    if (!data2)
       return "";
-    const dia = d.dataAbertura.replace(/-/g, "");
-    const ini = (d.horaAbertura || "09:00").replace(":", "") + "00";
+    const hIni = (abertura ? d.horaAbertura : d.horaApresentacao) || "09:00";
+    const hFim = abertura ? d.horaFimAbertura : "";
+    const dia = data2.replace(/-/g, "");
+    const ini = hIni.replace(":", "") + "00";
     const fimPadrao = (() => {
-      const [h, m] = (d.horaAbertura || "09:00").split(":").map(Number);
+      const [h, m] = hIni.split(":").map(Number);
       return `${String(Math.min(23, h + 2)).padStart(2, "0")}${String(m).padStart(2, "0")}00`;
     })();
-    const fim = d.horaFimAbertura ? d.horaFimAbertura.replace(":", "") + "00" : fimPadrao;
+    const fim = hFim ? hFim.replace(":", "") + "00" : fimPadrao;
     const q = [
       "action=TEMPLATE",
-      "text=" + encodeURIComponent(`Pivotando \xB7 Abertura do Desafio #${d.numero}`),
+      "text=" + encodeURIComponent(abertura ? `Pivotando \xB7 Abertura do Desafio #${d.numero}` : `Pivotando \xB7 Pitch e banca do Desafio #${d.numero}`),
       `dates=${dia}T${ini}/${dia}T${fim}`,
       "ctz=America/Sao_Paulo",
-      "details=" + encodeURIComponent(`${d.titulo}
+      "details=" + encodeURIComponent(abertura ? `${d.titulo}
 
 Encontro de abertura do Pivotando: apresenta\xE7\xE3o do desafio e sorteio dos times.
-${APP_PUBLICO}`),
-      d.localAbertura ? "location=" + encodeURIComponent(d.localAbertura) : ""
+${APP_PUBLICO}` : `${d.titulo}
+
+Apresenta\xE7\xE3o dos times e avalia\xE7\xE3o da banca do Pivotando.
+${APP_PUBLICO}#/avaliar/${d.id}`),
+      abertura && d.localAbertura ? "location=" + encodeURIComponent(d.localAbertura) : ""
     ].filter(Boolean).join("&");
     return "https://calendar.google.com/calendar/render?" + q;
   }
@@ -1505,6 +1516,95 @@ ${APP_PUBLICO}`),
 
     <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Juntos, viramos o jogo. \u{1F499}</p>`;
     return { assunto: `\u{1F389} Pivotando: voc\xEA est\xE1 no Time ${p.time.nome}! \xB7 Desafio #${d.numero}`, corpo };
+  }
+  function tabelaCriterios(criterios) {
+    const total = criterios.reduce((s, c) => s + c.peso, 0) || 1;
+    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${COR.borda};border-radius:10px;border-collapse:separate;overflow:hidden">
+    ${criterios.map((c, i) => `<tr style="background:${i % 2 ? "#ffffff" : COR.fundo}">
+      <td style="padding:11px 14px;font-size:14px"><b>${escapeHtml(c.nome)}</b><div style="font-size:12px;color:${COR.muted};margin-top:2px">${escapeHtml(c.descricao)}</div></td>
+      <td align="right" style="padding:11px 14px;white-space:nowrap"><div style="font-size:11px;color:${COR.muted}">peso</div><b style="color:${COR.azul};font-size:16px">${c.peso}</b>
+        <div style="font-size:11px;color:${COR.muted}">${Math.round(100 * c.peso / total)}% da nota</div></td></tr>`).join("")}
+  </table>`;
+  }
+  function conteudoConviteBanca(p) {
+    const d = p.desafio;
+    const ap = diaPorExtenso(d.dataApresentacao);
+    const ab = diaPorExtenso(d.dataAbertura);
+    const agenda = linkAgenda(d, "apresentacao");
+    const horarioAb = d.horaAbertura ? d.horaFimAbertura ? `, das ${d.horaAbertura} \xE0s ${d.horaFimAbertura}` : `, \xE0s ${d.horaAbertura}` : "";
+    const passos = [
+      ["Assista aos pitches", "No dia da apresenta\xE7\xE3o, cada time apresenta ao vivo a sua proposta para resolver o problema."],
+      ["D\xEA as notas pelo celular", `Para cada time, uma nota de <b>1 a 5</b> em cada crit\xE9rio abaixo, mais um coment\xE1rio opcional.${p.timeProprio ? ` Como voc\xEA est\xE1 no <b>Time ${escapeHtml(p.timeProprio)}</b>, n\xE3o avalia o pr\xF3prio time.` : ""}`],
+      ["Cerim\xF4nia de premia\xE7\xE3o", "As notas ficam <b>sigilosas</b> at\xE9 o facilitador revelar o p\xF3dio no tel\xE3o. A nota de cada time (0 a 100) \xE9 a m\xE9dia da banca."]
+    ];
+    const corpo = `
+    <p style="font-size:17px;margin:0 0 10px">Ol\xE1, <b>${escapeHtml(p.nome)}</b>! \u{1F44B}</p>
+    <p style="margin:0;line-height:1.6;color:#333">Voc\xEA foi convidado(a) para a <b>banca avaliadora</b> do <b>Pivotando</b>: \xE9 a banca que avalia o pitch de cada time
+      e define as ideias vencedoras, que ser\xE3o <b>premiadas</b>. \u{1F3C6}</p>
+
+    ${blocoMensagem((p.mensagem || "").trim(), p.remetente)}
+
+    ${secao("\u{1F9E9}", "O desafio")}
+    ${cartaoDesafio(d)}
+
+    ${ap ? `${secao("\u{1F3A4}", "A apresenta\xE7\xE3o")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:linear-gradient(120deg,#6a11b8,#ec2f8f);background-color:#6a11b8;border-radius:12px;padding:18px 20px;color:#ffffff">
+      <div style="font-size:13px;opacity:.85">${ap.semana.charAt(0).toUpperCase() + ap.semana.slice(1)}</div>
+      <div style="font-size:22px;font-weight:bold;margin:2px 0 6px">${ap.data}</div>
+      ${d.horaApresentacao ? `<div style="font-size:15px">\u{1F551} \xE0s ${d.horaApresentacao}</div>` : ""}
+      <div style="font-size:13px;opacity:.9;margin-top:10px">Os times apresentam ao vivo e a banca d\xE1 as notas na hora. \u2696\uFE0F</div>
+      ${agenda ? `<div style="margin-top:14px"><a href="${escapeHtml(agenda)}" style="background:#ffffff;color:#6a11b8;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;display:inline-block">\u{1F4C5} Adicionar \xE0 minha agenda</a></div>` : ""}
+    </td></tr></table>` : ""}
+
+    ${ab ? `<p style="font-size:13px;color:#555;margin:14px 0 0;line-height:1.5">\u{1F4CD} <b>Encontro de abertura</b> (se quiser acompanhar o sorteio dos times):
+      ${ab.semana}, ${ab.data}${horarioAb}${d.localAbertura ? ` \xB7 ${escapeHtml(d.localAbertura)}` : ""}.</p>` : ""}
+
+    ${secao("\u2696\uFE0F", "Como voc\xEA vai avaliar")}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${passos.map(([t, txt2], i) => `<tr>
+      <td valign="top" width="40" style="padding:0 12px 14px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${COR.roxo};color:#fff;text-align:center;font-weight:bold;font-size:14px">${i + 1}</div></td>
+      <td valign="top" style="padding:4px 0 14px"><b style="color:${COR.texto}">${t}</b><div style="color:#555;line-height:1.5;margin-top:2px">${txt2}</div></td></tr>`).join("")}</table>
+
+    ${secao("\u{1F4CB}", "Crit\xE9rios de avalia\xE7\xE3o")}
+    ${tabelaCriterios(p.criterios)}
+
+    ${tabelaPrazos(d)}
+
+    ${botaoCentral(p.link, "Abrir a avalia\xE7\xE3o \u2192", "As notas abrem no dia das apresenta\xE7\xF5es. Entre com a sua conta Google <b>@lti.net.br</b>.")}
+
+    <p style="text-align:center;font-size:15px;color:${COR.escuro};font-weight:bold;margin:22px 0 0">Obrigado por fazer parte! \u{1F499}</p>`;
+    return { assunto: `\u2696\uFE0F Voc\xEA est\xE1 na banca do Pivotando \xB7 Desafio #${d.numero}${d.dataApresentacao ? ` \xB7 pitch em ${fmtDia(d.dataApresentacao)}` : ""}`, corpo };
+  }
+  function mailLembreteBanca(p) {
+    const d = p.desafio;
+    send(
+      p.email,
+      `\u2696\uFE0F Amanh\xE3 \xE9 o pitch do Desafio #${d.numero}${d.horaApresentacao ? ` \xE0s ${d.horaApresentacao}` : ""} \u2014 banca do Pivotando`,
+      `<p>Ol\xE1, ${escapeHtml(p.nome)}!</p>
+     <p>Amanh\xE3 (${fmtDia(d.dataApresentacao)}${d.horaApresentacao ? `, \xE0s ${d.horaApresentacao}` : ""}) os times apresentam o <b>Desafio #${escapeHtml(d.numero)}</b>:
+       <i>${escapeHtml(d.titulo)}</i>. Como jurado(a) da banca, voc\xEA d\xE1 uma nota de 1 a 5 em cada crit\xE9rio para cada time:</p>
+     <ul style="line-height:1.6">${p.criterios.map((c) => `<li><b>${escapeHtml(c.nome)}</b> <span style="color:#6b7088">(peso ${c.peso})</span></li>`).join("")}</ul>
+     ${linkAgenda(d, "apresentacao") ? `<p style="font-size:13px"><a href="${escapeHtml(linkAgenda(d, "apresentacao"))}">\u{1F4C5} Adicionar \xE0 minha agenda</a></p>` : ""}
+     ${botao(p.link, "Abrir a avalia\xE7\xE3o")}`
+    );
+  }
+  function mailNotasAbertas(p) {
+    const d = p.desafio;
+    const cor = (c) => /^#[0-9a-f]{6}$/i.test(c) ? c : COR.azul;
+    send(
+      p.email,
+      `\u2696\uFE0F As notas est\xE3o abertas \xB7 Desafio #${d.numero} \u2014 banca do Pivotando`,
+      `<p style="font-size:17px;margin:0 0 10px">Ol\xE1, <b>${escapeHtml(p.nome)}</b>! \u{1F44B}</p>
+     <p style="margin:0;line-height:1.6;color:#333">As apresenta\xE7\xF5es do <b>Desafio #${escapeHtml(d.numero)}</b> come\xE7aram e as notas da banca est\xE3o <b>abertas</b>.
+       Abra o link no celular e avalie cada time logo depois do pitch dele.</p>
+     ${botaoCentral(p.link, "Avaliar os pitches agora \u2192", "Entre com a sua conta Google <b>@lti.net.br</b>.")}
+     ${secao("\u{1F3A4}", "Times")}
+     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${p.times.map((t) => `<tr>
+       <td width="18" style="padding:0 10px 10px 0"><div style="width:14px;height:14px;border-radius:50%;background:${cor(t.cor)}"></div></td>
+       <td style="padding:0 0 10px;font-size:14px"><b>Time ${escapeHtml(t.nome)}</b>${t.ideia ? `<span style="color:${COR.muted}"> \xB7 \u{1F4A1} ${escapeHtml(t.ideia)}</span>` : ""}${t.proprio ? `<span style="color:${COR.muted}"> \xB7 seu time (voc\xEA n\xE3o avalia)</span>` : ""}</td></tr>`).join("")}</table>
+     ${secao("\u{1F4CB}", "Crit\xE9rios (nota de 1 a 5)")}
+     <p style="margin:0;line-height:1.7;font-size:14px">${p.criterios.map((c) => `<b>${escapeHtml(c.nome)}</b> <span style="color:${COR.muted}">peso ${c.peso}</span>`).join("<br>")}</p>
+     <p style="font-size:13px;color:#555;margin:16px 0 0">\u{1F512} As notas ficam sigilosas at\xE9 a cerim\xF4nia de premia\xE7\xE3o.</p>`
+    );
   }
   function mailConvitePivotando(email, c) {
     send(email, c.assunto, c.corpo);
@@ -1875,15 +1975,16 @@ ${APP_PUBLICO}`),
     apresentacao: ["em_andamento", "encerrado"],
     encerrado: ["apresentacao"]
   };
-  function api_desafioStatus(id, status) {
+  function api_desafioStatus(id, status, avisarBanca) {
     const p = requireFacilitador();
     return withLock(() => {
       const d = mustGet("Desafios", id, "Desafio");
       if (!(TRANSICOES[d.status] || []).includes(status))
         throw new Error("Mudan\xE7a de situa\xE7\xE3o n\xE3o permitida.");
-      update("Desafios", id, { status, encerradoEm: status === "encerrado" ? nowIso() : "" });
-      audit(p.email, "desafio_" + status, id);
-      return api_desafio(id);
+      const novo = update("Desafios", id, { status, encerradoEm: status === "encerrado" ? nowIso() : "" });
+      const bancaAvisada = status === "apresentacao" && avisarBanca !== false ? avisarNotasAbertas(novo) : 0;
+      audit(p.email, "desafio_" + status, id, "", bancaAvisada ? { bancaAvisada } : {});
+      return { bancaAvisada, ...api_desafio(id) };
     });
   }
   function api_etapaReabrir(timeId, etapa, abrir) {
@@ -1919,7 +2020,9 @@ ${APP_PUBLICO}`),
       html: previaEmail(c),
       total: partes.length,
       pendentes: partes.filter((x) => !x.convidadoEm).length,
-      exemplo: usuarioPorEmail(partes[0].email)?.nome || partes[0].email
+      exemplo: usuarioPorEmail(partes[0].email)?.nome || partes[0].email,
+      // os jurados recebem, junto, o convite da banca (com as datas e os critérios)
+      banca: resumoConviteBanca(desafioId)
     };
   }
   function api_conviteEnviar(desafioId, mensagem, apenasPendentes) {
@@ -1929,8 +2032,9 @@ ${APP_PUBLICO}`),
       if (d.status === "encerrado")
         throw new Error("Este desafio j\xE1 foi encerrado.");
       const alvo = where("Participacoes", (x) => x.desafioId === desafioId && (!apenasPendentes || !x.convidadoEm));
-      if (!alvo.length)
-        throw new Error("Todos os participantes j\xE1 receberam o convite.");
+      const bancaPend = !d.resultadoEm && resumoConviteBanca(desafioId)[apenasPendentes ? "pendentes" : "total"] > 0;
+      if (!alvo.length && !bancaPend)
+        throw new Error("Todos os participantes e jurados j\xE1 receberam o convite.");
       let enviados = 0;
       const falhas = [];
       for (const x of alvo) {
@@ -1943,8 +2047,9 @@ ${APP_PUBLICO}`),
           audit("sistema", "erro_email", desafioId, "", { email: x.email, erro: String(e) });
         }
       }
-      audit(p.email, "convite_enviado", desafioId, "", { enviados, falhas: falhas.length });
-      return { enviados, falhas, ...api_desafio(desafioId) };
+      const banca = bancaPend ? enviarConvitesBanca(d, mensagem, p.nome, apenasPendentes) : { enviados: 0, falhas: [] };
+      audit(p.email, "convite_enviado", desafioId, "", { enviados, falhas: falhas.length, banca: banca.enviados });
+      return { enviados, falhas: [...falhas, ...banca.falhas], bancaEnviados: banca.enviados, ...api_desafio(desafioId) };
     });
   }
   function api_avisoTimesPrevia(desafioId, mensagem) {
@@ -2062,7 +2167,7 @@ ${APP_PUBLICO}`),
       minhas,
       // o progresso de cada jurado é só para o facilitador; os demais veem o total
       progresso: p.facilita ? prog : { jurados: [], feitas: prog.feitas, esperadas: prog.esperadas },
-      banca: juradosDo(desafioId).map((b) => ({ email: b.email, nome: nome(b.email) })),
+      banca: juradosDo(desafioId).map((b) => ({ email: b.email, nome: nome(b.email), convidadoEm: b.convidadoEm || "" })),
       // pessoas que podem entrar na banca (tela do facilitador)
       usuarios: p.facilita ? all("Usuarios").filter((u) => u.ativo === "1").map((u) => ({ email: u.email, nome: u.nome, departamento: u.departamento, funcao: u.funcao, bancaPadrao: u.bancaPadrao === "1", timeId: partes.find((x) => x.email === u.email)?.timeId || "" })).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")) : [],
       resultado: revelado ? rankingDo(d).map((r) => ({
@@ -2163,6 +2268,94 @@ ${APP_PUBLICO}`),
       audit(p.email, revelar ? "resultado_revelado" : "resultado_oculto", desafioId);
       return api_banca(desafioId);
     });
+  }
+  var linkAvaliar = (desafioId) => `${APP_PUBLICO}#/avaliar/${desafioId}`;
+  function conviteBancaDe(d, email, mensagem, remetente) {
+    const u = usuarioPorEmail(email);
+    const timeId = where("Participacoes", (x) => x.desafioId === d.id && x.email === email)[0]?.timeId || "";
+    const time = timeId ? where("Times", (t) => t.id === timeId)[0] : null;
+    return conteudoConviteBanca({
+      nome: (u?.nome || email).split(" ")[0],
+      desafio: d,
+      criterios: criteriosDo(d),
+      mensagem: txt(mensagem, 1500),
+      remetente,
+      link: linkAvaliar(d.id),
+      timeProprio: time?.nome || ""
+    });
+  }
+  function enviarConvitesBanca(d, mensagem, remetente, apenasPendentes) {
+    let enviados = 0;
+    const falhas = [];
+    for (const b of juradosDo(d.id).filter((x) => !apenasPendentes || !x.convidadoEm)) {
+      try {
+        mailConvitePivotando(b.email, conviteBancaDe(d, b.email, mensagem, remetente));
+        update("Banca", b.id, { convidadoEm: nowIso() });
+        enviados++;
+      } catch (e) {
+        falhas.push(b.email);
+        audit("sistema", "erro_email", d.id, "", { email: b.email, erro: String(e) });
+      }
+    }
+    return { enviados, falhas };
+  }
+  function resumoConviteBanca(desafioId) {
+    const js = juradosDo(desafioId);
+    return { total: js.length, pendentes: js.filter((b) => !b.convidadoEm).length };
+  }
+  function api_conviteBancaPrevia(desafioId, mensagem) {
+    const p = requireFacilitador();
+    const d = mustGet("Desafios", desafioId, "Desafio");
+    const js = juradosDo(desafioId);
+    if (!js.length)
+      throw new Error("Escolha os jurados e salve a banca antes de enviar o convite.");
+    const c = conviteBancaDe(d, js[0].email, mensagem, p.nome);
+    return { assunto: c.assunto, html: previaEmail(c), ...resumoConviteBanca(desafioId), exemplo: usuarioPorEmail(js[0].email)?.nome || js[0].email };
+  }
+  function api_conviteBancaEnviar(desafioId, mensagem, apenasPendentes) {
+    const p = requireFacilitador();
+    return withLock(() => {
+      const d = mustGet("Desafios", desafioId, "Desafio");
+      if (d.status === "encerrado" || d.resultadoEm)
+        throw new Error("O resultado da banca j\xE1 foi definido.");
+      if (!juradosDo(desafioId).some((b) => !apenasPendentes || !b.convidadoEm))
+        throw new Error("Todos os jurados j\xE1 receberam o convite.");
+      const r = enviarConvitesBanca(d, mensagem, p.nome, apenasPendentes);
+      audit(p.email, "convite_banca_enviado", desafioId, "", { enviados: r.enviados, falhas: r.falhas.length });
+      return { ...r, ...api_banca(desafioId) };
+    });
+  }
+  function avisarNotasAbertas(d) {
+    if (d.resultadoEm)
+      return 0;
+    const usuarios = new Map(all("Usuarios").map((u) => [u.email, u]));
+    const partes = where("Participacoes", (x) => x.desafioId === d.id);
+    const ideias = all("Ideias");
+    const times = where("Times", (t) => t.desafioId === d.id).map((t) => ({
+      id: t.id,
+      nome: t.nome,
+      cor: t.cor,
+      ideia: ideias.filter((i) => i.timeId === t.id).sort((a, b) => Number(a.ordem) - Number(b.ordem) || a.criadoEm.localeCompare(b.criadoEm))[0]?.titulo || ""
+    }));
+    let enviados = 0;
+    for (const b of juradosDo(d.id).filter((x) => !x.notasAbertasEm)) {
+      const meu = partes.find((x) => x.email === b.email)?.timeId || "";
+      try {
+        mailNotasAbertas({
+          email: b.email,
+          nome: (usuarios.get(b.email)?.nome || b.email).split(" ")[0],
+          desafio: d,
+          criterios: criteriosDo(d),
+          times: times.map((t) => ({ nome: t.nome, cor: t.cor, ideia: t.ideia, proprio: t.id === meu })),
+          link: linkAvaliar(d.id)
+        });
+        update("Banca", b.id, { notasAbertasEm: nowIso() });
+        enviados++;
+      } catch (e) {
+        audit("sistema", "erro_email", d.id, "", { email: b.email, erro: String(e) });
+      }
+    }
+    return enviados;
   }
 
   // src/server/painel.ts
@@ -2338,6 +2531,19 @@ ${APP_PUBLICO}`),
           }
           insert("Lembretes", [{ id: uuid(), timeId: t.id, etapa: e, enviadoEm: nowIso() }]);
         }
+      }
+    }
+    for (const d of where("Desafios", (x) => (x.status === "em_andamento" || x.status === "apresentacao") && x.dataApresentacao === amanha && !x.resultadoEm)) {
+      for (const b of juradosDo(d.id)) {
+        const chave = "banca:" + b.email;
+        if (enviados.has(`${d.id}|${chave}`))
+          continue;
+        try {
+          mailLembreteBanca({ email: b.email, nome: (usuarios.get(b.email)?.nome || b.email).split(" ")[0], desafio: d, criterios: criteriosDo(d), link: linkAvaliar(d.id) });
+        } catch (err) {
+          audit("sistema", "erro_email", d.id, "", { email: b.email, erro: String(err) });
+        }
+        insert("Lembretes", [{ id: uuid(), timeId: d.id, etapa: chave, enviadoEm: nowIso() }]);
       }
     }
   }
@@ -4126,7 +4332,12 @@ function abrirConvite() {
     pend, total: D.d.participantes.length,
     previa: (msg) => gs('api_convitePrevia', D.d.desafio.id, msg),
     enviar: (msg, soPend) => gs('api_conviteEnviar', D.d.desafio.id, msg, soPend),
-    feito: (r) => conquista('✉️', 'Convites enviados!', `${r.enviados} pessoa(s) convidada(s)${r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`),
+    // a banca recebe junto o convite dela (com as datas do pitch e os critérios)
+    extra: (r, quem) => {
+      const n = r.banca ? (quem === 'pend' ? r.banca.pendentes : r.banca.total) : 0;
+      return n ? `<div class="nota-banca">⚖️ ${n === 1 ? 'O jurado' : `Os ${n} jurados`} da banca também ${n === 1 ? 'recebe' : 'recebem'} <b>o convite da banca</b>, com a data do pitch e os critérios.</div>` : '';
+    },
+    feito: (r) => conquista('✉️', 'Convites enviados!', `${r.enviados} pessoa(s) convidada(s)${r.bancaEnviados ? ` · ${r.bancaEnviados} jurado(s)` : ''}${r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`),
   });
 }
 
@@ -4194,8 +4405,9 @@ async function modalEmail(o) {
         <label class="sel-pessoa ${pend ? 'on' : ''}" style="cursor:pointer"><input type="radio" name="cv-quem" value="pend" ${pend ? 'checked' : 'disabled'}>
           <div><b>Quem ainda não recebeu</b><div class="small muted">${pend} pessoa(s)</div></div></label>
         <label class="sel-pessoa ${pend ? '' : 'on'}" style="cursor:pointer"><input type="radio" name="cv-quem" value="todos" ${pend ? '' : 'checked'}>
-          <div><b>Todos os participantes</b><div class="small muted">${total} pessoa(s) · reenvia a quem já recebeu</div></div></label>`}
+          <div><b>${esc(o.todos || 'Todos os participantes')}</b><div class="small muted">${total} pessoa(s) · reenvia a quem já recebeu</div></div></label>`}
         <p class="small muted" style="margin-top:12px">Assunto: <b id="cv-assunto">…</b></p>
+        <div id="cv-extra"></div>
       </div>
       <div><div class="small muted" style="margin:14px 0 6px">Prévia <span id="cv-exemplo"></span></div>
         <iframe id="cv-previa" class="convite-previa" title="Prévia do e-mail" sandbox></iframe></div>
@@ -4209,6 +4421,7 @@ async function modalEmail(o) {
     $$('.sel-pessoa', m.el).forEach((l) => l.classList.toggle('on', l.querySelector('input').checked));
   };
   let pedido = 0;
+  let ultima = null; // última prévia (para a nota extra acompanhar a escolha de quem recebe)
   const atualizar = async () => {
     const meu = ++pedido;
     try {
@@ -4217,18 +4430,21 @@ async function modalEmail(o) {
       $('#cv-previa', m.el).srcdoc = r.html;
       $('#cv-assunto', m.el).textContent = r.assunto;
       $('#cv-exemplo', m.el).textContent = `· como ${r.exemplo} vai receber`;
+      if (o.extra) $('#cv-extra', m.el).innerHTML = o.extra(r, quem());
+      ultima = r;
     } catch (e) { toast(e, true); }
   };
   let espera;
   msg.oninput = () => { clearTimeout(espera); espera = setTimeout(atualizar, 600); };
-  m.el.onchange = (ev) => { if (ev.target.name === 'cv-quem') rotuloBotao(); };
+  m.el.onchange = (ev) => { if (ev.target.name === 'cv-quem') { rotuloBotao(); if (o.extra && ultima) $('#cv-extra', m.el).innerHTML = o.extra(ultima, quem()); } };
   $('#cv-cancelar', m.el).onclick = m.fechar;
   $('#cv-enviar', m.el).onclick = async (ev) => {
     const r = await acao(ev.target, () => o.enviar(msg.value, quem() === 'pend'));
     m.fechar();
-    D.d = r;
     confete();
     o.feito(r);
+    if (o.aplicar) return o.aplicar(r);
+    D.d = r;
     desenharDesafio();
   };
   rotuloBotao();
@@ -4403,8 +4619,14 @@ function passoAndamento(el) {
     const alvo = b.dataset.st;
     if (alvo === 'iniciar') return abrirIniciar();
     const txt = { apresentacao: ['Abrir as apresentações?', 'As etapas ficam somente leitura e todos podem ver os outros times.'], encerrado: ['Encerrar o desafio?', 'Tudo fica somente leitura e vai para o Acervo de ideias.'], em_andamento: ['Voltar ao andamento?', 'Os times poderão editar de novo dentro dos prazos.'] }[alvo];
-    if (!(await dialogo({ titulo: txt[0], texto: txt[1], ok: 'Confirmar' }))) return;
-    D.d = await acao(b, () => gs('api_desafioStatus', x.id, alvo));
+    // ao abrir as apresentações, a banca recebe o link das notas (uma vez só por jurado)
+    const pedido = dialogo({ titulo: txt[0], texto: txt[1], ok: 'Confirmar',
+      html: alvo === 'apresentacao' ? `<label class="check-banca"><input type="checkbox" id="dl-avisar" checked><span><b>⚖️ Avisar a banca por e-mail</b>
+        <small>Cada jurado recebe o link para dar as notas pelo celular (só quem ainda não recebeu).</small></span></label>` : '' });
+    const avisar = $('#dl-avisar');
+    if (!(await pedido)) return;
+    D.d = await acao(b, () => gs('api_desafioStatus', x.id, alvo, avisar ? avisar.checked : false));
+    if (D.d.bancaAvisada) toast(`⚖️ ${D.d.bancaAvisada} jurado(s) receberam o link das notas`);
     if (alvo === 'encerrado') { confete(); conquista('🏁', 'Desafio encerrado!', 'Obrigado a todos os times'); }
     desenharDesafio();
   };
@@ -4676,13 +4898,33 @@ async function passoBanca(el) {
         <div id="bk-crit"></div>
         ${travado ? '' : '<button class="btn sec peq" id="bk-add" style="margin-top:10px">+ Critério</button>'}</div>
     </div>
-    ${revelado ? '' : '<div class="acoes-form"><button class="btn" id="bk-salvar">Salvar banca</button></div>'}`;
+    ${revelado ? '' : '<div class="acoes-form"><button class="btn" id="bk-salvar">Salvar banca</button></div>'}
+    ${cartaoConviteBanca()}`;
+
+  // convite da banca: só com a banca salva (quem está na lista gravada) e antes do resultado
+  function cartaoConviteBanca() {
+    const js = b.banca;
+    if (!js.length || revelado || st === 'encerrado') return '';
+    const ok = js.filter((j) => j.convidadoEm).length;
+    const pend = js.length - ok;
+    const ultimo = js.map((j) => j.convidadoEm).filter(Boolean).sort().pop();
+    return `<div class="card convite-card" style="margin-top:16px">
+      <div class="convite-ico">⚖️</div>
+      <div style="flex:1;min-width:220px"><b style="font-size:16px">Convite da banca</b>
+        <div class="muted">${ok === 0 ? `Os ${js.length} jurado(s) ainda não foram convidados.`
+          : pend ? `${ok} de ${js.length} já receberam · <b>${pend} ainda não</b>.` : `Todos os ${js.length} jurados já receberam ✓`}
+          ${ultimo ? `<span class="small"> Último envio: ${fmtDataHora(ultimo)}.</span>` : ''}</div>
+        <div class="convite-barra"><i style="width:${Math.round((ok / js.length) * 100)}%"></i></div>
+        <div class="small muted">O convite apresenta o desafio, a data do pitch (com link para a agenda), os critérios e o link das notas. Ele também vai junto com o convite dos participantes, e na véspera do pitch cada jurado recebe um lembrete.</div></div>
+      <button class="btn ${pend ? 'grad' : 'sec'}" id="bk-convite">${pend ? '⚖️ Ver prévia e enviar' : '⚖️ Reenviar convite'}</button></div>`;
+  }
 
   const desenharJurados = () => {
     const us = b.usuarios;
     $('#bk-chips').innerHTML = [...sel].map((e) => {
       const u = us.find((x) => x.email === e) || { nome: e };
-      return `<span class="bk-chip">${av(u.nome, 'mini')}${esc(u.nome)}${u.timeId ? ` <i title="Está no Time ${esc((timeNome.get(u.timeId) || {}).nome || '')}: não avalia o próprio time">⚠️</i>` : ''}${revelado ? '' : `<button data-tira="${esc(e)}" title="Tirar da banca">✕</button>`}</span>`;
+      const j = b.banca.find((x) => x.email === e);
+      return `<span class="bk-chip">${av(u.nome, 'mini')}${esc(u.nome)}${j && j.convidadoEm ? ` <i title="Recebeu o convite da banca em ${esc(fmtDataHora(j.convidadoEm))}">✉️</i>` : ''}${u.timeId ? ` <i title="Está no Time ${esc((timeNome.get(u.timeId) || {}).nome || '')}: não avalia o próprio time">⚠️</i>` : ''}${revelado ? '' : `<button data-tira="${esc(e)}" title="Tirar da banca">✕</button>`}</span>`;
     }).join('') || '<span class="muted small">Ninguém na banca ainda.</span>';
     const vis = us.filter((u) => !busca || `${u.nome} ${u.email} ${u.departamento} ${u.funcao}`.toLowerCase().includes(busca));
     $('#bk-lista').innerHTML = vis.map((u) => `<label class="sel-pessoa ${sel.has(u.email) ? 'on' : ''}"><input type="checkbox" value="${esc(u.email)}" ${sel.has(u.email) ? 'checked' : ''} ${revelado ? 'disabled' : ''}>
@@ -4740,6 +4982,17 @@ async function passoBanca(el) {
     toast('🔒 Resultado oculto de novo');
     passoBanca(el);
   };
+  const conv = $('#bk-convite');
+  if (conv) conv.onclick = () => modalEmail({
+    titulo: '⚖️ Convite da banca',
+    todos: 'Todos os jurados',
+    exemploMsg: 'Ex.: Obrigado por topar avaliar os pitches! A apresentação será no auditório; levem o celular para dar as notas.',
+    pend: b.banca.filter((j) => !j.convidadoEm).length, total: b.banca.length,
+    previa: (msg) => gs('api_conviteBancaPrevia', id, msg),
+    enviar: (msg, soPend) => gs('api_conviteBancaEnviar', id, msg, soPend),
+    feito: (r) => conquista('⚖️', 'Banca convidada!', `${r.enviados} jurado(s) receberam o convite${r.falhas.length ? ` · ${r.falhas.length} falha(s)` : ''}`),
+    aplicar: () => passoBanca(el),
+  });
   const link = $('#bk-link');
   if (link) link.onclick = () => {
     const url = linkAvaliar(id);
