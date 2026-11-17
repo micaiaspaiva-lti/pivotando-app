@@ -503,6 +503,180 @@ button.av.eu:hover { transform:scale(1.06); box-shadow:0 0 0 3px color-mix(in sr
 .convite-grid { display:grid; grid-template-columns: 1fr 1.25fr; gap:20px; }
 .convite-previa { width:100%; height:440px; border:1px solid var(--borda); border-radius:14px; background:#f5f8fd; }
 @media (max-width: 800px) { .convite-grid { grid-template-columns:1fr; } .convite-previa { height:360px; } }
+
+/* ---------- Banca avaliadora ---------- */
+.bk-barra { height:8px; border-radius:99px; background:color-mix(in srgb, var(--borda) 80%, transparent); overflow:hidden; margin-top:8px; }
+.bk-barra i { display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,#3fb8ee,var(--azul),var(--f-definir)); transition:width .8s cubic-bezier(.2,.8,.2,1); }
+.bk-topo { display:grid; grid-template-columns:1fr auto; gap:14px 20px; align-items:center; margin-bottom:16px; position:relative; overflow:hidden; }
+.bk-topo::before { content:""; position:absolute; inset:0 0 auto 0; height:5px; background:linear-gradient(90deg,#ffd54a,#f59e0b,var(--f-empatizar)); }
+.bk-topo .kicker { text-transform:uppercase; letter-spacing:1.2px; font-size:11px; font-weight:800; color:var(--muted); }
+.bk-sit { display:flex; flex-direction:column; gap:2px; margin-top:4px; }
+.bk-sit b { font-size:18px; letter-spacing:-.3px; }
+.bk-sit span { color:var(--muted); }
+.bk-sit.ok b { color:#b45309; } .bk-sit.vivo b { color:var(--azul); }
+.bk-topo-acoes { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.bk-jurados-prog { grid-column:1 / -1; display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; }
+.bk-jp { display:flex; gap:10px; align-items:center; padding:10px 12px; border-radius:14px; background:var(--card-2); border:1px solid var(--borda); position:relative; }
+.bk-jp > div:nth-child(2) { flex:1; min-width:0; }
+.bk-jp.ok { border-color:color-mix(in srgb,var(--ok) 45%, var(--borda)); background:color-mix(in srgb,var(--ok) 7%, var(--card)); }
+.bk-ok { width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--ok); color:#fff; font-weight:800; font-size:12px; animation:carimbo .6s cubic-bezier(.3,1.8,.5,1); }
+.bk-grid { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:16px; align-items:start; }
+.bk-cab { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.bk-cab h3 { margin:0; font-size:17px; }
+.bk-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; min-height:30px; }
+.bk-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 6px 4px 4px; border-radius:99px; background:color-mix(in srgb,#f59e0b 14%, var(--card)); border:1px solid color-mix(in srgb,#f59e0b 40%, var(--borda)); font-weight:600; font-size:12px; animation:entra .3s; }
+.bk-chip i { font-style:normal; cursor:help; }
+.bk-chip button { border:0; background:none; cursor:pointer; color:var(--muted); width:20px; height:20px; border-radius:50%; padding:0; }
+.bk-chip button:hover { background:var(--card-2); color:var(--erro); }
+.chip-trava { font-size:12px; font-weight:700; padding:4px 10px; border-radius:99px; background:var(--card-2); color:var(--muted); }
+.crit { display:grid; grid-template-columns:30px 1fr auto auto; gap:12px; align-items:center; padding:12px; border-radius:14px; border:1px solid var(--borda); background:var(--card-2); margin-bottom:8px; animation:entra .3s; }
+.crit-num { width:30px; height:30px; border-radius:10px; display:grid; place-items:center; font-weight:800; color:#fff; background:linear-gradient(135deg,var(--f-empatizar),var(--f-definir)); }
+.crit-txt { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.crit-txt .crit-nome { font-weight:700; }
+.crit-txt .crit-desc { font-size:12px; }
+.crit-peso { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.peso-chips { display:flex; gap:3px; }
+.peso-chips button { width:28px; height:28px; border-radius:8px; border:1px solid var(--borda); background:var(--card); cursor:pointer; font-weight:800; font-size:12px; transition:.15s; }
+.peso-chips button:not(:disabled):hover { transform:translateY(-2px); }
+.peso-chips button.on { background:var(--azul); color:#fff; border-color:transparent; box-shadow:0 3px 10px rgba(1,100,200,.35); }
+.peso-chips button:disabled { cursor:default; }
+.peso-chips button:disabled:not(.on) { opacity:.45; }
+.crit-pct { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+.crit-tira { border:0; background:none; cursor:pointer; color:var(--muted); width:28px; height:28px; border-radius:50%; }
+.crit-tira:hover { background:var(--card); color:var(--erro); }
+.selo-banca { display:inline-block; margin-left:6px; padding:1px 8px; border-radius:99px; font-size:11px; font-weight:700; background:color-mix(in srgb,#f59e0b 18%, var(--card)); color:#b45309; }
+.check-banca { display:flex; gap:10px; align-items:flex-start; margin-top:16px; padding:12px; border-radius:12px; border:1px solid color-mix(in srgb,#f59e0b 40%, var(--borda)); background:color-mix(in srgb,#ffd54a 10%, var(--card)); cursor:pointer; }
+.modal .check-banca input { width:18px; height:18px; flex:none; padding:0; margin:2px 0 0; accent-color:#f59e0b; }
+.check-banca span { display:flex; flex-direction:column; }
+.check-banca small { color:var(--muted); }
+.bk-card::before { background:linear-gradient(90deg,#ffd54a,#f59e0b,var(--f-empatizar)); }
+.chip-banca { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px; font-size:12px; font-weight:600; text-decoration:none; cursor:pointer;
+  background:color-mix(in srgb,#f59e0b 16%, var(--card)); color:#b45309; border:1px solid color-mix(in srgb,#f59e0b 35%, var(--borda)); }
+.hist-pos { font-size:16px; }
+.hist-nota { display:inline-block; margin-left:6px; padding:1px 8px; border-radius:99px; font-size:11px; font-weight:800; background:var(--card-2); color:var(--muted); }
+
+/* jurado (celular) */
+.bk-hero h1 { font-size:22px; }
+.av-times { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; margin-top:18px; }
+.av-time { text-align:left; border:1px solid var(--borda); background:var(--card); border-radius:18px; padding:18px 16px 14px; cursor:pointer; box-shadow:var(--sombra); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; gap:8px; transition:transform .2s, box-shadow .2s; }
+.av-time::before { content:""; position:absolute; inset:0 0 auto 0; height:5px; background:var(--tc); }
+.av-time:not(:disabled):hover { transform:translateY(-3px); box-shadow:var(--sombra-forte); }
+.av-time.feito { border-color:color-mix(in srgb,var(--ok) 40%, var(--borda)); }
+.av-time.meu { opacity:.55; cursor:not-allowed; }
+.av-time-cab { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:16px; }
+.av-nota { font-weight:800; font-size:15px; padding:2px 10px; border-radius:99px; color:#fff; background:var(--ok); }
+.av-ideia { font-weight:600; }
+.av-rod { font-size:12px; font-weight:700; color:var(--azul); margin-top:auto; }
+.av-time.feito .av-rod { color:var(--ok); } .av-time.meu .av-rod { color:var(--muted); }
+.av-hero { position:relative; overflow:hidden; color:#fff; border:0; background:linear-gradient(135deg, var(--tc), color-mix(in srgb, var(--tc) 55%, #13389a)); }
+.av-hero .kicker { text-transform:uppercase; letter-spacing:1.2px; font-size:11px; font-weight:800; opacity:.85; }
+.av-hero h2 { margin:4px 0 6px; font-size:22px; letter-spacing:-.4px; }
+.av-hero p { margin:0 0 8px; opacity:.92; }
+.av-hero .btn.sec { background:rgba(255,255,255,.16); color:#fff; border-color:rgba(255,255,255,.35); }
+.av-micro { margin-top:8px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); }
+.av-micro span { display:block; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.8px; opacity:.85; }
+.av-membros { display:flex; align-items:center; gap:4px; margin-top:12px; font-size:12px; opacity:.9; flex-wrap:wrap; }
+.av-membros .av { border-color:transparent; }
+.av-membros span { margin-left:6px; }
+.av-crits { display:flex; flex-direction:column; gap:12px; margin:14px 0; }
+.av-crit-cab { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:16px; }
+.peso-tag { font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; background:var(--card-2); color:var(--muted); white-space:nowrap; }
+.nota-btns { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-top:12px; }
+.nota-btns button { border:1.5px solid var(--borda); background:var(--card-2); border-radius:14px; padding:10px 2px 8px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; transition:transform .15s, background .2s, box-shadow .2s; }
+.nota-btns button b { font-size:22px; line-height:1; }
+.nota-btns button span { font-size:10px; color:var(--muted); font-weight:600; white-space:nowrap; }
+.nota-btns button:not(:disabled):hover { transform:translateY(-2px); }
+.nota-btns button.on { color:#fff; border-color:transparent; transform:translateY(-2px) scale(1.04); box-shadow:0 6px 16px rgba(106,17,184,.35);
+  background:linear-gradient(135deg,var(--f-empatizar),var(--f-definir) 60%,var(--azul)); animation:carimbo .45s cubic-bezier(.3,1.8,.5,1); }
+.nota-btns button.on span { color:rgba(255,255,255,.9); }
+.nota-btns button:disabled { cursor:default; }
+.av-barra-fixa { position:sticky; bottom:12px; z-index:20; display:flex; align-items:center; gap:14px; justify-content:space-between; margin-top:14px; padding:12px 14px; border-radius:18px;
+  background:color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--borda); box-shadow:var(--sombra-forte); }
+.av-total span { display:block; font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:700; }
+.av-total small { display:block; font-size:11px; color:var(--muted); margin-top:2px; }
+.av-total b { font-size:26px; font-variant-numeric:tabular-nums; line-height:1; }
+
+/* cerimônia (sempre em palco escuro) */
+.palco-res { position:relative; overflow:hidden; border-radius:24px; min-height:560px; padding:28px 28px 60px; color:#fff; box-shadow:var(--sombra-forte);
+  background:radial-gradient(900px 420px at 50% -10%, rgba(246,165,192,.28), transparent 60%), linear-gradient(160deg,#0d1030,#1a0b45 55%,#13389a); }
+.palco-res:fullscreen { border-radius:0; display:flex; flex-direction:column; justify-content:center; }
+.palco-luz { position:absolute; inset:-40% 20% auto; height:120%; background:conic-gradient(from 180deg at 50% 0%, transparent 40%, rgba(255,255,255,.07) 50%, transparent 60%); pointer-events:none; animation:holofote 7s ease-in-out infinite alternate; }
+@keyframes holofote { from { transform:rotate(-12deg); } to { transform:rotate(12deg); } }
+.palco-res > * { position:relative; }
+.palco-ctrl { position:absolute; right:16px; top:16px; z-index:3; }
+.palco-ctrl button, .palco-pular { background:rgba(255,255,255,.12) !important; color:#fff !important; border:1px solid rgba(255,255,255,.25) !important; border-radius:10px; cursor:pointer; padding:6px 10px; }
+.palco-pular { position:absolute; right:16px; bottom:16px; z-index:3; }
+.palco-cab { text-align:center; max-width:820px; margin:0 auto; }
+.palco-cab .k { text-transform:uppercase; letter-spacing:2px; font-weight:700; font-size:12px; opacity:.7; }
+.palco-cab h2 { margin:6px 0 0; font-size:clamp(18px,2.4vw,30px); letter-spacing:-.5px; }
+.palco-logo { position:absolute; left:22px; bottom:18px; height:24px; opacity:.8; }
+.suspense { text-align:center; max-width:560px; margin:30px auto 0; }
+.suspense .trofeu { font-size:84px; animation:flutua 2.4s ease-in-out infinite; filter:drop-shadow(0 10px 30px rgba(245,158,11,.55)); }
+@keyframes flutua { 50% { transform:translateY(-10px) rotate(-4deg); } }
+.suspense h3 { font-size:clamp(26px,3.6vw,44px); margin:8px 0 4px; letter-spacing:-1px; }
+.suspense p { opacity:.85; margin:0 0 6px; }
+.suspense .bk-barra { background:rgba(255,255,255,.15); height:10px; }
+.suspense-jurados { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin:22px 0 26px; }
+.suspense-jurados > div { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:13px; font-weight:600; opacity:.6; transition:.3s; }
+.suspense-jurados > div.ok { opacity:1; }
+.suspense-jurados .av { width:46px; height:46px; font-size:15px; border-color:rgba(255,255,255,.4); }
+.suspense-jurados .ok .av { box-shadow:0 0 0 3px #41c463; }
+.suspense-jurados small { font-size:11px; opacity:.8; }
+.btn.grande { padding:14px 28px; font-size:17px; border-radius:16px; }
+.anuncio { text-align:center; min-height:52px; margin:22px 0 8px; font-size:clamp(20px,3vw,34px); font-weight:800; letter-spacing:-.5px; }
+.anuncio.on span { display:inline-block; animation:anuncia .7s cubic-bezier(.3,1.5,.5,1); }
+@keyframes anuncia { from { opacity:0; transform:translateY(14px) scale(.92); filter:blur(4px); } to { opacity:1; transform:none; filter:none; } }
+.podio { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:end; max-width:860px; margin:10px auto 0; }
+.degrau { display:flex; flex-direction:column; align-items:center; gap:10px; }
+.degrau .quem { text-align:center; display:flex; flex-direction:column; align-items:center; gap:4px; min-height:120px; justify-content:flex-end; }
+.degrau .quem .med { font-size:44px; line-height:1; }
+.degrau.d1 .quem .med { font-size:60px; filter:drop-shadow(0 6px 20px rgba(245,158,11,.7)); }
+.degrau .quem b { font-size:clamp(15px,1.8vw,22px); }
+.degrau .quem small { opacity:.8; font-size:12px; max-width:220px; }
+.degrau .quem .av { border-color:transparent; }
+.degrau .bloco { width:100%; border-radius:16px 16px 6px 6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--tc,#888) 90%, #fff), color-mix(in srgb, var(--tc,#888) 70%, #000)); box-shadow:inset 0 2px 0 rgba(255,255,255,.35), 0 18px 40px rgba(0,0,0,.35); }
+.degrau.d1 .bloco { height:210px; } .degrau.d2 .bloco { height:160px; } .degrau.d3 .bloco { height:120px; }
+.degrau .pts { font-size:clamp(26px,3.4vw,44px); font-weight:800; font-variant-numeric:tabular-nums; line-height:1; }
+.degrau .lug { font-size:13px; font-weight:800; letter-spacing:1px; opacity:.85; }
+.degrau.vazio .bloco { background:rgba(255,255,255,.06); box-shadow:none; border:1px dashed rgba(255,255,255,.2); }
+.degrau.vazio .bloco span { opacity:.4; font-weight:800; }
+.degrau.oculto .quem { opacity:0; transform:translateY(20px) scale(.8); }
+.degrau.oculto .bloco { background:rgba(255,255,255,.08); box-shadow:none; }
+.degrau.oculto .bloco span { opacity:0; }
+.degrau .quem, .degrau .bloco, .degrau .bloco span { transition:all .8s cubic-bezier(.3,1.4,.5,1); }
+.degrau.revela .bloco { animation:sobe .9s cubic-bezier(.3,1.4,.5,1); }
+.degrau.d1.revela .quem { animation:brilha 1.6s ease-out; }
+@keyframes sobe { from { transform:scaleY(.2); transform-origin:bottom; } to { transform:scaleY(1); transform-origin:bottom; } }
+@keyframes brilha { 0% { filter:drop-shadow(0 0 0 rgba(255,213,74,0)); } 40% { filter:drop-shadow(0 0 30px rgba(255,213,74,.9)); } 100% { filter:drop-shadow(0 0 0 rgba(255,213,74,0)); } }
+.res-demais { max-width:620px; margin:22px auto 0; display:flex; flex-direction:column; gap:8px; }
+.res-linha { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:12px; padding:10px 14px; border-radius:14px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14);
+  border-left:5px solid var(--tc); transition:all .6s cubic-bezier(.3,1.4,.5,1); }
+.res-linha.oculto { opacity:0; transform:translateX(-30px); }
+.res-linha .pos { font-weight:800; opacity:.8; }
+.res-linha .pts { font-weight:800; font-variant-numeric:tabular-nums; }
+.res-tab td.pos { font-size:20px; }
+.media-crit { display:inline-block; min-width:44px; padding:3px 8px; border-radius:8px; font-weight:700; font-variant-numeric:tabular-nums;
+  background:linear-gradient(90deg, color-mix(in srgb,var(--azul) 22%, transparent) var(--p), var(--card-2) var(--p)); }
+.nota-final { font-size:18px; font-variant-numeric:tabular-nums; }
+.res-coments { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+.res-com { padding:12px 14px; border-radius:14px; background:var(--card-2); border-left:5px solid var(--tc); }
+.res-com p { margin:8px 0 0; font-style:italic; }
+.res-com small { display:block; font-style:normal; color:var(--muted); margin-top:2px; }
+@media (max-width: 900px) {
+  .bk-grid { grid-template-columns:1fr; }
+  .bk-topo { grid-template-columns:1fr; } .bk-topo-acoes { justify-content:flex-start; }
+}
+@media (max-width: 560px) {
+  .crit { grid-template-columns:30px 1fr; } .crit-peso { grid-column:2; align-items:flex-start; } .crit-tira { position:absolute; right:6px; top:6px; } .crit { position:relative; }
+  .nota-btns { gap:4px; } .nota-btns button { padding:8px 0 6px; border-radius:12px; } .nota-btns button span { font-size:8.5px; }
+  .palco-res { padding:22px 12px 56px; min-height:480px; }
+  .podio { gap:6px; } .degrau .quem .med { font-size:32px; } .degrau.d1 .quem .med { font-size:42px; } .degrau .quem small, .degrau .quem .avs { display:none; }
+  .degrau.d1 .bloco { height:150px; } .degrau.d2 .bloco { height:115px; } .degrau.d3 .bloco { height:85px; }
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) :is(.selo-banca, .chip-banca, .bk-sit.ok b) { color:#fbbf24; } }
+:root[data-theme="dark"] :is(.selo-banca, .chip-banca, .bk-sit.ok b) { color:#fbbf24; }
 </style>
 
 </head>
@@ -656,8 +830,11 @@ var PIVDEMO = (() => {
   // src/server/index.ts
   var server_exports = {};
   __export(server_exports, {
+    api_avaliar: () => api_avaliar,
     api_avisoTimesEnviar: () => api_avisoTimesEnviar,
     api_avisoTimesPrevia: () => api_avisoTimesPrevia,
+    api_banca: () => api_banca,
+    api_bancaDefinir: () => api_bancaDefinir,
     api_boot: () => api_boot,
     api_conviteEnviar: () => api_conviteEnviar,
     api_convitePrevia: () => api_convitePrevia,
@@ -670,6 +847,7 @@ var PIVDEMO = (() => {
     api_inicio: () => api_inicio,
     api_painel: () => api_painel,
     api_participantesDefinir: () => api_participantesDefinir,
+    api_resultadoRevelar: () => api_resultadoRevelar,
     api_sortear: () => api_sortear,
     api_time: () => api_time,
     api_timeAcao: () => api_timeAcao,
@@ -713,7 +891,8 @@ var PIVDEMO = (() => {
   // src/server/db.ts
   var TABLES = {
     // papel: admin | facilitador | participante; ativo: '1' | ''
-    Usuarios: ["id", "email", "nome", "departamento", "funcao", "papel", "ativo", "criadoEm"],
+    // bancaPadrao: '1' = entra na banca avaliadora de todo desafio novo
+    Usuarios: ["id", "email", "nome", "departamento", "funcao", "papel", "ativo", "criadoEm", "bancaPadrao"],
     // status: rascunho | em_andamento | apresentacao | encerrado; prazos em "yyyy-MM-dd"
     Desafios: [
       "id",
@@ -748,7 +927,10 @@ var PIVDEMO = (() => {
       "horaPlano",
       "dataIdeias",
       "horaIdeias",
-      "horaApresentacao"
+      "horaApresentacao",
+      // banca: critérios de avaliação (JSON; vazio = padrão) e quando o resultado foi revelado (vazio = oculto)
+      "criterios",
+      "resultadoEm"
     ],
     // convidadoEm: quando recebeu o convite para o desafio (antes do sorteio)
     // avisoTimeEm: quando recebeu o aviso do seu time (com o link da sala)
@@ -765,7 +947,11 @@ var PIVDEMO = (() => {
     Ideias: ["id", "timeId", "titulo", "descricao", "ordem", "autor", "criadoEm", "atualizadoEm"],
     IdeiaApoios: ["id", "timeId", "ideiaId", "texto", "autor", "criadoEm"],
     Auditoria: ["id", "timestamp", "ator", "acao", "desafioId", "timeId", "detalhes"],
-    Lembretes: ["id", "timeId", "etapa", "enviadoEm"]
+    Lembretes: ["id", "timeId", "etapa", "enviadoEm"],
+    // jurados da banca avaliadora de cada desafio
+    Banca: ["id", "desafioId", "email", "criadoEm"],
+    // nota de um jurado para o pitch de um time; notas: JSON { criterioId: 1..5 }
+    Avaliacoes: ["id", "desafioId", "timeId", "avaliador", "notas", "comentario", "criadoEm", "atualizadoEm"]
   };
   var ss = null;
   var conferidas = /* @__PURE__ */ new Set();
@@ -988,7 +1174,8 @@ var PIVDEMO = (() => {
     if (p.facilita || membro)
       return { p, time, desafio, membro };
     const aberto = desafio.status === "apresentacao" || desafio.status === "encerrado";
-    if (nivel2 === "ver" && aberto && minhas.length)
+    const jurado = () => where("Banca", (b) => b.desafioId === desafio.id && b.email === p.email).length > 0;
+    if (nivel2 === "ver" && aberto && (minhas.length || jurado()))
       return { p, time, desafio, membro };
     throw new Error("Voc\xEA n\xE3o faz parte deste time.");
   }
@@ -1088,6 +1275,56 @@ var PIVDEMO = (() => {
     if (depois.length >= 2)
       return { email, nome, departamento: depois[0], funcao: depois[1] };
     return { email, nome, departamento: "", funcao: depois[0] || "" };
+  }
+  var CRITERIOS_PADRAO = [
+    { id: "impacto", nome: "\u{1F3AF} Impacto no problema", descricao: "A ideia resolve o problema central e o microproblema escolhido? Quanto ganho gera?", peso: 3 },
+    { id: "viabilidade", nome: "\u{1F6E0}\uFE0F Viabilidade", descricao: "D\xE1 para implementar com os recursos, o tempo e o custo da LTI?", peso: 2 },
+    { id: "inovacao", nome: "\u{1F4A1} Inova\xE7\xE3o", descricao: "\xC9 original e foge do \xF3bvio?", peso: 2 },
+    { id: "metodo", nome: "\u{1F9ED} Consist\xEAncia do m\xE9todo", descricao: "A proposta se apoia no que o time levantou na GUT, na CSD e no Plano de A\xE7\xE3o?", peso: 1 },
+    { id: "pitch", nome: "\u{1F3A4} Clareza do pitch", descricao: "A apresenta\xE7\xE3o foi clara, objetiva e convincente?", peso: 1 }
+  ];
+  function criteriosDo(d) {
+    try {
+      const c = JSON.parse(d.criterios || "");
+      if (Array.isArray(c) && c.length)
+        return c;
+    } catch (e) {
+    }
+    return CRITERIOS_PADRAO.map((c) => ({ ...c }));
+  }
+  function notaJurado(notas, criterios) {
+    const pesos = criterios.reduce((s, c) => s + c.peso, 0);
+    if (!pesos)
+      return 0;
+    const soma = criterios.reduce((s, c) => s + (Number(notas[c.id]) || 0) * c.peso, 0);
+    return soma / (5 * pesos) * 100;
+  }
+  function rankear(timeIds, criterios, avaliacoes) {
+    const ordemDesempate = criterios.map((c, i) => ({ c, i })).sort((a, b) => b.c.peso - a.c.peso || a.i - b.i).map((x) => x.c.id);
+    const r = timeIds.map((timeId) => {
+      const av = avaliacoes.filter((a) => a.timeId === timeId);
+      const porCriterio = {};
+      for (const c of criterios)
+        porCriterio[c.id] = av.length ? av.reduce((s, a) => s + (Number(a.notas[c.id]) || 0), 0) / av.length : 0;
+      const nota = av.length ? av.reduce((s, a) => s + notaJurado(a.notas, criterios), 0) / av.length : 0;
+      return { timeId, nota: Math.round(nota * 10) / 10, porCriterio, jurados: av.length, posicao: 0 };
+    });
+    const cmp = (a, b) => {
+      if (!a.jurados !== !b.jurados)
+        return a.jurados ? -1 : 1;
+      if (b.nota !== a.nota)
+        return b.nota - a.nota;
+      for (const k of ordemDesempate)
+        if (Math.abs(b.porCriterio[k] - a.porCriterio[k]) > 1e-9)
+          return b.porCriterio[k] - a.porCriterio[k];
+      return 0;
+    };
+    r.sort(cmp);
+    r.forEach((x, i) => {
+      if (x.jurados)
+        x.posicao = i > 0 && r[i - 1].jurados && cmp(r[i - 1], x) === 0 ? r[i - 1].posicao : i + 1;
+    });
+    return r;
   }
 
   // src/server/mail.ts
@@ -1280,7 +1517,7 @@ ${APP_PUBLICO}`),
   // src/server/usuarios.ts
   var PAPEIS = ["admin", "facilitador", "participante"];
   function usuarioPublico(u) {
-    return { id: u.id, email: u.email, nome: u.nome, departamento: u.departamento, funcao: u.funcao, papel: u.papel, ativo: u.ativo === "1" };
+    return { id: u.id, email: u.email, nome: u.nome, departamento: u.departamento, funcao: u.funcao, papel: u.papel, ativo: u.ativo === "1", bancaPadrao: u.bancaPadrao === "1" };
   }
   function api_usuarios() {
     requireFacilitador();
@@ -1306,7 +1543,9 @@ ${APP_PUBLICO}`),
         departamento: txt(dados.departamento, 80),
         funcao: txt(dados.funcao, 80),
         papel,
-        ativo: dados.ativo === false ? "" : "1"
+        ativo: dados.ativo === false ? "" : "1",
+        // sem o campo (telas antigas) mantém como está
+        bancaPadrao: dados.bancaPadrao === void 0 ? atual?.bancaPadrao || "" : dados.bancaPadrao ? "1" : ""
       };
       if (atual) {
         const deixaDeSerAdmin = atual.papel === "admin" && atual.ativo === "1" && (novo.papel !== "admin" || novo.ativo !== "1");
@@ -1394,7 +1633,9 @@ ${APP_PUBLICO}`),
       horaApresentacao: d.horaApresentacao,
       criadoEm: d.criadoEm,
       iniciadoEm: d.iniciadoEm,
-      encerradoEm: d.encerradoEm
+      encerradoEm: d.encerradoEm,
+      criterios: criteriosDo(d),
+      resultadoEm: d.resultadoEm || ""
     };
   }
   var lista = (s) => s ? s.split(",").filter(Boolean) : [];
@@ -1479,6 +1720,8 @@ ${APP_PUBLICO}`),
         id = uuid();
         const numero = all("Desafios").reduce((m, d) => Math.max(m, Number(d.numero) || 0), 0) + 1;
         insert("Desafios", [{ id, numero: String(numero), status: "rascunho", criadoPor: p.email, criadoEm: nowIso(), ...campos }]);
+        const banca = where("Usuarios", (u) => u.ativo === "1" && u.bancaPadrao === "1");
+        insert("Banca", banca.map((u) => ({ id: uuid(), desafioId: id, email: u.email, criadoEm: nowIso() })));
       }
       audit(p.email, dados.id ? "desafio_editado" : "desafio_criado", id);
       return api_desafio(id);
@@ -1532,7 +1775,7 @@ ${APP_PUBLICO}`),
       }
       remove("Times", (t) => t.desafioId === desafioId && !mantidos.has(t.id));
       const partes = where("Participacoes", (x) => x.desafioId === desafioId);
-      const timeDe = new Map(partes.map((x) => [x.email, x.timeId]));
+      const timeDe2 = new Map(partes.map((x) => [x.email, x.timeId]));
       const novosNoTime = [];
       const vistos = /* @__PURE__ */ new Set();
       for (const t of times || []) {
@@ -1550,10 +1793,10 @@ ${APP_PUBLICO}`),
           if (vistos.has(email))
             continue;
           vistos.add(email);
-          if (!timeDe.has(email)) {
+          if (!timeDe2.has(email)) {
             insert("Participacoes", [{ id: uuid(), desafioId, email, timeId: id }]);
             novosNoTime.push({ email, timeId: id });
-          } else if (timeDe.get(email) !== id) {
+          } else if (timeDe2.get(email) !== id) {
             const part = partes.find((x) => x.email === email);
             update("Participacoes", part.id, { timeId: id, avisoTimeEm: "" });
             novosNoTime.push({ email, timeId: id });
@@ -1736,6 +1979,192 @@ ${APP_PUBLICO}`),
     });
   }
 
+  // src/server/banca.ts
+  var lerNotas = (s) => {
+    try {
+      const n = JSON.parse(s || "{}");
+      return n && typeof n === "object" ? n : {};
+    } catch (e) {
+      return {};
+    }
+  };
+  var juradosDo = (desafioId) => where("Banca", (b) => b.desafioId === desafioId);
+  var ehJurado = (desafioId, email) => juradosDo(desafioId).some((b) => b.email === email);
+  function timeDe(desafioId) {
+    return new Map(where("Participacoes", (x) => x.desafioId === desafioId && !!x.timeId).map((x) => [x.email, x.timeId]));
+  }
+  function rankingDo(d) {
+    const times = where("Times", (t) => t.desafioId === d.id);
+    const avs = where("Avaliacoes", (a) => a.desafioId === d.id).map((a) => ({ timeId: a.timeId, notas: lerNotas(a.notas) }));
+    return rankear(times.map((t) => t.id), criteriosDo(d), avs);
+  }
+  function progressoBanca(d) {
+    const times = where("Times", (t) => t.desafioId === d.id);
+    const doTime = timeDe(d.id);
+    const avs = where("Avaliacoes", (a) => a.desafioId === d.id);
+    const usuarios = new Map(all("Usuarios").map((u) => [u.email, u]));
+    const jurados = juradosDo(d.id).map((b) => {
+      const proprio = doTime.get(b.email) || "";
+      return {
+        email: b.email,
+        nome: usuarios.get(b.email)?.nome || b.email,
+        timeProprio: proprio,
+        avaliados: avs.filter((a) => a.avaliador === b.email && a.timeId !== proprio).length,
+        total: times.filter((t) => t.id !== proprio).length
+      };
+    });
+    return { jurados, feitas: jurados.reduce((s, j) => s + j.avaliados, 0), esperadas: jurados.reduce((s, j) => s + j.total, 0) };
+  }
+  function acessoBanca(d) {
+    const p = requireUsuario();
+    const jurado = ehJurado(d.id, p.email);
+    if (p.facilita || jurado)
+      return { p, jurado };
+    if (d.resultadoEm && where("Participacoes", (x) => x.desafioId === d.id && x.email === p.email).length)
+      return { p, jurado };
+    throw new Error(d.resultadoEm ? "Voc\xEA n\xE3o participa deste desafio." : "O resultado ainda n\xE3o foi revelado.");
+  }
+  function api_banca(desafioId) {
+    const d = mustGet("Desafios", desafioId, "Desafio");
+    const { p, jurado } = acessoBanca(d);
+    const usuarios = new Map(all("Usuarios").map((u) => [u.email, u]));
+    const nome = (e) => usuarios.get(e)?.nome || e;
+    const partes = where("Participacoes", (x) => x.desafioId === desafioId);
+    const gut = all("GutItens");
+    const ideias = all("Ideias");
+    const meuTime = partes.find((x) => x.email === p.email)?.timeId || "";
+    const times = where("Times", (t) => t.desafioId === desafioId).map((t) => {
+      const micro = gut.find((g) => g.id === t.microproblemaId);
+      const top = ideias.filter((i) => i.timeId === t.id).sort((a, b) => Number(a.ordem) - Number(b.ordem) || a.criadoEm.localeCompare(b.criadoEm))[0];
+      return {
+        id: t.id,
+        nome: t.nome,
+        cor: t.cor,
+        microproblema: micro?.texto || "",
+        ideia: top ? { titulo: top.titulo, descricao: top.descricao } : null,
+        membros: partes.filter((x) => x.timeId === t.id).map((x) => nome(x.email))
+      };
+    });
+    const revelado = !!d.resultadoEm;
+    const avs = where("Avaliacoes", (a) => a.desafioId === desafioId);
+    const minhas = {};
+    if (jurado)
+      for (const a of avs.filter((x) => x.avaliador === p.email))
+        minhas[a.timeId] = { notas: lerNotas(a.notas), comentario: a.comentario };
+    const prog = progressoBanca(d);
+    return {
+      desafio: desafioPublico(d),
+      eu: { email: p.email, jurado, facilita: p.facilita, meuTime },
+      podeAvaliar: jurado && d.status === "apresentacao" && !revelado,
+      criteriosTravados: avs.length > 0,
+      criteriosPadrao: CRITERIOS_PADRAO,
+      times,
+      minhas,
+      // o progresso de cada jurado é só para o facilitador; os demais veem o total
+      progresso: p.facilita ? prog : { jurados: [], feitas: prog.feitas, esperadas: prog.esperadas },
+      banca: juradosDo(desafioId).map((b) => ({ email: b.email, nome: nome(b.email) })),
+      // pessoas que podem entrar na banca (tela do facilitador)
+      usuarios: p.facilita ? all("Usuarios").filter((u) => u.ativo === "1").map((u) => ({ email: u.email, nome: u.nome, departamento: u.departamento, funcao: u.funcao, bancaPadrao: u.bancaPadrao === "1", timeId: partes.find((x) => x.email === u.email)?.timeId || "" })).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")) : [],
+      resultado: revelado ? rankingDo(d).map((r) => ({
+        ...r,
+        comentarios: avs.filter((a) => a.timeId === r.timeId && a.comentario).map((a) => ({ jurado: nome(a.avaliador), texto: a.comentario }))
+      })) : null
+    };
+  }
+  function lerCriterios(lista2) {
+    const vistos = /* @__PURE__ */ new Set();
+    const r = (lista2 || []).map((c) => {
+      let id = String(c.id || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 30);
+      if (!id || vistos.has(id))
+        id = "c" + uuid().slice(0, 8);
+      vistos.add(id);
+      return { id, nome: txt(c.nome, 60), descricao: txt(c.descricao, 240), peso: Math.max(1, Math.min(5, Math.round(Number(c.peso) || 1))) };
+    });
+    if (!r.length)
+      throw new Error("A banca precisa de pelo menos um crit\xE9rio.");
+    if (r.length > 8)
+      throw new Error("Use no m\xE1ximo 8 crit\xE9rios.");
+    if (r.some((c) => !c.nome))
+      throw new Error("D\xEA um nome a cada crit\xE9rio.");
+    return r;
+  }
+  function api_bancaDefinir(desafioId, emails, criterios) {
+    const p = requireFacilitador();
+    return withLock(() => {
+      const d = mustGet("Desafios", desafioId, "Desafio");
+      if (d.resultadoEm)
+        throw new Error("O resultado j\xE1 foi revelado: desfa\xE7a a revela\xE7\xE3o para mudar a banca.");
+      const ativos = new Set(where("Usuarios", (u) => u.ativo === "1").map((u) => u.email));
+      const quer = new Set((emails || []).map((e) => String(e).toLowerCase()).filter((e) => ativos.has(e)));
+      const avs = where("Avaliacoes", (a) => a.desafioId === desafioId);
+      const saindo = juradosDo(desafioId).filter((b) => !quer.has(b.email) && avs.some((a) => a.avaliador === b.email));
+      if (saindo.length) {
+        const u = where("Usuarios", (x) => x.email === saindo[0].email)[0];
+        throw new Error(`${u?.nome || saindo[0].email} j\xE1 deu notas e n\xE3o pode sair da banca.`);
+      }
+      if (criterios) {
+        const novos = lerCriterios(criterios);
+        if (JSON.stringify(novos) !== JSON.stringify(criteriosDo(d))) {
+          if (avs.length)
+            throw new Error("A banca j\xE1 come\xE7ou a dar notas: os crit\xE9rios n\xE3o podem mais mudar.");
+          update("Desafios", desafioId, { criterios: JSON.stringify(novos) === JSON.stringify(CRITERIOS_PADRAO) ? "" : JSON.stringify(novos) });
+        }
+      }
+      const ja = new Set(juradosDo(desafioId).map((b) => b.email));
+      remove("Banca", (b) => b.desafioId === desafioId && !quer.has(b.email));
+      insert("Banca", [...quer].filter((e) => !ja.has(e)).map((email) => ({ id: uuid(), desafioId, email, criadoEm: nowIso() })));
+      audit(p.email, "banca_definida", desafioId, "", { jurados: quer.size });
+      return api_banca(desafioId);
+    });
+  }
+  function api_avaliar(desafioId, timeId, notas, comentario) {
+    const p = requireUsuario();
+    return withLock(() => {
+      const d = mustGet("Desafios", desafioId, "Desafio");
+      if (!ehJurado(desafioId, p.email))
+        throw new Error("Apenas jurados da banca d\xE3o notas.");
+      if (d.resultadoEm)
+        throw new Error("O resultado j\xE1 foi revelado: as notas est\xE3o fechadas.");
+      if (d.status !== "apresentacao")
+        throw new Error("As notas abrem quando o desafio entra em apresenta\xE7\xE3o.");
+      const t = mustGet("Times", timeId, "Time");
+      if (t.desafioId !== desafioId)
+        throw new Error("Time de outro desafio.");
+      if (timeDe(desafioId).get(p.email) === timeId)
+        throw new Error("Voc\xEA faz parte deste time e n\xE3o pode avali\xE1-lo.");
+      const lidas = {};
+      for (const c of criteriosDo(d)) {
+        const n = Number((notas || {})[c.id]);
+        if (!Number.isInteger(n) || n < 1 || n > 5)
+          throw new Error(`D\xEA uma nota de 1 a 5 em "${c.nome}".`);
+        lidas[c.id] = n;
+      }
+      const atual = where("Avaliacoes", (a) => a.desafioId === desafioId && a.timeId === timeId && a.avaliador === p.email)[0];
+      const campos = { notas: JSON.stringify(lidas), comentario: txt(comentario, 1e3), atualizadoEm: nowIso() };
+      if (atual)
+        update("Avaliacoes", atual.id, campos);
+      else
+        insert("Avaliacoes", [{ id: uuid(), desafioId, timeId, avaliador: p.email, criadoEm: nowIso(), ...campos }]);
+      audit(p.email, "pitch_avaliado", desafioId, "", { time: t.nome, nota: Math.round(notaJurado(lidas, criteriosDo(d))) });
+      return api_banca(desafioId);
+    });
+  }
+  function api_resultadoRevelar(desafioId, revelar) {
+    const p = requireFacilitador();
+    return withLock(() => {
+      const d = mustGet("Desafios", desafioId, "Desafio");
+      if (revelar) {
+        if (d.status !== "apresentacao" && d.status !== "encerrado")
+          throw new Error("O resultado \xE9 revelado depois das apresenta\xE7\xF5es.");
+        if (!where("Avaliacoes", (a) => a.desafioId === desafioId).length)
+          throw new Error("A banca ainda n\xE3o deu nenhuma nota.");
+      }
+      update("Desafios", desafioId, { resultadoEm: revelar ? d.resultadoEm || nowIso() : "" });
+      audit(p.email, revelar ? "resultado_revelado" : "resultado_oculto", desafioId);
+      return api_banca(desafioId);
+    });
+  }
+
   // src/server/painel.ts
   function api_boot() {
     const p = perfilOuNulo();
@@ -1780,7 +2209,11 @@ ${APP_PUBLICO}`),
       participantes: where("Participacoes", (x) => x.desafioId === d.id).length,
       times: times.filter((t) => t.desafioId === d.id).map((t) => resumoTime(t, d))
     })).sort((a, b) => Number(b.numero) - Number(a.numero)) : [];
-    return { meus, gestao };
+    const banca = where("Banca", (b) => b.email === p.email).map((b) => desafios.find((d) => d.id === b.desafioId)).filter((d) => !!d && d.status !== "rascunho").map((d) => {
+      const prog = progressoBanca(d).jurados.find((j) => j.email === p.email);
+      return { desafio: desafioPublico(d), avaliados: prog?.avaliados || 0, total: prog?.total || 0 };
+    }).sort((a, b) => Number(b.desafio.numero) - Number(a.desafio.numero));
+    return { meus, gestao, banca };
   }
   function api_painel(desafioId) {
     requireFacilitador();
@@ -1799,8 +2232,10 @@ ${APP_PUBLICO}`),
       const t = nomeTime.get(a.timeId);
       return { quando: a.timestamp, ator: usuarios.get(a.ator)?.nome || a.ator, acao: a.acao, texto: det.texto || "", etapa: det.etapa || "", time: t?.nome || "", cor: t?.cor || "" };
     });
+    const prog = progressoBanca(d);
     return {
       desafio: desafioPublico(d),
+      banca: { feitas: prog.feitas, esperadas: prog.esperadas, jurados: prog.jurados.length },
       times: times.map((t) => {
         const membros = partes.filter((x) => x.timeId === t.id).map((x) => x.email);
         let on = {};
@@ -1825,21 +2260,27 @@ ${APP_PUBLICO}`),
     const gut = all("GutItens");
     const ideias = all("Ideias");
     const csd = all("CsdCards");
-    return all("Desafios").filter((d) => d.status === "encerrado" || d.status === "apresentacao").sort((a, b) => Number(b.numero) - Number(a.numero)).map((d) => ({
-      ...desafioPublico(d),
-      times: times.filter((t) => t.desafioId === d.id).map((t) => {
-        const m = gut.find((g) => g.id === t.microproblemaId);
-        return {
-          id: t.id,
-          nome: t.nome,
-          cor: t.cor,
-          microproblema: m ? { texto: m.texto, grau: grau(+m.g, +m.u, +m.t) } : null,
-          microproblemas: gut.filter((g) => g.timeId === t.id).length,
-          postits: csd.filter((c) => c.timeId === t.id).length,
-          ideias: ideias.filter((i) => i.timeId === t.id).sort((a, b) => Number(a.ordem) - Number(b.ordem)).map((i) => ({ titulo: i.titulo, descricao: i.descricao }))
-        };
-      })
-    }));
+    return all("Desafios").filter((d) => d.status === "encerrado" || d.status === "apresentacao").sort((a, b) => Number(b.numero) - Number(a.numero)).map((d) => {
+      const rk = d.resultadoEm ? new Map(rankingDo(d).map((r) => [r.timeId, r])) : null;
+      return {
+        ...desafioPublico(d),
+        times: times.filter((t) => t.desafioId === d.id).map((t) => {
+          const m = gut.find((g) => g.id === t.microproblemaId);
+          const r = rk?.get(t.id);
+          return {
+            id: t.id,
+            nome: t.nome,
+            cor: t.cor,
+            posicao: r?.posicao || 0,
+            nota: r ? r.nota : null,
+            microproblema: m ? { texto: m.texto, grau: grau(+m.g, +m.u, +m.t) } : null,
+            microproblemas: gut.filter((g) => g.timeId === t.id).length,
+            postits: csd.filter((c) => c.timeId === t.id).length,
+            ideias: ideias.filter((i) => i.timeId === t.id).sort((a, b) => Number(a.ordem) - Number(b.ordem)).map((i) => ({ titulo: i.titulo, descricao: i.descricao }))
+          };
+        }).sort((a, b) => (a.posicao || 99) - (b.posicao || 99))
+      };
+    });
   }
 
   // src/server/setup.ts
@@ -2257,8 +2698,12 @@ function semearDemo(S, mock) {
   como(DEMO_FACILITADOR);
   S.setup();
   const eu = S.api_usuarios()[0];
-  S.api_usuarioSalvar({ id: eu.id, email: DEMO_FACILITADOR, nome: 'Facilitador(a) LTI', departamento: 'Inovação', funcao: 'Facilitação', papel: 'admin', ativo: true });
+  S.api_usuarioSalvar({ id: eu.id, email: DEMO_FACILITADOR, nome: 'Facilitador(a) LTI', departamento: 'Inovação', funcao: 'Facilitação', papel: 'admin', ativo: true, bancaPadrao: true });
   S.api_usuariosImportar(P.map(([n, d, f]) => [email(n), n, d, f].join(';')).join('\n'));
+
+  // banca padrão fictícia (entra em todo desafio): duas pessoas da diretoria + o facilitador
+  const JURADOS = [['renata.bastos@lti.net.br', 'Renata Bastos', 'Diretoria', 'Diretora de Operações'], ['otavio.sales@lti.net.br', 'Otávio Sales', 'Diretoria', 'Diretor Comercial']];
+  JURADOS.forEach(([email, nome, departamento, funcao]) => S.api_usuarioSalvar({ email, nome, departamento, funcao, papel: 'participante', ativo: true, bancaPadrao: true }));
 
   const acaoComo = (quem, timeId, acao, dados) => { como(quem); const r = S.api_timeAcao(timeId, acao, dados); como(DEMO_FACILITADOR); return r; };
   const montarTimes = (desafioId, times) => S.api_timesSalvar(desafioId, times.map(([nome, cor, nomes]) => ({ nome, cor, emails: nomes.map((n) => E[n]) })));
@@ -2266,12 +2711,13 @@ function semearDemo(S, mock) {
   /* ---------- Desafio #1: encerrado, alimenta o acervo ---------- */
   let D = S.api_desafioSalvar({ titulo: 'Como aumentar a adesão ao programa de PDI?', problema: 'Só 35% dos colaboradores atualizam o PDI no semestre.', tamanhoTime: '4', prazoGut: dia(5), prazoCsd: dia(6), prazoPlano: dia(7), prazoIdeias: dia(8) });
   const d1 = D.desafio;
-  S.api_participantesDefinir(d1.id, ['Ana', 'Bruno', 'Carla', 'Diego', 'Fábio', 'Gabi', 'Isabela', 'Karen'].map((n) => E[n]));
-  D = montarTimes(d1.id, [['Pulsar', '#3fb8ee', ['Ana', 'Bruno', 'Carla', 'Fábio']], ['Vega', '#c026d3', ['Diego', 'Gabi', 'Isabela', 'Karen']]]);
+  S.api_participantesDefinir(d1.id, ['Ana', 'Bruno', 'Carla', 'Diego', 'Fábio', 'Gabi', 'Isabela', 'Karen', 'Elisa', 'Henrique', 'João', 'Lucas'].map((n) => E[n]));
+  D = montarTimes(d1.id, [['Pulsar', '#3fb8ee', ['Ana', 'Bruno', 'Carla', 'Fábio']], ['Vega', '#c026d3', ['Diego', 'Gabi', 'Isabela', 'Karen']], ['Zênite', '#0d9488', ['Elisa', 'Henrique', 'João', 'Lucas']]]);
   S.api_desafioIniciar(d1.id);
   const hist = [
     ['Formulário do PDI é longo demais', [4, 4, 4], 'Por que as pessoas abandonam o PDI no meio?', 'Entrevistar 10 colaboradores', ['PDI em 5 perguntas', 'Lembrete no 1:1 mensal', 'Trilhas prontas por função']],
     ['Gestores não cobram o PDI nas conversas', [4, 3, 4], 'Gestores sabem conduzir uma conversa de PDI?', 'Oficina de 1h para gestores', ['PDI gamificado com metas trimestrais', 'Ranking de áreas com PDI em dia']],
+    ['Metas do PDI desconectadas da avaliação de desempenho', [5, 3, 4], 'O que os gestores olham na avaliação semestral?', 'Cruzar metas do PDI com a avaliação', ['PDI ligado à avaliação semestral', 'Mentoria cruzada entre áreas']],
   ];
   D.times.forEach((t, k) => {
     const [micro, [g, u, tt], duvida, acaoTxt, ideias] = hist[k];
@@ -2289,6 +2735,22 @@ function semearDemo(S, mock) {
     acaoComo(m[0], t.id, 'etapa.concluir', { etapa: 'ideias' });
   });
   S.api_desafioSalvar({ ...d1, prazoGut: dia(-40), prazoCsd: dia(-35), prazoPlano: dia(-30), prazoIdeias: dia(-25), dataApresentacao: dia(-21) });
+  // banca: notas de cada jurado (impacto, viabilidade, inovação, método, pitch), revelação e só então o encerramento
+  S.api_desafioStatus(d1.id, 'apresentacao');
+  const notasD1 = {
+    Pulsar: [[[4, 5, 3, 4, 5], 'Simples de implantar já no próximo ciclo.'], [[4, 4, 3, 4, 4], ''], [[5, 4, 3, 5, 4], 'Boa leitura da Matriz CSD.']],
+    Vega: [[[4, 3, 5, 3, 5], 'Gamificação criativa, mas cuidado com o ranking entre áreas.'], [[3, 3, 5, 3, 4], ''], [[4, 3, 4, 4, 5], '']],
+    Zênite: [[[5, 4, 4, 5, 4], 'Atacou a causa raiz: o PDI passa a valer na avaliação.'], [[5, 5, 4, 4, 5], 'Pitch muito convincente!'], [[5, 4, 5, 5, 4], '']],
+  };
+  [DEMO_FACILITADOR, ...JURADOS.map((j) => j[0])].forEach((jurado, k) => {
+    como(jurado);
+    D.times.forEach((t) => {
+      const [[impacto, viabilidade, inovacao, metodo, pitch], comentario] = notasD1[t.nome][k];
+      S.api_avaliar(d1.id, t.id, { impacto, viabilidade, inovacao, metodo, pitch }, comentario);
+    });
+  });
+  como(DEMO_FACILITADOR);
+  S.api_resultadoRevelar(d1.id, true);
   S.api_desafioStatus(d1.id, 'encerrado');
 
   /* ---------- Desafio #2: em andamento, o principal da apresentação ---------- */
@@ -2542,6 +3004,8 @@ function __demoIniciarUI() {
     ['part', () => `/time/${d().aurora}/priorizar`, 'Brainstorm round-robin', 'Cada pessoa dá uma ideia principal e os colegas reforçam com ideias de apoio. Depois o time arrasta para definir a ordem de importância.'],
     ['fac', () => `/painel/${d().desafio2}`, 'Painel ao vivo', 'No telão, o facilitador vê todos os times avançando em tempo real. Repare nos colegas trabalhando agora mesmo.'],
     ['fac', () => `/apresentar/${d().aurora}`, 'Pitch', 'Os slides do time são montados automaticamente para a apresentação ao vivo. Use as setas ← → ou clique no slide.'],
+    ['fac', () => `/avaliar/${d().desafio1}`, 'Banca avaliadora', 'Cada jurado da banca abre no próprio celular e dá notas de 1 a 5, em 5 critérios com peso (impacto, viabilidade, inovação…), ao pitch de cada time. As notas ficam sigilosas até a cerimônia.'],
+    ['fac', () => `/resultado/${d().desafio1}/cerimonia`, 'Cerimônia de premiação', 'No telão, o facilitador revela o ranking: o pódio sobe do 3º ao 1º lugar, com a nota de cada time e os comentários da banca. Depois, o resultado fica guardado no Acervo.'],
     ['fac', '/historico', 'Acervo de ideias', 'Ao encerrar, tudo fica guardado: problemas, microproblemas e ideias de todos os desafios, com busca. E o ciclo recomeça com um novo desafio.'],
   ];
   let passo = 0;
@@ -2815,7 +3279,7 @@ function rotear(hash) {
   app.appendChild(tela);
   (ROTAS[nome] || ROTAS.inicio)(tela, partes[1], partes[2]);
 }
-const MENU_DE = { time: 'inicio', desafio: 'inicio', painel: 'inicio', apresentar: 'inicio' };
+const MENU_DE = { time: 'inicio', desafio: 'inicio', painel: 'inicio', apresentar: 'inicio', avaliar: 'inicio', resultado: 'inicio' };
 
 function carregando(el, txt = 'Carregando…') {
   el.innerHTML = `<div class="carregando-pag"><div class="roda"></div>${esc(txt)}</div>`;
@@ -3446,7 +3910,7 @@ ROTAS.inicio = async (el) => {
       ${t ? `<div style="display:flex;align-items:center;gap:8px"><i style="width:12px;height:12px;border-radius:50%;background:${esc(t.cor)}"></i><b>Time ${esc(t.nome)}</b>
           <span class="muted small">· ${t.etapaAtual === 'pitch' ? 'pronto para o pitch 🎤' : 'etapa atual: ' + esc(FASE[t.etapaAtual].sub)}</span></div>
         <div class="mini-trilha">${etapasDe(d).map((e) => `<span style="--fc:${FASE[e].cor}"><i style="--p:${t.concluidas.includes(e) ? 100 : 0}%"></i></span>`).join('')}</div>` : '<span class="muted">Você ainda não está em um time.</span>'}
-      <div class="rod">${t ? `<a class="btn" data-go="/time/${esc(t.id)}">Entrar na sala do time →</a>` : ''}</div></div>`;
+      <div class="rod">${t ? `<a class="btn" data-go="/time/${esc(t.id)}">Entrar na sala do time →</a>` : ''}${d.resultadoEm ? `<a class="btn grad" data-go="/resultado/${esc(d.id)}">🏆 Resultado</a>` : ''}</div></div>`;
   };
   const cardGestao = (d) => `<div class="card dcard">
       <div style="display:flex;justify-content:space-between;align-items:center"><span class="num">Desafio #${esc(d.numero)}</span>${statusTag(d.status)}</div>
@@ -3454,6 +3918,15 @@ ROTAS.inicio = async (el) => {
       <div class="muted small">${d.participantes} participante(s) · ${d.times.length} time(s)${d.dataApresentacao ? ' · apresentação em ' + fmtDia(d.dataApresentacao) : ''}</div>
       ${d.times.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${d.times.map((t) => `<span class="dep" style="--dc:${esc(t.cor)}">${esc(t.nome)} · ${t.concluidas.length}/${etapasDe(d).length}</span>`).join('')}</div>` : ''}
       <div class="rod"><a class="btn sec peq" data-go="/desafio/${esc(d.id)}">⚙️ Configurar</a>${d.status !== 'rascunho' ? `<a class="btn peq" data-go="/painel/${esc(d.id)}">📡 Painel ao vivo</a>` : ''}</div></div>`;
+  const cardBanca = ({ desafio: d, avaliados, total }) => {
+    const revelado = !!d.resultadoEm;
+    return `<div class="card dcard bk-card">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="num">⚖️ Banca · Desafio #${esc(d.numero)}</span>${statusTag(d.status)}</div>
+      <h3>${esc(d.titulo)}</h3>
+      <div class="muted small">${revelado ? '🏆 Resultado revelado' : d.status === 'apresentacao' ? `Você avaliou ${avaliados} de ${total} time(s)` : 'As notas abrem nas apresentações'}${d.dataApresentacao && !revelado ? ' · pitch em ' + fmtDia(d.dataApresentacao) : ''}</div>
+      ${d.status === 'apresentacao' && !revelado ? barraProg(avaliados, total) : ''}
+      <div class="rod">${revelado ? `<a class="btn grad" data-go="/resultado/${esc(d.id)}">🏆 Ver resultado</a>` : `<a class="btn ${d.status === 'apresentacao' ? 'grad' : 'sec'}" data-go="/avaliar/${esc(d.id)}">${d.status === 'apresentacao' ? (avaliados >= total ? 'Revisar minhas notas' : 'Avaliar os pitches →') : 'Ver critérios'}</a>`}</div></div>`;
+  };
   el.innerHTML = `
     <div class="card hero boas-vindas">
       <div><div class="kicker">Pivotando · Juntos, viramos o jogo.</div><h1>${saud}, ${esc(primeiro(ME.nome))}! 👋</h1>
@@ -3463,6 +3936,7 @@ ROTAS.inicio = async (el) => {
     <div class="secao"><h3>Meus desafios</h3>
       ${ini.meus.length ? `<div class="grade">${ini.meus.map(cardMeu).join('')}</div>`
         : '<div class="card vazio"><div class="ico">🚀</div>Você ainda não participa de nenhum desafio em andamento.<br>Quando for sorteado para um time, o convite chega no seu e-mail.</div>'}</div>
+    ${ini.banca && ini.banca.length ? `<div class="secao"><h3>Banca avaliadora</h3><div class="grade">${ini.banca.map(cardBanca).join('')}</div></div>` : ''}
     ${ME.facilita ? `<div class="secao"><h3>Gestão de desafios</h3>
       ${ini.gestao.length ? `<div class="grade">${ini.gestao.map(cardGestao).join('')}</div>`
         : '<div class="card vazio"><div class="ico">🧭</div>Nenhum desafio criado ainda.<br><br><button class="btn grad" data-go="/desafio/novo">Criar o primeiro desafio</button></div>'}</div>` : ''}`;
@@ -3470,7 +3944,7 @@ ROTAS.inicio = async (el) => {
 
 /* ============================== DESAFIO (facilitador) ============================== */
 let D = null;
-const PASSOS = [['dados', 'Problema e prazos'], ['participantes', 'Participantes'], ['times', 'Times'], ['andamento', 'Andamento']];
+const PASSOS = [['dados', 'Problema e prazos'], ['participantes', 'Participantes'], ['times', 'Times'], ['andamento', 'Andamento'], ['banca', 'Banca 🏆']];
 
 ROTAS.desafio = async (el, id, passo) => {
   if (!ME.facilita) return falha(el, 'Apenas facilitadores acessam esta tela.');
@@ -3492,7 +3966,7 @@ ROTAS.desafio = async (el, id, passo) => {
 
 function desenharDesafio() {
   const { d } = D;
-  const feito = { dados: !D.novo, participantes: d.participantes.length > 0, times: d.times.length > 0, andamento: d.desafio.status !== 'rascunho' };
+  const feito = { dados: !D.novo, participantes: d.participantes.length > 0, times: d.times.length > 0, andamento: d.desafio.status !== 'rascunho', banca: !!d.desafio.resultadoEm };
   D.el.innerHTML = `<button class="voltar" data-go="/">← Início</button>
     <div class="cab-pag"><div><div class="muted small" style="font-weight:700;letter-spacing:1px;text-transform:uppercase">${D.novo ? 'Novo desafio' : 'Desafio #' + esc(d.desafio.numero)}</div>
       <h1 class="pag">${esc(d.desafio.titulo || 'Qual é o problema central?')}</h1></div><span class="espaco"></span>${D.novo ? '' : statusTag(d.desafio.status)}</div>
@@ -3502,7 +3976,7 @@ function desenharDesafio() {
     if (D.novo && p.dataset.passo !== 'dados') return toast('Salve o problema e os prazos primeiro.');
     D.passo = p.dataset.passo; desenharDesafio();
   }));
-  ({ dados: passoDados, participantes: passoParticipantes, times: passoTimes, andamento: passoAndamento })[D.passo]($('#passo'));
+  ({ dados: passoDados, participantes: passoParticipantes, times: passoTimes, andamento: passoAndamento, banca: passoBanca })[D.passo]($('#passo'));
 }
 
 // [etapa, campo do prazo, ícone, nome, para que serve, [data, horário] da realização]
@@ -3889,13 +4363,13 @@ function passoAndamento(el) {
   const botoes = {
     rascunho: `<button class="btn grad" data-st="iniciar" ${d.times.length ? '' : 'disabled'}>🚀 Iniciar desafio e avisar os times</button>`,
     em_andamento: `<a class="btn" data-go="/painel/${esc(x.id)}">📡 Painel ao vivo</a><button class="btn sec" data-st="apresentacao">🎤 Abrir apresentações</button><button class="btn sec" data-st="encerrado">🏁 Encerrar desafio</button>`,
-    apresentacao: `<a class="btn" data-go="/painel/${esc(x.id)}">📡 Painel ao vivo</a><button class="btn sec" data-st="em_andamento">↩ Voltar ao andamento</button><button class="btn grad" data-st="encerrado">🏁 Encerrar desafio</button>`,
-    encerrado: `<button class="btn sec" data-st="apresentacao">↩ Reabrir para apresentação</button><a class="btn grad" data-go="/desafio/novo">+ Novo desafio</a>`,
+    apresentacao: `<a class="btn" data-go="/painel/${esc(x.id)}">📡 Painel ao vivo</a><button class="btn grad" data-passo-ir="banca">🏆 Banca e resultado</button><button class="btn sec" data-st="em_andamento">↩ Voltar ao andamento</button><button class="btn sec" data-st="encerrado">🏁 Encerrar desafio</button>`,
+    encerrado: `<button class="btn sec" data-passo-ir="banca">🏆 Banca e resultado</button><button class="btn sec" data-st="apresentacao">↩ Reabrir para apresentação</button><a class="btn grad" data-go="/desafio/novo">+ Novo desafio</a>`,
   }[st];
   const dica = {
     rascunho: 'Ao iniciar, cada participante recebe por e-mail o seu time, os colegas, os prazos e o link direto para a sala do time (você vê a prévia antes).',
     em_andamento: 'Os times estão trabalhando. Etapas com prazo vencido ficam somente leitura; clique numa etapa vermelha para reabri-la para o time.',
-    apresentacao: 'Hora do pitch! Todos os participantes podem ver o trabalho dos outros times. As etapas estão somente leitura.',
+    apresentacao: 'Hora do pitch! Todos os participantes podem ver o trabalho dos outros times, e a banca já pode dar as notas. As etapas estão somente leitura.',
     encerrado: 'Desafio encerrado: tudo foi guardado no Acervo de ideias.',
   }[st];
   const agora = Date.now();
@@ -3916,6 +4390,8 @@ function passoAndamento(el) {
     </div>`).join('')}</div>` : '<div class="card vazio"><div class="ico">🎲</div>Os times ainda não foram formados.</div>'}`;
   el.onclick = async (ev) => {
     if (ev.target.closest('#abrir-aviso')) return abrirAvisoTimes();
+    const ir = ev.target.closest('[data-passo-ir]');
+    if (ir) { D.passo = ir.dataset.passoIr; return desenharDesafio(); }
     const r = ev.target.closest('[data-reabrir]');
     if (r) {
       D.d = await acao(null, () => gs('api_etapaReabrir', r.dataset.reabrir, r.dataset.etapa, !!r.dataset.abrir));
@@ -3951,7 +4427,7 @@ ROTAS.usuarios = async (el) => {
     const vis = us.filter((u) => !busca || `${u.nome} ${u.email} ${u.departamento} ${u.funcao}`.toLowerCase().includes(busca));
     $('#tb-u').innerHTML = vis.map((u) => `<tr class="click ${u.ativo ? '' : 'inativo'}" data-id="${esc(u.id)}"><td><div class="pessoa-cel">${av(u.nome)}<div><b>${esc(u.nome)}</b><div class="small muted">${esc(u.email)}</div></div></div></td>
       <td>${u.departamento ? `<span class="dep" style="--dc:${corDe(u.departamento)}">${esc(u.departamento)}</span>` : '<span class="muted">—</span>'}</td><td>${esc(u.funcao || '—')}</td>
-      <td>${esc(PAPEL[u.papel] || u.papel)}${u.ativo ? '' : ' · inativo'}</td></tr>`).join('') || '<tr><td colspan="4" class="vazio">Ninguém encontrado.</td></tr>';
+      <td>${esc(PAPEL[u.papel] || u.papel)}${u.ativo ? '' : ' · inativo'}${u.bancaPadrao ? ' <span class="selo-banca" title="Entra na banca de todo desafio novo">⭐ Banca</span>' : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="vazio">Ninguém encontrado.</td></tr>';
   };
   desenhar();
   $('#busca-u').oninput = (ev) => { busca = ev.target.value.trim().toLowerCase(); desenhar(); };
@@ -3966,13 +4442,14 @@ ROTAS.usuarios = async (el) => {
       <datalist id="dl-deps">${deps().map((d) => `<option value="${esc(d)}">`).join('')}</datalist>
       <div class="cols2"><div><label class="campo">Papel</label><select name="papel" ${ME.admin ? '' : 'disabled'}>${Object.entries(PAPEL).map(([k, t]) => `<option value="${k}" ${u.papel === k ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
         <div><label class="campo">Situação</label><select name="ativo"><option value="1" ${u.ativo ? 'selected' : ''}>Ativo</option><option value="" ${u.ativo ? '' : 'selected'}>Inativo</option></select></div></div>
+      <label class="check-banca"><input type="checkbox" name="bancaPadrao" ${u.bancaPadrao ? 'checked' : ''}><span><b>⭐ Banca padrão</b><small>Entra automaticamente na banca avaliadora de todo desafio novo (dá para tirar no desafio).</small></span></label>
       ${ME.admin ? '' : '<p class="muted small">Só administradores definem facilitadores e administradores.</p>'}
       <div class="acoes-form"><button type="button" class="btn sec" id="canc">Cancelar</button><button class="btn">Salvar</button></div></form>`);
     $('#canc', m.el).onclick = m.fechar;
     $('#f-u', m.el).onsubmit = async (ev) => {
       ev.preventDefault();
       const f = ev.target;
-      const dados = { id: u.id, email: f.email.value, nome: f.nome.value, departamento: f.departamento.value, funcao: f.funcao.value, papel: f.papel.value || u.papel, ativo: !!f.ativo.value };
+      const dados = { id: u.id, email: f.email.value, nome: f.nome.value, departamento: f.departamento.value, funcao: f.funcao.value, papel: f.papel.value || u.papel, ativo: !!f.ativo.value, bancaPadrao: f.bancaPadrao.checked };
       us = await acao(f.querySelector('button:last-child'), () => gs('api_usuarioSalvar', dados));
       m.fechar(); toast('✅ Pessoa salva'); desenhar();
     };
@@ -4021,11 +4498,17 @@ ROTAS.painel = async (el, id) => {
       el.innerHTML = `<button class="voltar" data-go="/desafio/${esc(d.id)}">← Configuração do desafio</button>
         <div class="inst-head"><div><div class="muted small" style="font-weight:700;letter-spacing:1px;text-transform:uppercase">Desafio #${esc(d.numero)}</div><h2>${esc(d.titulo)}</h2></div>
           ${d.status === 'em_andamento' || d.status === 'apresentacao' ? '<span class="ao-vivo">AO VIVO</span>' : statusTag(d.status)}<span class="espaco"></span>
+          <a class="chip-banca" id="painel-banca" data-go="/resultado/${esc(d.id)}" style="display:none"></a>
           <span class="muted small">Atualiza sozinho · ideal para o telão</span><button class="btn sec peq" id="tela-cheia">⛶ Tela cheia</button></div>
         <div class="painel"><div class="painel-times" id="painel-times"></div>
           <div class="card"><b>Atividade recente</b><div class="feed" id="feed" style="margin-top:12px"></div></div></div>`;
       $('#tela-cheia').onclick = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen && document.documentElement.requestFullscreen());
     }
+    // andamento da banca (as notas em si ficam sigilosas até a cerimônia)
+    const bk = $('#painel-banca');
+    const mostraBanca = dados.banca && dados.banca.jurados && (d.status === 'apresentacao' || d.resultadoEm);
+    bk.style.display = mostraBanca ? '' : 'none';
+    if (mostraBanca) bk.innerHTML = d.resultadoEm ? '🏆 Resultado revelado' : `⚖️ Banca: <b>${dados.banca.feitas}</b>/${dados.banca.esperadas} notas`;
     $('#painel-times').innerHTML = dados.times.map((t) => {
       const c = t.contagem, antes = ultimo[t.id] || c;
       const pulo = (k) => (c[k] !== antes[k] ? 'pulo' : '');
@@ -4123,7 +4606,8 @@ ROTAS.historico = async (el) => {
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="num muted small" style="font-weight:800;letter-spacing:1px">DESAFIO #${esc(d.numero)}</span>${statusTag(d.status)}
         <span class="muted small">${d.encerradoEm ? 'encerrado em ' + fmtDataHora(d.encerradoEm) : ''}</span></div>
       <h3 style="margin:6px 0 4px;font-size:19px">${marcar(d.titulo, q)}</h3>${d.problema ? `<p class="muted" style="margin:0 0 10px">${marcar(resumoTexto(d.problema, 400), q)}</p>` : ''}
-      ${d.times.map((t) => `<div class="hist-time"><div><b style="color:${esc(t.cor)}">● Time ${esc(t.nome)}</b><div class="small muted">${t.microproblemas} microproblema(s) · ${t.postits} post-it(s)</div>
+      ${d.resultadoEm ? `<a class="btn grad peq" style="margin:4px 0 10px" data-go="/resultado/${esc(d.id)}">🏆 Resultado da banca</a>` : ''}
+      ${d.times.map((t) => `<div class="hist-time"><div><b style="color:${esc(t.cor)}">${t.posicao ? `<span class="hist-pos" title="${t.posicao}º lugar na banca">${['', '🥇', '🥈', '🥉'][t.posicao] || t.posicao + 'º'}</span>` : '●'} Time ${esc(t.nome)}</b>${t.nota != null ? `<span class="hist-nota">${fmtNota(t.nota)} pts</span>` : ''}<div class="small muted">${t.microproblemas} microproblema(s) · ${t.postits} post-it(s)</div>
           <a class="btn sec peq" style="margin-top:8px" data-go="/apresentar/${esc(t.id)}">🎤 Ver slides</a></div>
         <div>${t.microproblema ? `<div style="margin-bottom:8px"><span class="small muted">👑 Microproblema</span><div><b>${marcar(t.microproblema.texto, q)}</b> <span class="small muted">(grau ${t.microproblema.grau})</span></div></div>` : ''}
           <div class="hist-ideias">${t.ideias.map((i, k) => `<div>${['🥇', '🥈', '🥉'][k] || '•'} <b>${marcar(i.titulo, q)}</b>${i.descricao ? ` <span class="muted">— ${marcar(i.descricao, q)}</span>` : ''}</div>`).join('') || '<span class="muted small">Sem ideias registradas.</span>'}</div></div></div>`).join('')}
@@ -4131,6 +4615,354 @@ ROTAS.historico = async (el) => {
   };
   desenhar('');
   $('#busca-h').oninput = (ev) => desenhar(ev.target.value.trim().toLowerCase());
+};
+</script>
+
+<script>
+/* ============================== BANCA AVALIADORA ============================== */
+const ROT_NOTA = ['', 'Fraco', 'Regular', 'Bom', 'Muito bom', 'Excelente'];
+const fmtNota = (n) => Number(n || 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+const MEDALHA = ['', '🥇', '🥈', '🥉'];
+/** Nota de 0 a 100 de um jurado (mesma conta do servidor). */
+function notaDe(notas, criterios) {
+  const pesos = criterios.reduce((s, c) => s + c.peso, 0);
+  return pesos ? (criterios.reduce((s, c) => s + (Number(notas[c.id]) || 0) * c.peso, 0) / (5 * pesos)) * 100 : 0;
+}
+const linkAvaliar = (id) => `${APP_PUBLICO}#/avaliar/${id}`;
+const barraProg = (feitas, total) => `<div class="bk-barra"><i style="width:${total ? Math.round((100 * feitas) / total) : 0}%"></i></div>`;
+
+/* ---------- passo "Banca" do desafio (facilitador) ---------- */
+async function passoBanca(el) {
+  const id = D.d.desafio.id;
+  carregando(el, 'Carregando a banca…');
+  let b;
+  try { b = await gs('api_banca', id); } catch (e) { return el.isConnected && falha(el, e); }
+  if (!el.isConnected) return;
+  const st = b.desafio.status;
+  const revelado = !!b.desafio.resultadoEm;
+  const travado = b.criteriosTravados || revelado;
+  const sel = new Set(b.banca.map((j) => j.email));
+  let crit = b.desafio.criterios.map((c) => ({ ...c }));
+  let busca = '';
+  const timeNome = new Map(b.times.map((t) => [t.id, t]));
+  const prog = b.progresso;
+
+  const situacao = revelado
+    ? `<div class="bk-sit ok"><b>🏆 Resultado revelado</b><span>em ${fmtDataHora(b.desafio.resultadoEm)}. As notas estão fechadas.</span></div>`
+    : st === 'apresentacao'
+      ? `<div class="bk-sit vivo"><b>🎤 Banca avaliando</b><span>${prog.feitas} de ${prog.esperadas} notas dadas.</span></div>${barraProg(prog.feitas, prog.esperadas)}`
+      : st === 'encerrado'
+        ? '<div class="bk-sit"><b>Desafio encerrado</b><span>O resultado ainda não foi revelado.</span></div>'
+        : '<div class="bk-sit"><b>⏳ Aguardando as apresentações</b><span>Os jurados dão as notas quando você abrir as apresentações (passo Andamento).</span></div>';
+  el.innerHTML = `<div class="card bk-topo">
+      <div class="bk-topo-txt"><div class="kicker">Banca avaliadora</div>${situacao}</div>
+      <div class="bk-topo-acoes">
+        ${st === 'apresentacao' || st === 'encerrado' ? `<a class="btn grad" data-go="/resultado/${esc(id)}">${revelado ? '🏆 Ver resultado' : '🥁 Abrir cerimônia'}</a>` : ''}
+        ${revelado ? '<button class="btn sec" id="bk-ocultar">↩ Desfazer revelação</button>' : ''}
+        ${sel.size ? '<button class="btn sec" id="bk-link">📲 Link para os jurados</button>' : ''}
+      </div>
+      ${prog.jurados.length && st !== 'rascunho' && st !== 'em_andamento' ? `<div class="bk-jurados-prog">${prog.jurados.map((j) => `<div class="bk-jp ${j.avaliados >= j.total ? 'ok' : ''}">${av(j.nome)}<div><b>${esc(primeiro(j.nome))}</b>
+        <div class="small muted">${j.avaliados}/${j.total} time(s)${j.timeProprio ? ` · não avalia o Time ${esc((timeNome.get(j.timeProprio) || {}).nome || '')}` : ''}</div>${barraProg(j.avaliados, j.total)}</div>${j.avaliados >= j.total ? '<span class="bk-ok">✓</span>' : ''}</div>`).join('')}</div>` : ''}
+    </div>
+    <div class="bk-grid">
+      <div class="card"><div class="bk-cab"><h3>⚖️ Jurados <span class="muted small">(<span id="bk-n">${sel.size}</span>)</span></h3>
+          <span class="muted small">⭐ = banca padrão (marque em Pessoas)</span></div>
+        <div class="bk-chips" id="bk-chips"></div>
+        <input class="inp" id="bk-busca" placeholder="🔎 Buscar pessoa para a banca" style="margin:10px 0 4px">
+        <div class="selecao" id="bk-lista"></div></div>
+      <div class="card"><div class="bk-cab"><h3>📋 Critérios</h3>
+          ${travado ? '<span class="chip-trava">🔒 A banca já deu notas</span>' : '<button class="btn sec peq" id="bk-padrao">↺ Restaurar padrão</button>'}</div>
+        <p class="muted small" style="margin:4px 0 10px">Cada jurado dá uma nota de <b>1 a 5</b> em cada critério. O peso define quanto o critério vale na nota final (0 a 100).</p>
+        <div id="bk-crit"></div>
+        ${travado ? '' : '<button class="btn sec peq" id="bk-add" style="margin-top:10px">+ Critério</button>'}</div>
+    </div>
+    ${revelado ? '' : '<div class="acoes-form"><button class="btn" id="bk-salvar">Salvar banca</button></div>'}`;
+
+  const desenharJurados = () => {
+    const us = b.usuarios;
+    $('#bk-chips').innerHTML = [...sel].map((e) => {
+      const u = us.find((x) => x.email === e) || { nome: e };
+      return `<span class="bk-chip">${av(u.nome, 'mini')}${esc(u.nome)}${u.timeId ? ` <i title="Está no Time ${esc((timeNome.get(u.timeId) || {}).nome || '')}: não avalia o próprio time">⚠️</i>` : ''}${revelado ? '' : `<button data-tira="${esc(e)}" title="Tirar da banca">✕</button>`}</span>`;
+    }).join('') || '<span class="muted small">Ninguém na banca ainda.</span>';
+    const vis = us.filter((u) => !busca || `${u.nome} ${u.email} ${u.departamento} ${u.funcao}`.toLowerCase().includes(busca));
+    $('#bk-lista').innerHTML = vis.map((u) => `<label class="sel-pessoa ${sel.has(u.email) ? 'on' : ''}"><input type="checkbox" value="${esc(u.email)}" ${sel.has(u.email) ? 'checked' : ''} ${revelado ? 'disabled' : ''}>
+      ${av(u.nome)}<div style="flex:1;min-width:0"><b>${esc(u.nome)}</b>${u.bancaPadrao ? ' <span title="Banca padrão">⭐</span>' : ''}<div class="small muted">${esc(u.funcao || '—')}${u.timeId ? ` · <span style="color:var(--aviso)">no Time ${esc((timeNome.get(u.timeId) || {}).nome || '')}</span>` : ''}</div></div>
+      ${u.departamento ? `<span class="dep" style="--dc:${corDe(u.departamento)}">${esc(u.departamento)}</span>` : ''}</label>`).join('') || '<div class="vazio small">Ninguém encontrado.</div>';
+    $('#bk-n').textContent = sel.size;
+  };
+  const desenharCriterios = () => {
+    const total = crit.reduce((s, c) => s + (Number(c.peso) || 0), 0) || 1;
+    $('#bk-crit').innerHTML = crit.map((c, i) => `<div class="crit" data-i="${i}">
+      <div class="crit-num">${i + 1}</div>
+      <div class="crit-txt">${travado
+        ? `<b>${esc(c.nome)}</b><div class="small muted">${esc(c.descricao)}</div>`
+        : `<input class="inp crit-nome" data-k="nome" maxlength="60" value="${esc(c.nome)}" placeholder="Nome do critério">
+           <input class="inp crit-desc" data-k="descricao" maxlength="240" value="${esc(c.descricao)}" placeholder="Pergunta que o jurado responde">`}</div>
+      <div class="crit-peso"><span class="small muted">Peso</span><div class="peso-chips">${[1, 2, 3, 4, 5].map((p) => `<button type="button" data-peso="${p}" class="${c.peso === p ? 'on' : ''}" ${travado ? 'disabled' : ''}>${p}</button>`).join('')}</div>
+        <span class="crit-pct">${Math.round((100 * c.peso) / total)}% da nota</span></div>
+      ${travado || crit.length <= 1 ? '' : '<button type="button" class="crit-tira" title="Remover critério">✕</button>'}</div>`).join('');
+  };
+  desenharJurados();
+  desenharCriterios();
+
+  $('#bk-busca').oninput = (ev) => { busca = ev.target.value.trim().toLowerCase(); desenharJurados(); };
+  $('#bk-lista').onchange = (ev) => { if (ev.target.checked) sel.add(ev.target.value); else sel.delete(ev.target.value); desenharJurados(); };
+  $('#bk-chips').onclick = (ev) => { const x = ev.target.closest('[data-tira]'); if (x) { sel.delete(x.dataset.tira); desenharJurados(); } };
+  $('#bk-crit').oninput = (ev) => { const k = ev.target.dataset.k; if (k) crit[+ev.target.closest('.crit').dataset.i][k] = ev.target.value; };
+  $('#bk-crit').onclick = (ev) => {
+    const linha = ev.target.closest('.crit');
+    if (!linha || travado) return;
+    const i = +linha.dataset.i;
+    const p = ev.target.closest('[data-peso]');
+    if (p) { crit[i].peso = +p.dataset.peso; desenharCriterios(); }
+    if (ev.target.closest('.crit-tira')) { crit.splice(i, 1); desenharCriterios(); }
+  };
+  const add = $('#bk-add');
+  if (add) add.onclick = () => {
+    if (crit.length >= 8) return toast('Use no máximo 8 critérios.');
+    crit.push({ id: '', nome: '', descricao: '', peso: 1 });
+    desenharCriterios();
+    const ns = $$('.crit-nome', el); ns[ns.length - 1].focus();
+  };
+  const padrao = $('#bk-padrao');
+  if (padrao) padrao.onclick = () => { crit = b.criteriosPadrao.map((c) => ({ ...c })); desenharCriterios(); toast('↺ Critérios padrão restaurados (salve para gravar)'); };
+  const salvar = $('#bk-salvar');
+  if (salvar) salvar.onclick = async () => {
+    await acao(salvar, () => gs('api_bancaDefinir', id, [...sel], travado ? null : crit));
+    toast('✅ Banca salva');
+    passoBanca(el);
+  };
+  const ocultar = $('#bk-ocultar');
+  if (ocultar) ocultar.onclick = async () => {
+    if (!(await dialogo({ titulo: 'Desfazer a revelação?', texto: 'O resultado volta a ficar oculto e os jurados podem corrigir as notas.', ok: 'Desfazer' }))) return;
+    await acao(ocultar, () => gs('api_resultadoRevelar', id, false));
+    D.d.desafio.resultadoEm = '';
+    toast('🔒 Resultado oculto de novo');
+    passoBanca(el);
+  };
+  const link = $('#bk-link');
+  if (link) link.onclick = () => {
+    const url = linkAvaliar(id);
+    const m = modal(`<h2>📲 Link para os jurados</h2>
+      <p class="muted">Cada jurado abre no próprio celular, entra com a conta da LTI e dá as notas de cada time durante o pitch. O link também aparece no Início de cada jurado.</p>
+      <label class="campo">Link da avaliação</label><input type="text" id="bk-url" readonly value="${esc(url)}">
+      <div class="acoes-form"><button class="btn sec" id="bk-fechar">Fechar</button><button class="btn" id="bk-copiar">📋 Copiar link</button></div>`);
+    $('#bk-fechar', m.el).onclick = m.fechar;
+    $('#bk-url', m.el).onclick = (ev) => ev.target.select();
+    $('#bk-copiar', m.el).onclick = async () => {
+      try { await navigator.clipboard.writeText(url); toast('📋 Link copiado!'); } catch (e) { $('#bk-url', m.el).select(); toast('Selecione o link e copie com Ctrl+C'); }
+    };
+  };
+}
+
+/* ---------- tela do jurado (celular) ---------- */
+ROTAS.avaliar = async (el, id) => {
+  carregando(el, 'Abrindo a avaliação…');
+  let b;
+  try { b = await gs('api_banca', id); } catch (e) { return el.isConnected && falha(el, e); }
+  if (!el.isConnected) return;
+  if (!b.eu.jurado) return falha(el, 'Você não está na banca deste desafio.');
+  let atual = null; // time aberto no formulário
+  let rasc = {}; // notas em edição
+
+  const avaliaveis = () => b.times.filter((t) => t.id !== b.eu.meuTime);
+  const lista = () => {
+    atual = null;
+    const feitos = avaliaveis().filter((t) => b.minhas[t.id]).length;
+    const total = avaliaveis().length;
+    const revelado = !!b.desafio.resultadoEm;
+    el.innerHTML = `<button class="voltar" data-go="/">← Início</button>
+      <div class="card hero bk-hero"><div><div class="kicker">Banca avaliadora · Desafio #${esc(b.desafio.numero)}</div><h1>${esc(b.desafio.titulo)}</h1>
+        <div class="problema">${revelado ? '🏆 O resultado já foi revelado. Obrigado pela avaliação!'
+          : b.podeAvaliar ? 'Dê uma nota de 1 a 5 em cada critério para o pitch de cada time. Suas notas ficam sigilosas até a cerimônia.'
+            : 'As notas abrem quando o facilitador abrir as apresentações.'}</div>
+        <div class="progresso"><div class="barra"><i style="width:${total ? (100 * feitos) / total : 0}%"></i></div><div class="small" style="margin-top:6px;opacity:.9">Você avaliou <b>${feitos}</b> de <b>${total}</b> time(s)</div></div></div>
+        <div class="hero-dir">${revelado ? `<a class="btn grad" data-go="/resultado/${esc(id)}">🏆 Ver resultado</a>` : ''}</div></div>
+      <div class="av-times">${b.times.map((t) => {
+        const meu = t.id === b.eu.meuTime;
+        const m = b.minhas[t.id];
+        return `<button class="av-time ${m ? 'feito' : ''} ${meu ? 'meu' : ''}" style="--tc:${esc(t.cor)}" ${meu ? 'disabled' : `data-t="${esc(t.id)}"`}>
+          <div class="av-time-cab"><b>Time ${esc(t.nome)}</b>${m ? `<span class="av-nota">${fmtNota(notaDe(m.notas, b.desafio.criterios))}</span>` : ''}</div>
+          <div class="av-ideia">${t.ideia ? '💡 ' + esc(t.ideia.titulo) : '<span class="muted">Sem ideia registrada</span>'}</div>
+          <div class="av-rod">${meu ? '🙅 Seu time: você não avalia' : m ? (b.podeAvaliar ? '✓ Avaliado · toque para revisar' : '✓ Avaliado · ver minhas notas') : b.podeAvaliar ? 'Avaliar →' : 'Ver'}</div></button>`;
+      }).join('') || '<div class="card vazio">Nenhum time neste desafio.</div>'}</div>`;
+    el.onclick = (ev) => { const t = ev.target.closest('[data-t]'); if (t) form(t.dataset.t); };
+  };
+
+  const form = (timeId) => {
+    const t = b.times.find((x) => x.id === timeId);
+    atual = t;
+    const m = b.minhas[timeId];
+    rasc = m ? { ...m.notas } : {};
+    const ro = !b.podeAvaliar;
+    const crit = b.desafio.criterios;
+    el.onclick = null;
+    el.innerHTML = `<button class="voltar" id="av-voltar">← Todos os times</button>
+      <div class="card av-hero" style="--tc:${esc(t.cor)}"><div class="kicker">Time ${esc(t.nome)}</div>
+        <h2>${t.ideia ? '💡 ' + esc(t.ideia.titulo) : 'Pitch do Time ' + esc(t.nome)}</h2>
+        ${t.ideia && t.ideia.descricao ? `<p>${esc(t.ideia.descricao)}</p>` : ''}
+        ${t.microproblema ? `<div class="av-micro"><span>👑 Problema escolhido</span>${esc(t.microproblema)}</div>` : ''}
+        <div class="av-membros">${t.membros.map((n) => av(n, 'mini')).join('')}<span>${t.membros.map((n) => esc(primeiro(n))).join(', ')}</span></div>
+        <a class="btn sec peq" data-go="/apresentar/${esc(t.id)}" style="margin-top:12px">🎤 Ver slides do time</a></div>
+      <div class="av-crits">${crit.map((c) => `<div class="card av-crit" data-c="${esc(c.id)}">
+          <div class="av-crit-cab"><b>${esc(c.nome)}</b><span class="peso-tag">peso ${c.peso}</span></div>
+          <div class="small muted">${esc(c.descricao)}</div>
+          <div class="nota-btns">${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-n="${n}" class="${rasc[c.id] === n ? 'on' : ''}" ${ro ? 'disabled' : ''}><b>${n}</b><span>${ROT_NOTA[n]}</span></button>`).join('')}</div></div>`).join('')}</div>
+      <div class="card"><label class="campo" style="margin-top:0">Comentário para o time <small>(opcional, aparece no resultado)</small></label>
+        <textarea id="av-com" rows="3" maxlength="1000" ${ro ? 'disabled' : ''} placeholder="O que mais chamou sua atenção no pitch?">${esc(m ? m.comentario : '')}</textarea></div>
+      <div class="av-barra-fixa"><div class="av-total"><span>Sua nota</span><b id="av-total">—</b><small id="av-falta"></small></div>
+        ${ro ? '' : '<button class="btn grad" id="av-salvar">Salvar e próximo →</button>'}</div>`;
+    const atualizar = () => {
+      const completo = crit.every((c) => rasc[c.id]);
+      const falta = crit.filter((c) => !rasc[c.id]).length;
+      $('#av-total').textContent = completo ? fmtNota(notaDe(rasc, crit)) : '—';
+      $('#av-falta').textContent = completo ? 'de 0 a 100' : `falta${falta > 1 ? 'm' : ''} ${falta} critério${falta > 1 ? 's' : ''}`;
+    };
+    atualizar();
+    $('#av-voltar').onclick = lista;
+    $('.av-crits', el).onclick = (ev) => {
+      const bt = ev.target.closest('[data-n]');
+      if (!bt || ro) return;
+      const card = bt.closest('[data-c]');
+      rasc[card.dataset.c] = +bt.dataset.n;
+      $$('[data-n]', card).forEach((x) => x.classList.toggle('on', x === bt));
+      atualizar();
+    };
+    const salvar = $('#av-salvar');
+    if (salvar) salvar.onclick = async () => {
+      const falta = crit.find((c) => !rasc[c.id]);
+      if (falta) { toast(`Falta a nota de "${falta.nome}"`); $(`[data-c="${falta.id}"]`, el).scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+      b = await acao(salvar, () => gs('api_avaliar', id, timeId, rasc, $('#av-com').value));
+      toast(`✅ Time ${t.nome}: ${fmtNota(notaDe(rasc, crit))}`);
+      const fila = avaliaveis();
+      const prox = fila.slice(fila.findIndex((x) => x.id === timeId) + 1).concat(fila).find((x) => !b.minhas[x.id]);
+      if (prox) { form(prox.id); scrollTo(0, 0); } else { conquista('⚖️', 'Avaliação completa!', 'Você deu nota a todos os times'); lista(); }
+    };
+  };
+  lista();
+};
+
+/* ---------- cerimônia de premiação (telão) ---------- */
+ROTAS.resultado = async (el, id, modo) => {
+  carregando(el, 'Preparando o palco…');
+  let b;
+  try { b = await gs('api_banca', id); } catch (e) { return el.isConnected && falha(el, e); }
+  if (!el.isConnected) return;
+  let timer = null;
+  aoSair(() => { clearInterval(timer); clearTimeout(timer); parar = true; });
+  let parar = false;
+  const espera = (ms) => new Promise((r) => setTimeout(r, parar ? 0 : ms));
+  const tela = (html) => {
+    el.innerHTML = `<button class="voltar" data-go="${b.eu.facilita ? '/desafio/' + esc(id) + '/banca' : '/'}">← Voltar</button>
+      <div class="palco-res" id="palco"><div class="palco-luz"></div>
+        <div class="palco-ctrl"><button id="pr-fs" title="Tela cheia">⛶</button></div>
+        <div class="palco-cab"><div class="k">Pivotando · Desafio #${esc(b.desafio.numero)} · Banca avaliadora</div><h2>${esc(b.desafio.titulo)}</h2></div>
+        <div id="palco-corpo">${html}</div>
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MjIiIGhlaWdodD0iMTY4IiB2aWV3Qm94PSIwIDAgNzIyIDE2OCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJQaXZvdGFuZG8iPjx0aXRsZT5QaXZvdGFuZG88L3RpdGxlPgo8ZyB0cmFuc2Zvcm09InNjYWxlKDEuNCkiPjxwYXRoIGQ9Ik0xNCAxNCBIODggVjI2IEgxMDAgVjM4IEgxMTIgVjEwNiBRMTEyIDEyMCA5OCAxMjAgSDM0IFEwIDEyMCAwIDg2IFYyOCBRMCAxNCAxNCAxNCBaIiBmaWxsPSIjMDE2NEM4Ii8+CjxyZWN0IHg9IjEwMCIgeT0iMTQiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzAxNjRDOCIvPgo8cmVjdCB4PSIxMTIiIHk9IjI2IiB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIGZpbGw9IiMxRUFBRkYiLz4KPHJlY3QgeD0iMTIwIiB5PSI5IiB3aWR0aD0iNyIgaGVpZ2h0PSI3IiBmaWxsPSIjMTlGQUZGIi8+CjxyZWN0IHg9IjExMyIgeT0iMSIgd2lkdGg9IjUiIGhlaWdodD0iNSIgZmlsbD0iI0ZGRkZGRiIvPgo8cGF0aCBkPSJNMzYgOTggVjU2IEEyNCAyNCAwIDEgMSA2MCA4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjEzIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBvbHlnb24gcG9pbnRzPSI0Niw4MCA2Miw2NyA2Miw5MyIgZmlsbD0iI0ZGRkZGRiIvPgo8cmVjdCB4PSI1NCIgeT0iNTAiIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzE5RkFGRiIvPjwvZz4KPHBhdGggZD0iTTI2Ni4zODA4NTkzNzUgNjEuNzAxMTcxODc1UTI3NS41NjA1NDY4NzUgNjEuNzAxMTcxODc1IDI4MC43ODUxNTYyNSA2OS4wNDk4MDQ2ODc1UTI4Ni4wMDk3NjU2MjUgNzYuMzk4NDM3NSAyODYuMDA5NzY1NjI1IDkwLjIxNjc5Njg3NVEyODYuMDA5NzY1NjI1IDk5LjY0MDYyNSAyODMuMzczMDQ2ODc1IDEwNi4wNjE1MjM0Mzc1UTI4MC43MzYzMjgxMjUgMTEyLjQ4MjQyMTg3NSAyNzYuMTcwODk4NDM3NSAxMTUuNzI5NDkyMTg3NVEyNzEuNjA1NDY4NzUgMTE4Ljk3NjU2MjUgMjY1Ljc5NDkyMTg3NSAxMTguOTc2NTYyNVEyNjEuODg4NjcxODc1IDExOC45NzY1NjI1IDI1OS4xNzg3MTA5Mzc1IDExOC4wUTI1Ni40Njg3NSAxMTcuMDIzNDM3NSAyNTQuNjg2NTIzNDM3NSAxMTUuNTU4NTkzNzVRMjUyLjkwNDI5Njg3NSAxMTQuMDkzNzUgMjUxLjY4MzU5Mzc1IDExMi41ODAwNzgxMjVIMjUxLjA5NzY1NjI1UTI1MS4zNDE3OTY4NzUgMTE0LjQ4NDM3NSAyNTEuNTEyNjk1MzEyNSAxMTYuNjgxNjQwNjI1UTI1MS42ODM1OTM3NSAxMTguODc4OTA2MjUgMjUxLjY4MzU5Mzc1IDEyMS44MDg1OTM3NVYxNDIuMDIzNDM3NUgyMzIuNTkxNzk2ODc1VjYyLjY3NzczNDM3NUgyNDguMTE5MTQwNjI1TDI1MC44MDQ2ODc1IDY5LjcwODk4NDM3NUgyNTEuNjgzNTkzNzVRMjUzLjA1MDc4MTI1IDY3LjU2MDU0Njg3NSAyNTUuMDAzOTA2MjUgNjUuNzI5NDkyMTg3NVEyNTYuOTU3MDMxMjUgNjMuODk4NDM3NSAyNTkuNzY0NjQ4NDM3NSA2Mi43OTk4MDQ2ODc1UTI2Mi41NzIyNjU2MjUgNjEuNzAxMTcxODc1IDI2Ni4zODA4NTkzNzUgNjEuNzAxMTcxODc1Wk0yNTkuMjAzMTI1IDc2LjY5MTQwNjI1UTI1Ni40MTk5MjE4NzUgNzYuNjkxNDA2MjUgMjU0LjgwODU5Mzc1IDc4LjAwOTc2NTYyNVEyNTMuMTk3MjY1NjI1IDc5LjMyODEyNSAyNTIuNDg5MjU3ODEyNSA4MS45ODkyNTc4MTI1UTI1MS43ODEyNSA4NC42NTAzOTA2MjUgMjUxLjY4MzU5Mzc1IDg4LjYwNTQ2ODc1VjkwLjExOTE0MDYyNVEyNTEuNjgzNTkzNzUgOTQuNTEzNjcxODc1IDI1Mi4zNjcxODc1IDk3LjUxNjYwMTU2MjVRMjUzLjA1MDc4MTI1IDEwMC41MTk1MzEyNSAyNTQuNzEwOTM3NSAxMDIuMDU3NjE3MTg3NVEyNTYuMzcxMDkzNzUgMTAzLjU5NTcwMzEyNSAyNTkuMzAwNzgxMjUgMTAzLjU5NTcwMzEyNVEyNjEuNjkzMzU5Mzc1IDEwMy41OTU3MDMxMjUgMjYzLjMwNDY4NzUgMTAyLjIyODUxNTYyNVEyNjQuOTE2MDE1NjI1IDEwMC44NjEzMjgxMjUgMjY1Ljc0NjA5Mzc1IDk3Ljg4MjgxMjVRMjY2LjU3NjE3MTg3NSA5NC45MDQyOTY4NzUgMjY2LjU3NjE3MTg3NSA5MC4wMjE0ODQzNzVRMjY2LjU3NjE3MTg3NSA4Mi43NDYwOTM3NSAyNjQuNjk2Mjg5MDYyNSA3OS43MTg3NVEyNjIuODE2NDA2MjUgNzYuNjkxNDA2MjUgMjU5LjIwMzEyNSA3Ni42OTE0MDYyNVogTTMxMS41ODc4OTA2MjUgNjIuNjc3NzM0Mzc1VjExOC4wSDI5Mi40OTYwOTM3NVY2Mi42Nzc3MzQzNzVaTTMwMi4xMTUyMzQzNzUgNDAuNDEyMTA5Mzc1UTMwNi4yMTY3OTY4NzUgNDAuNDEyMTA5Mzc1IDMwOS4yNjg1NTQ2ODc1IDQyLjEyMTA5Mzc1UTMxMi4zMjAzMTI1IDQzLjgzMDA3ODEyNSAzMTIuMzIwMzEyNSA0OC45MDgyMDMxMjVRMzEyLjMyMDMxMjUgNTMuODM5ODQzNzUgMzA5LjI2ODU1NDY4NzUgNTUuNTczMjQyMTg3NVEzMDYuMjE2Nzk2ODc1IDU3LjMwNjY0MDYyNSAzMDIuMTE1MjM0Mzc1IDU3LjMwNjY0MDYyNVEyOTcuOTE2MDE1NjI1IDU3LjMwNjY0MDYyNSAyOTQuOTYxOTE0MDYyNSA1NS41NzMyNDIxODc1UTI5Mi4wMDc4MTI1IDUzLjgzOTg0Mzc1IDI5Mi4wMDc4MTI1IDQ4LjkwODIwMzEyNVEyOTIuMDA3ODEyNSA0My44MzAwNzgxMjUgMjk0Ljk2MTkxNDA2MjUgNDIuMTIxMDkzNzVRMjk3LjkxNjAxNTYyNSA0MC40MTIxMDkzNzUgMzAyLjExNTIzNDM3NSA0MC40MTIxMDkzNzVaIE0zMzQuOTE5OTIxODc1IDExOC4wIDMxMy44MjYxNzE4NzUgNjIuNjc3NzM0Mzc1SDMzMy43NDgwNDY4NzVMMzQzLjEyMzA0Njg3NSA5NS4zOTI1NzgxMjVRMzQzLjI2OTUzMTI1IDk1LjgzMjAzMTI1IDM0My42MzU3NDIxODc1IDk3LjYzODY3MTg3NVEzNDQuMDAxOTUzMTI1IDk5LjQ0NTMxMjUgMzQ0LjAwMTk1MzEyNSAxMDEuMDA3ODEyNUgzNDQuMzQzNzVRMzQ0LjM0Mzc1IDk5LjM0NzY1NjI1IDM0NC42ODU1NDY4NzUgOTcuODMzOTg0Mzc1UTM0NS4wMjczNDM3NSA5Ni4zMjAzMTI1IDM0NS4yMjI2NTYyNSA5NS40OTAyMzQzNzVMMzU1LjAzNzEwOTM3NSA2Mi42Nzc3MzQzNzVIMzc0LjkxMDE1NjI1TDM1My44MTY0MDYyNSAxMTguMFogTTQyOS44MzM5ODQzNzUgOTAuMjE2Nzk2ODc1UTQyOS44MzM5ODQzNzUgOTcuMTUwMzkwNjI1IDQyNy45Mjk2ODc1IDEwMi41MjE0ODQzNzVRNDI2LjAyNTM5MDYyNSAxMDcuODkyNTc4MTI1IDQyMi40MTIxMDkzNzUgMTExLjU1NDY4NzVRNDE4Ljc5ODgyODEyNSAxMTUuMjE2Nzk2ODc1IDQxMy42NzE4NzUgMTE3LjA5NjY3OTY4NzVRNDA4LjU0NDkyMTg3NSAxMTguOTc2NTYyNSA0MDIuMDk5NjA5Mzc1IDExOC45NzY1NjI1UTM5Ni4wOTM3NSAxMTguOTc2NTYyNSAzOTEuMDg4ODY3MTg3NSAxMTcuMDk2Njc5Njg3NVEzODYuMDgzOTg0Mzc1IDExNS4yMTY3OTY4NzUgMzgyLjM3MzA0Njg3NSAxMTEuNTU0Njg3NVEzNzguNjYyMTA5Mzc1IDEwNy44OTI1NzgxMjUgMzc2LjYzNTc0MjE4NzUgMTAyLjUyMTQ4NDM3NVEzNzQuNjA5Mzc1IDk3LjE1MDM5MDYyNSAzNzQuNjA5Mzc1IDkwLjIxNjc5Njg3NVEzNzQuNjA5Mzc1IDgxLjAzNzEwOTM3NSAzNzcuOTU0MTAxNTYyNSA3NC42ODk0NTMxMjVRMzgxLjI5ODgyODEyNSA2OC4zNDE3OTY4NzUgMzg3LjUyNDQxNDA2MjUgNjUuMDIxNDg0Mzc1UTM5My43NSA2MS43MDExNzE4NzUgNDAyLjM5MjU3ODEyNSA2MS43MDExNzE4NzVRNDEwLjM1MTU2MjUgNjEuNzAxMTcxODc1IDQxNi41NTI3MzQzNzUgNjUuMDIxNDg0Mzc1UTQyMi43NTM5MDYyNSA2OC4zNDE3OTY4NzUgNDI2LjI5Mzk0NTMxMjUgNzQuNjg5NDUzMTI1UTQyOS44MzM5ODQzNzUgODEuMDM3MTA5Mzc1IDQyOS44MzM5ODQzNzUgOTAuMjE2Nzk2ODc1Wk0zOTMuOTk0MTQwNjI1IDkwLjIxNjc5Njg3NVEzOTMuOTk0MTQwNjI1IDk0Ljk1MzEyNSAzOTQuODI0MjE4NzUgOTguMjAwMTk1MzEyNVEzOTUuNjU0Mjk2ODc1IDEwMS40NDcyNjU2MjUgMzk3LjQ4NTM1MTU2MjUgMTAzLjEzMTgzNTkzNzVRMzk5LjMxNjQwNjI1IDEwNC44MTY0MDYyNSA0MDIuMjk0OTIxODc1IDEwNC44MTY0MDYyNVE0MDUuMjczNDM3NSAxMDQuODE2NDA2MjUgNDA3LjAzMTI1IDEwMy4xMzE4MzU5Mzc1UTQwOC43ODkwNjI1IDEwMS40NDcyNjU2MjUgNDA5LjU5NDcyNjU2MjUgOTguMjAwMTk1MzEyNVE0MTAuNDAwMzkwNjI1IDk0Ljk1MzEyNSA0MTAuNDAwMzkwNjI1IDkwLjIxNjc5Njg3NVE0MTAuNDAwMzkwNjI1IDg1LjQ4MDQ2ODc1IDQwOS41OTQ3MjY1NjI1IDgyLjMwNjY0MDYyNVE0MDguNzg5MDYyNSA3OS4xMzI4MTI1IDQwNy4wMDY4MzU5Mzc1IDc3LjUyMTQ4NDM3NVE0MDUuMjI0NjA5Mzc1IDc1LjkxMDE1NjI1IDQwMi4xOTcyNjU2MjUgNzUuOTEwMTU2MjVRMzk3Ljg1MTU2MjUgNzUuOTEwMTU2MjUgMzk1LjkyMjg1MTU2MjUgNzkuNTIzNDM3NVEzOTMuOTk0MTQwNjI1IDgzLjEzNjcxODc1IDM5My45OTQxNDA2MjUgOTAuMjE2Nzk2ODc1WiBNNDYzLjMyMjI2NTYyNSAxMDMuODg4NjcxODc1UTQ2NS45MTAxNTYyNSAxMDMuODg4NjcxODc1IDQ2OC4wNTg1OTM3NSAxMDMuMzUxNTYyNVE0NzAuMjA3MDMxMjUgMTAyLjgxNDQ1MzEyNSA0NzIuNTUwNzgxMjUgMTAxLjk4NDM3NVYxMTUuOTAwMzkwNjI1UTQ2OS40MjU3ODEyNSAxMTcuMjY3NTc4MTI1IDQ2NS45MzQ1NzAzMTI1IDExOC4xMjIwNzAzMTI1UTQ2Mi40NDMzNTkzNzUgMTE4Ljk3NjU2MjUgNDU3LjAyMzQzNzUgMTE4Ljk3NjU2MjVRNDUxLjY1MjM0Mzc1IDExOC45NzY1NjI1IDQ0Ny41NTA3ODEyNSAxMTcuMjkxOTkyMTg3NVE0NDMuNDQ5MjE4NzUgMTE1LjYwNzQyMTg3NSA0NDEuMTc4NzEwOTM3NSAxMTEuNDMyNjE3MTg3NVE0MzguOTA4MjAzMTI1IDEwNy4yNTc4MTI1IDQzOC45MDgyMDMxMjUgOTkuNzg3MTA5Mzc1Vjc2Ljk4NDM3NUg0MzIuMjE4NzVWNjkuMjIwNzAzMTI1TDQ0MC43MTQ4NDM3NSA2My4yMTQ4NDM3NUw0NDUuNjQ2NDg0Mzc1IDUxLjU5Mzc1SDQ1OC4xNDY0ODQzNzVWNjIuNjc3NzM0Mzc1SDQ3MS43MjA3MDMxMjVWNzYuOTg0Mzc1SDQ1OC4xNDY0ODQzNzVWOTguNTE3NTc4MTI1UTQ1OC4xNDY0ODQzNzUgMTAxLjIwMzEyNSA0NTkuNTEzNjcxODc1IDEwMi41NDU4OTg0Mzc1UTQ2MC44ODA4NTkzNzUgMTAzLjg4ODY3MTg3NSA0NjMuMzIyMjY1NjI1IDEwMy44ODg2NzE4NzVaIE01MDQuNzIwNzAzMTI1IDYxLjcwMTE3MTg3NVE1MTUuMjE4NzUgNjEuNzAxMTcxODc1IDUyMS4xMjY5NTMxMjUgNjYuOTAxMzY3MTg3NVE1MjcuMDM1MTU2MjUgNzIuMTAxNTYyNSA1MjcuMDM1MTU2MjUgODEuNzIwNzAzMTI1VjExOC4wSDUxMy44MDI3MzQzNzVMNTEwLjE0MDYyNSAxMTAuNjc1NzgxMjVINTA5Ljc1UTUwNy40MDYyNSAxMTMuNjA1NDY4NzUgNTA0Ljk0MDQyOTY4NzUgMTE1LjQzNjUyMzQzNzVRNTAyLjQ3NDYwOTM3NSAxMTcuMjY3NTc4MTI1IDQ5OS4zMDA3ODEyNSAxMTguMTIyMDcwMzEyNVE0OTYuMTI2OTUzMTI1IDExOC45NzY1NjI1IDQ5MS41MzcxMDkzNzUgMTE4Ljk3NjU2MjVRNDg2Ljc1MTk1MzEyNSAxMTguOTc2NTYyNSA0ODIuOTQzMzU5Mzc1IDExNy4wMjM0Mzc1UTQ3OS4xMzQ3NjU2MjUgMTE1LjA3MDMxMjUgNDc2LjkzNzUgMTExLjExNTIzNDM3NVE0NzQuNzQwMjM0Mzc1IDEwNy4xNjAxNTYyNSA0NzQuNzQwMjM0Mzc1IDEwMS4xMDU0Njg3NVE0NzQuNzQwMjM0Mzc1IDkyLjIxODc1IDQ4MC44OTI1NzgxMjUgODcuOTIxODc1UTQ4Ny4wNDQ5MjE4NzUgODMuNjI1IDQ5OC43MTQ4NDM3NSA4My4wODc4OTA2MjVMNTA3Ljk0MzM1OTM3NSA4Mi43OTQ5MjE4NzVWODIuMDEzNjcxODc1UTUwNy45NDMzNTkzNzUgNzguMzAyNzM0Mzc1IDUwNi4xMTIzMDQ2ODc1IDc2Ljc0MDIzNDM3NVE1MDQuMjgxMjUgNzUuMTc3NzM0Mzc1IDUwMS4yMDUwNzgxMjUgNzUuMTc3NzM0Mzc1UTQ5Ny45MzM1OTM3NSA3NS4xNzc3MzQzNzUgNDkzLjkwNTI3MzQzNzUgNzYuMzI1MTk1MzEyNVE0ODkuODc2OTUzMTI1IDc3LjQ3MjY1NjI1IDQ4NS44MjQyMTg3NSA3OS4yNzkyOTY4NzVMNDgwLjMwNjY0MDYyNSA2Ni42ODE2NDA2MjVRNDg1LjA5MTc5Njg3NSA2NC4yNDAyMzQzNzUgNDkxLjE0NjQ4NDM3NSA2Mi45NzA3MDMxMjVRNDk3LjIwMTE3MTg3NSA2MS43MDExNzE4NzUgNTA0LjcyMDcwMzEyNSA2MS43MDExNzE4NzVaTTUwOC4wNDEwMTU2MjUgOTMuMjkyOTY4NzUgNTAzLjY0NjQ4NDM3NSA5My40ODgyODEyNVE0OTguMzczMDQ2ODc1IDkzLjY4MzU5Mzc1IDQ5Ni4yNDkwMjM0Mzc1IDk1LjMxOTMzNTkzNzVRNDk0LjEyNSA5Ni45NTUwNzgxMjUgNDk0LjEyNSA5OS45ODI0MjE4NzVRNDk0LjEyNSAxMDIuODE0NDUzMTI1IDQ5NS42Mzg2NzE4NzUgMTA0LjE1NzIyNjU2MjVRNDk3LjE1MjM0Mzc1IDEwNS41IDQ5OS42NDI1NzgxMjUgMTA1LjVRNTAzLjEwOTM3NSAxMDUuNSA1MDUuNTc1MTk1MzEyNSAxMDMuMzAyNzM0Mzc1UTUwOC4wNDEwMTU2MjUgMTAxLjEwNTQ2ODc1IDUwOC4wNDEwMTU2MjUgOTcuNTg5ODQzNzVaIE01NzAuMTQyNTc4MTI1IDYxLjcwMTE3MTg3NVE1NzguNjg3NSA2MS43MDExNzE4NzUgNTg0LjEwNzQyMTg3NSA2Ni41MzUxNTYyNVE1ODkuNTI3MzQzNzUgNzEuMzY5MTQwNjI1IDU4OS41MjczNDM3NSA4Mi4wMTM2NzE4NzVWMTE4LjBINTcwLjQzNTU0Njg3NVY4Ny44MjQyMTg3NVE1NzAuNDM1NTQ2ODc1IDgyLjMwNjY0MDYyNSA1NjguODQ4NjMyODEyNSA3OS40OTkwMjM0Mzc1UTU2Ny4yNjE3MTg3NSA3Ni42OTE0MDYyNSA1NjMuNzQ2MDkzNzUgNzYuNjkxNDA2MjVRNTU4LjMyNjE3MTg3NSA3Ni42OTE0MDYyNSA1NTYuNDcwNzAzMTI1IDgxLjExMDM1MTU2MjVRNTU0LjYxNTIzNDM3NSA4NS41MjkyOTY4NzUgNTU0LjYxNTIzNDM3NSA5My43ODEyNVYxMTguMEg1MzUuNTIzNDM3NVY2Mi42Nzc3MzQzNzVINTQ5LjkyNzczNDM3NUw1NTIuNTE1NjI1IDcwLjAwMTk1MzEyNUg1NTMuMjQ4MDQ2ODc1UTU1NS4wMDU4NTkzNzUgNjcuMzY1MjM0Mzc1IDU1Ny40NDcyNjU2MjUgNjUuNTA5NzY1NjI1UTU1OS44ODg2NzE4NzUgNjMuNjU0Mjk2ODc1IDU2My4wNjI1IDYyLjY3NzczNDM3NVE1NjYuMjM2MzI4MTI1IDYxLjcwMTE3MTg3NSA1NzAuMTQyNTc4MTI1IDYxLjcwMTE3MTg3NVogTTYxNS4yMDMxMjUgMTE4Ljk3NjU2MjVRNjA2LjY1ODIwMzEyNSAxMTguOTc2NTYyNSA2MDEuMTQwNjI1IDExMS43MDExNzE4NzVRNTk1LjYyMzA0Njg3NSAxMDQuNDI1NzgxMjUgNTk1LjYyMzA0Njg3NSA5MC40MTIxMDkzNzVRNTk1LjYyMzA0Njg3NSA3Ni4yNTE5NTMxMjUgNjAxLjI4NzEwOTM3NSA2OC45NzY1NjI1UTYwNi45NTExNzE4NzUgNjEuNzAxMTcxODc1IDYxNS45MzU1NDY4NzUgNjEuNzAxMTcxODc1UTYxOS42NDY0ODQzNzUgNjEuNzAxMTcxODc1IDYyMi4zMzIwMzEyNSA2Mi43NzUzOTA2MjVRNjI1LjAxNzU3ODEyNSA2My44NDk2MDkzNzUgNjI2Ljk5NTExNzE4NzUgNjUuNjgwNjY0MDYyNVE2MjguOTcyNjU2MjUgNjcuNTExNzE4NzUgNjMwLjQzNzUgNjkuODA2NjQwNjI1SDYzMC44MjgxMjVRNjMwLjQ4NjMyODEyNSA2Ny43MDcwMzEyNSA2MzAuMTkzMzU5Mzc1IDY0LjAyMDUwNzgxMjVRNjI5LjkwMDM5MDYyNSA2MC4zMzM5ODQzNzUgNjI5LjkwMDM5MDYyNSA1Ni44MTgzNTkzNzVWNDIuMDIzNDM3NUg2NDkuMTM4NjcxODc1VjExOC4wSDYzNC43MzQzNzVMNjMwLjYzMjgxMjUgMTExLjAxNzU3ODEyNUg2MjkuOTAwMzkwNjI1UTYyOC41ODIwMzEyNSAxMTMuMjE0ODQzNzUgNjI2LjYwNDQ5MjE4NzUgMTE1LjAyMTQ4NDM3NVE2MjQuNjI2OTUzMTI1IDExNi44MjgxMjUgNjIxLjgxOTMzNTkzNzUgMTE3LjkwMjM0Mzc1UTYxOS4wMTE3MTg3NSAxMTguOTc2NTYyNSA2MTUuMjAzMTI1IDExOC45NzY1NjI1Wk02MjMuMDE1NjI1IDEwMy44ODg2NzE4NzVRNjI3LjYwNTQ2ODc1IDEwMy44ODg2NzE4NzUgNjI5LjQ4NTM1MTU2MjUgMTAwLjk4MzM5ODQzNzVRNjMxLjM2NTIzNDM3NSA5OC4wNzgxMjUgNjMxLjUxMTcxODc1IDkyLjEyMTA5Mzc1VjkwLjYwNzQyMTg3NVE2MzEuNTExNzE4NzUgODQuMDY0NDUzMTI1IDYyOS42ODA2NjQwNjI1IDgwLjU3MzI0MjE4NzVRNjI3Ljg0OTYwOTM3NSA3Ny4wODIwMzEyNSA2MjIuODIwMzEyNSA3Ny4wODIwMzEyNVE2MTkuNDAyMzQzNzUgNzcuMDgyMDMxMjUgNjE3LjE1NjI1IDgwLjQwMjM0Mzc1UTYxNC45MTAxNTYyNSA4My43MjI2NTYyNSA2MTQuOTEwMTU2MjUgOTAuNzA1MDc4MTI1UTYxNC45MTAxNTYyNSA5Ny41ODk4NDM3NSA2MTcuMTgwNjY0MDYyNSAxMDAuNzM5MjU3ODEyNVE2MTkuNDUxMTcxODc1IDEwMy44ODg2NzE4NzUgNjIzLjAxNTYyNSAxMDMuODg4NjcxODc1WiBNNzEwLjY1NDI5Njg3NSA5MC4yMTY3OTY4NzVRNzEwLjY1NDI5Njg3NSA5Ny4xNTAzOTA2MjUgNzA4Ljc1IDEwMi41MjE0ODQzNzVRNzA2Ljg0NTcwMzEyNSAxMDcuODkyNTc4MTI1IDcwMy4yMzI0MjE4NzUgMTExLjU1NDY4NzVRNjk5LjYxOTE0MDYyNSAxMTUuMjE2Nzk2ODc1IDY5NC40OTIxODc1IDExNy4wOTY2Nzk2ODc1UTY4OS4zNjUyMzQzNzUgMTE4Ljk3NjU2MjUgNjgyLjkxOTkyMTg3NSAxMTguOTc2NTYyNVE2NzYuOTE0MDYyNSAxMTguOTc2NTYyNSA2NzEuOTA5MTc5Njg3NSAxMTcuMDk2Njc5Njg3NVE2NjYuOTA0Mjk2ODc1IDExNS4yMTY3OTY4NzUgNjYzLjE5MzM1OTM3NSAxMTEuNTU0Njg3NVE2NTkuNDgyNDIxODc1IDEwNy44OTI1NzgxMjUgNjU3LjQ1NjA1NDY4NzUgMTAyLjUyMTQ4NDM3NVE2NTUuNDI5Njg3NSA5Ny4xNTAzOTA2MjUgNjU1LjQyOTY4NzUgOTAuMjE2Nzk2ODc1UTY1NS40Mjk2ODc1IDgxLjAzNzEwOTM3NSA2NTguNzc0NDE0MDYyNSA3NC42ODk0NTMxMjVRNjYyLjExOTE0MDYyNSA2OC4zNDE3OTY4NzUgNjY4LjM0NDcyNjU2MjUgNjUuMDIxNDg0Mzc1UTY3NC41NzAzMTI1IDYxLjcwMTE3MTg3NSA2ODMuMjEyODkwNjI1IDYxLjcwMTE3MTg3NVE2OTEuMTcxODc1IDYxLjcwMTE3MTg3NSA2OTcuMzczMDQ2ODc1IDY1LjAyMTQ4NDM3NVE3MDMuNTc0MjE4NzUgNjguMzQxNzk2ODc1IDcwNy4xMTQyNTc4MTI1IDc0LjY4OTQ1MzEyNVE3MTAuNjU0Mjk2ODc1IDgxLjAzNzEwOTM3NSA3MTAuNjU0Mjk2ODc1IDkwLjIxNjc5Njg3NVpNNjc0LjgxNDQ1MzEyNSA5MC4yMTY3OTY4NzVRNjc0LjgxNDQ1MzEyNSA5NC45NTMxMjUgNjc1LjY0NDUzMTI1IDk4LjIwMDE5NTMxMjVRNjc2LjQ3NDYwOTM3NSAxMDEuNDQ3MjY1NjI1IDY3OC4zMDU2NjQwNjI1IDEwMy4xMzE4MzU5Mzc1UTY4MC4xMzY3MTg3NSAxMDQuODE2NDA2MjUgNjgzLjExNTIzNDM3NSAxMDQuODE2NDA2MjVRNjg2LjA5Mzc1IDEwNC44MTY0MDYyNSA2ODcuODUxNTYyNSAxMDMuMTMxODM1OTM3NVE2ODkuNjA5Mzc1IDEwMS40NDcyNjU2MjUgNjkwLjQxNTAzOTA2MjUgOTguMjAwMTk1MzEyNVE2OTEuMjIwNzAzMTI1IDk0Ljk1MzEyNSA2OTEuMjIwNzAzMTI1IDkwLjIxNjc5Njg3NVE2OTEuMjIwNzAzMTI1IDg1LjQ4MDQ2ODc1IDY5MC40MTUwMzkwNjI1IDgyLjMwNjY0MDYyNVE2ODkuNjA5Mzc1IDc5LjEzMjgxMjUgNjg3LjgyNzE0ODQzNzUgNzcuNTIxNDg0Mzc1UTY4Ni4wNDQ5MjE4NzUgNzUuOTEwMTU2MjUgNjgzLjAxNzU3ODEyNSA3NS45MTAxNTYyNVE2NzguNjcxODc1IDc1LjkxMDE1NjI1IDY3Ni43NDMxNjQwNjI1IDc5LjUyMzQzNzVRNjc0LjgxNDQ1MzEyNSA4My4xMzY3MTg3NSA2NzQuODE0NDUzMTI1IDkwLjIxNjc5Njg3NVoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+Cg==" alt="" class="palco-logo"></div>
+      <div id="detalhe"></div>`;
+    $('#pr-fs').onclick = () => { const w = $('#palco'); document.fullscreenElement ? document.exitFullscreen() : w.requestFullscreen && w.requestFullscreen(); };
+  };
+  const timeDe = (r) => b.times.find((t) => t.id === r.timeId) || { nome: '?', cor: '#888', membros: [] };
+
+  // antes da revelação: só o facilitador, com o andamento da banca
+  const suspense = () => {
+    const p = b.progresso;
+    const falta = p.esperadas - p.feitas;
+    tela(`<div class="suspense"><div class="trofeu">🏆</div><h3>Quem vai levar?</h3>
+      <p>${p.esperadas ? `A banca já deu <b>${p.feitas}</b> de <b>${p.esperadas}</b> notas.` : 'Defina a banca para começar.'}</p>
+      ${barraProg(p.feitas, p.esperadas)}
+      <div class="suspense-jurados">${p.jurados.map((j) => `<div class="${j.avaliados >= j.total ? 'ok' : ''}">${av(j.nome)}<span>${esc(primeiro(j.nome))}</span><small>${j.avaliados >= j.total ? '✓ pronto' : `${j.avaliados}/${j.total}`}</small></div>`).join('')}</div>
+      <button class="btn grad grande" id="pr-revelar" ${p.feitas ? '' : 'disabled'}>🥁 Revelar resultado</button>
+      ${falta > 0 && p.feitas ? `<div class="small" style="opacity:.7;margin-top:10px">Ainda faltam ${falta} nota(s). Quem não avaliar não pesa na média.</div>` : ''}</div>`);
+    $('#pr-revelar').onclick = async (ev) => {
+      if (falta > 0 && !(await dialogo({ titulo: 'Revelar mesmo assim?', texto: `Ainda faltam ${falta} nota(s) da banca. Os times são comparados pela média de quem já avaliou.`, ok: 'Revelar' }))) return;
+      b = await acao(ev.target, () => gs('api_resultadoRevelar', id, true));
+      clearInterval(timer);
+      if (D && D.d) D.d.desafio.resultadoEm = b.desafio.resultadoEm;
+      cerimonia();
+    };
+  };
+
+  const degrau = (r, lugar, vazio) => {
+    if (!r) return `<div class="degrau d${lugar} vazio"><div class="bloco"><span>${lugar}º</span></div></div>`;
+    const t = timeDe(r);
+    return `<div class="degrau d${lugar} ${vazio ? 'oculto' : ''}" data-l="${lugar}" style="--tc:${esc(t.cor)}">
+      <div class="quem"><div class="med">${MEDALHA[r.posicao] || r.posicao + 'º'}</div><b>Time ${esc(t.nome)}</b>
+        <div class="avs">${t.membros.slice(0, 6).map((n) => av(n, 'mini')).join('')}</div>${t.ideia ? `<small>💡 ${esc(t.ideia.titulo)}</small>` : ''}</div>
+      <div class="bloco"><span class="pts" data-pts="${r.nota}">${vazio ? '' : fmtNota(r.nota)}</span><span class="lug">${r.posicao}º</span></div></div>`;
+  };
+  // pódio só com quem recebeu nota; os demais (e quem ficou sem nota) vêm depois
+  const topo = (rk) => rk.filter((r) => r.jurados).slice(0, 3);
+  const resto = (rk) => rk.filter((r) => r.jurados).slice(3).concat(rk.filter((r) => !r.jurados));
+  const podio = (rk, oculto) => { const t = topo(rk); return `<div class="podio">${degrau(t[1], 2, oculto)}${degrau(t[0], 1, oculto)}${degrau(t[2], 3, oculto)}</div>`; };
+  const demais = (rk, oculto) => resto(rk).length ? `<div class="res-demais">${resto(rk).map((r) => {
+    const t = timeDe(r);
+    return `<div class="res-linha ${oculto ? 'oculto' : ''}" style="--tc:${esc(t.cor)}"><span class="pos">${r.jurados ? r.posicao + 'º' : '—'}</span><b>Time ${esc(t.nome)}</b><span class="pts">${r.jurados ? fmtNota(r.nota) : 'sem notas'}</span></div>`;
+  }).join('')}</div>` : '';
+
+  const contar = (span) => {
+    const fim = +span.dataset.pts;
+    const t0 = performance.now();
+    const passo = (t) => { const k = Math.min(1, (t - t0) / 1200); span.textContent = fmtNota(fim * (1 - Math.pow(1 - k, 3))); if (k < 1 && !parar) requestAnimationFrame(passo); else span.textContent = fmtNota(fim); };
+    requestAnimationFrame(passo);
+  };
+
+  async function cerimonia() {
+    const rk = b.resultado;
+    tela(`<div class="anuncio" id="anuncio"></div>${podio(rk, true)}${demais(rk, true)}
+      <button class="btn sec peq palco-pular" id="pr-pular">⏭ Pular</button>`);
+    $('#pr-pular').onclick = () => { parar = true; final(); };
+    const anunciar = async (txt, ms) => { const a = $('#anuncio'); if (!a) return; a.innerHTML = `<span>${txt}</span>`; a.classList.remove('on'); void a.offsetWidth; a.classList.add('on'); await espera(ms); };
+    // de trás para frente: do último ao 4º lugar
+    const linhas = $$('.res-linha', el).reverse();
+    if (linhas.length) await anunciar('Vamos às colocações…', 1400);
+    for (const l of linhas) { if (parar) return; l.classList.remove('oculto'); await espera(700); }
+    for (const lugar of [3, 2, 1]) {
+      const d = $(`.degrau[data-l="${lugar}"]`, el);
+      if (!d && lugar === 1) break;
+      if (!d) continue;
+      await anunciar(lugar === 1 ? '🥁 E o grande vencedor é…' : `E o ${lugar}º lugar vai para…`, lugar === 1 ? 2600 : 1800);
+      if (parar) return;
+      d.classList.remove('oculto');
+      d.classList.add('revela');
+      const pts = $('.pts', d);
+      if (pts) contar(pts);
+      if (lugar === 1) {
+        confete();
+        const t = timeDe(rk[0]);
+        conquista('🏆', `Time ${t.nome} campeão!`, `Nota ${fmtNota(rk[0].nota)} da banca`);
+        await anunciar(`🏆 Time ${esc(t.nome)}!`, 1500);
+      } else await espera(1300);
+    }
+    if (!parar) final(true);
+  }
+
+  // resultado completo: pódio + tabela com a média de cada critério + comentários
+  function final(semRedesenho) {
+    const rk = b.resultado;
+    if (!semRedesenho) tela(`<div class="anuncio on" id="anuncio"><span>🏆 Resultado da banca</span></div>${podio(rk, false)}${demais(rk, false)}`);
+    const pp = $('#pr-pular'); if (pp) pp.remove();
+    const crit = b.desafio.criterios;
+    $('#detalhe').innerHTML = `<div class="card" style="margin-top:18px"><div class="bk-cab"><h3>📊 Notas da banca</h3>
+        <button class="btn sec peq" id="pr-rever">▶ Rever cerimônia</button></div>
+      <div style="overflow:auto"><table class="tabela res-tab"><thead><tr><th></th><th>Time</th>${crit.map((c) => `<th title="${esc(c.descricao)}">${esc(c.nome)}<div class="small" style="font-weight:600;text-transform:none">peso ${c.peso}</div></th>`).join('')}<th>Nota</th></tr></thead>
+        <tbody>${rk.map((r) => { const t = timeDe(r); return `<tr><td class="pos">${r.jurados ? MEDALHA[r.posicao] || r.posicao + 'º' : '—'}</td><td><b style="color:${esc(t.cor)}">● Time ${esc(t.nome)}</b><div class="small muted">${r.jurados} jurado(s)</div></td>
+          ${crit.map((c) => `<td><span class="media-crit" style="--p:${(r.porCriterio[c.id] || 0) * 20}%">${r.jurados ? (r.porCriterio[c.id] || 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) : '—'}</span></td>`).join('')}
+          <td><b class="nota-final">${r.jurados ? fmtNota(r.nota) : '—'}</b></td></tr>`; }).join('')}</tbody></table></div>
+      <p class="small muted">Médias de 1 a 5 por critério; nota final de 0 a 100, ponderada pelos pesos. Empate: vence quem foi melhor no critério de maior peso.</p></div>
+      ${rk.some((r) => r.comentarios.length) ? `<div class="card" style="margin-top:16px"><h3 style="margin-top:0">💬 O que a banca disse</h3><div class="res-coments">${rk.filter((r) => r.comentarios.length).map((r) => { const t = timeDe(r); return `<div class="res-com" style="--tc:${esc(t.cor)}"><b>Time ${esc(t.nome)}</b>${r.comentarios.map((c) => `<p>“${esc(c.texto)}”<small>— ${esc(c.jurado)}</small></p>`).join('')}</div>`; }).join('')}</div></div>` : ''}`;
+    $('#pr-rever').onclick = () => { parar = false; scrollTo(0, 0); cerimonia(); };
+  }
+
+  // /resultado/<id>/cerimonia: já abre tocando a cerimônia (para o telão e a demonstração)
+  if (b.resultado) return modo === 'cerimonia' ? cerimonia() : final();
+  if (!b.eu.facilita) return falha(el, 'O resultado ainda não foi revelado.');
+  suspense();
+  // o andamento da banca se atualiza sozinho enquanto o palco espera
+  timer = setInterval(async () => {
+    if (document.hidden || b.resultado) return;
+    try { const nb = await gs('api_banca', id); if (!b.resultado && el.isConnected && $('#pr-revelar')) { b = nb; suspense(); } } catch (e) { /* tenta de novo */ }
+  }, 8000);
 };
 </script>
 
