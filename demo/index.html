@@ -472,6 +472,10 @@ textarea { resize:vertical; min-height:72px; }
 .voltar:hover { color:var(--azul); }
 .salvo { font-size:12px; color:var(--ok); opacity:0; transition:opacity .3s; } .salvo.on { opacity:1; }
 .carregando-pag { display:grid; place-items:center; padding:80px 0; color:var(--muted); gap:12px; }
+.carregando-ajuda { max-width:460px; text-align:center; background:var(--card); border:1px solid var(--borda); border-radius:14px; padding:16px 18px; color:var(--texto); box-shadow:var(--sombra); animation: entra .3s; }
+.carregando-ajuda p { margin:6px 0 0; color:var(--muted); font-size:13px; }
+.carregando-ajuda .acoes-form { justify-content:center; }
+.carregando-ajuda a.btn { text-decoration:none; }
 .carregando-pag .roda { width:42px; height:42px; border-radius:50%; border:4px solid var(--borda); border-top-color:var(--azul); animation:gira .8s linear infinite; }
 .hist-time { display:grid; grid-template-columns: 180px 1fr; gap:14px; padding:12px 0; border-top:1px solid var(--borda); }
 .hist-time:first-of-type { border-top:0; }
@@ -3524,6 +3528,18 @@ const MENU_DE = { time: 'inicio', desafio: 'inicio', painel: 'inicio', apresenta
 
 function carregando(el, txt = 'Carregando…') {
   el.innerHTML = `<div class="carregando-pag"><div class="roda"></div>${esc(txt)}</div>`;
+  // Com mais de uma conta Google no navegador, o Google às vezes manda a chamada para a conta errada
+  // e ela nunca volta (nem com erro). Depois de 15 s, explica e oferece a saída.
+  if (BOOT.demo) return;
+  const caixa = el.firstElementChild;
+  setTimeout(() => {
+    if (!caixa.isConnected) return; // já carregou
+    caixa.insertAdjacentHTML('beforeend', `<div class="carregando-ajuda">
+      <b>Está demorando mais que o normal.</b>
+      <p>Se este navegador tem <b>mais de uma conta Google</b> conectada, o Google pode estar usando a conta errada. Troque para a sua conta LTI ou abra o Pivotando numa janela onde só ela esteja conectada.</p>
+      <div class="acoes-form"><button class="btn sec" onclick="location.reload()">↻ Recarregar</button>
+        <a class="btn" target="_top" href="${esc(urlTrocarConta(BOOT.execUrl || APP_PUBLICO))}">🔄 Trocar de conta LTI</a></div></div>`);
+  }, 15000);
 }
 function falha(el, e) {
   el.innerHTML = `<div class="card vazio"><div class="ico">😕</div><b>${esc(msgErro(e))}</b><p><a class="btn sec" data-go="/">Voltar ao início</a></p></div>`;
