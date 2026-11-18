@@ -1169,7 +1169,7 @@ var PIVDEMO = (() => {
     if (!u || u.ativo !== "1")
       return null;
     const papel = u.papel || "participante";
-    return { email, nome: u.nome || email, papel, facilita: facilitaRow(u), admin: papel === "admin" };
+    return { email, nome: u.nome || email, papel, facilita: papel === "admin" || papel === "facilitador", facilitador: facilitaRow(u), admin: papel === "admin" };
   }
   function requireUsuario() {
     const p = perfilOuNulo();
@@ -1181,6 +1181,15 @@ var PIVDEMO = (() => {
     const p = requireUsuario();
     if (!p.facilita)
       throw new Error("Apenas facilitadores podem fazer isso.");
+    return p;
+  }
+  function acompanhaTudo(p) {
+    return p.facilita || p.admin;
+  }
+  function requireAcompanhamento() {
+    const p = requireUsuario();
+    if (!acompanhaTudo(p))
+      throw new Error("Apenas facilitadores e administradores acompanham os desafios.");
     return p;
   }
   function requireGestorPessoas() {
@@ -1196,6 +1205,8 @@ var PIVDEMO = (() => {
     const minhas = where("Participacoes", (x) => x.desafioId === desafio.id && x.email === p.email);
     const membro = minhas.some((x) => x.timeId === timeId);
     if (p.facilita || membro)
+      return { p, time, desafio, membro };
+    if (nivel2 === "ver" && p.admin)
       return { p, time, desafio, membro };
     const aberto = desafio.status === "apresentacao" || desafio.status === "encerrado";
     const jurado = () => where("Banca", (b) => b.desafioId === desafio.id && b.email === p.email).length > 0;
@@ -2147,6 +2158,8 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
     const jurado = ehJurado(d.id, p.email);
     if (p.facilita || jurado)
       return { p, jurado };
+    if (d.resultadoEm && p.admin)
+      return { p, jurado };
     if (d.resultadoEm && where("Participacoes", (x) => x.desafioId === d.id && x.email === p.email).length)
       return { p, jurado };
     throw new Error(d.resultadoEm ? "Voc\xEA n\xE3o participa deste desafio." : "O resultado ainda n\xE3o foi revelado.");
@@ -2386,7 +2399,7 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
     if (!p)
       return { me: null };
     return {
-      me: { email: p.email, nome: p.nome, papel: p.papel, facilita: p.facilita, admin: p.admin },
+      me: { email: p.email, nome: p.nome, papel: p.papel, facilita: p.facilita, facilitador: p.facilitador, admin: p.admin },
       inicio: api_inicio(),
       // link da demonstração (página pública, sem login): só o Admin vê o botão para abrir/copiar
       demoUrl: p.admin ? APP_PUBLICO + "demo/" : "",
@@ -2419,7 +2432,7 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
         return null;
       return { desafio: desafioPublico(d), time: t ? resumoTime(t, d) : null };
     }).filter(Boolean).sort((a, b) => Number(b.desafio.numero) - Number(a.desafio.numero));
-    const gestao = p.facilita ? desafios.map((d) => ({
+    const gestao = acompanhaTudo(p) ? desafios.map((d) => ({
       ...desafioPublico(d),
       participantes: where("Participacoes", (x) => x.desafioId === d.id).length,
       times: times.filter((t) => t.desafioId === d.id).map((t) => resumoTime(t, d))
@@ -2431,7 +2444,7 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
     return { meus, gestao, banca };
   }
   function api_painel(desafioId) {
-    requireFacilitador();
+    requireAcompanhamento();
     const d = mustGet("Desafios", desafioId, "Desafio");
     const usuarios = new Map(all("Usuarios").map((u) => [u.email, u]));
     const partes = where("Participacoes", (x) => x.desafioId === desafioId);
@@ -3545,7 +3558,7 @@ const APP_PUBLICO = 'https://micaiaspaiva-lti.github.io/pivotando-app/';
 const CONTAS_GOOGLE = 'https://' + ['accounts', 'google', 'com'].join('.') + '/';
 const urlTrocarConta = (volta) => CONTAS_GOOGLE + 'Account' + 'Chooser?continue=' + encodeURIComponent(volta);
 const urlSair = (volta) => CONTAS_GOOGLE + 'Log' + 'out?continue=' + encodeURIComponent(volta);
-const PAPEL_NOME = (m) => [m.admin && 'Administrador', m.facilita && 'Facilitador'].filter(Boolean).join(' · ') || 'Participante';
+const PAPEL_NOME = (m) => [m.admin && 'Administrador', (m.facilitador ?? m.facilita) && 'Facilitador'].filter(Boolean).join(' · ') || 'Participante';
 
 /** Menu da conta (clique no avatar): quem sou eu, trocar de conta e sair. */
 function menuConta() {
@@ -3814,7 +3827,7 @@ function desenharInst() {
   if (info && !info.editavel) {
     const d = T.s.desafio;
     aviso = d.status !== 'em_andamento' ? (d.status === 'rascunho' ? '⏳ O desafio ainda não começou.' : '🔒 O desafio não está mais em andamento: tudo está somente leitura.')
-      : !T.s.eu.membro && !T.s.eu.facilita ? '👀 Você está vendo o trabalho de outro time.'
+      : !T.s.eu.membro && !T.s.eu.facilita ? (ME.admin ? '👀 Você está acompanhando este time (somente leitura).' : '👀 Você está vendo o trabalho de outro time.')
       : info.vencido ? `⏰ O prazo desta etapa terminou em ${fmtDia(info.prazo)}. Peça ao facilitador para reabrir se precisar.` : '';
   }
   const avisoHtml = aviso ? `<div class="aviso-etapa">${aviso}</div>` : '';
@@ -4145,7 +4158,7 @@ ROTAS.inicio = async (el) => {
       <h3>${esc(d.titulo)}</h3>
       <div class="muted small">${d.participantes} participante(s) · ${d.times.length} time(s)${d.dataApresentacao ? ' · apresentação em ' + fmtDia(d.dataApresentacao) : ''}</div>
       ${d.times.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${d.times.map((t) => `<span class="dep" style="--dc:${esc(t.cor)}">${esc(t.nome)} · ${t.concluidas.length}/${etapasDe(d).length}</span>`).join('')}</div>` : ''}
-      <div class="rod"><a class="btn sec peq" data-go="/desafio/${esc(d.id)}">⚙️ Configurar</a>${d.status !== 'rascunho' ? `<a class="btn peq" data-go="/painel/${esc(d.id)}">📡 Painel ao vivo</a>` : ''}</div></div>`;
+      <div class="rod">${ME.facilita ? `<a class="btn sec peq" data-go="/desafio/${esc(d.id)}">⚙️ Configurar</a>` : ''}${d.status !== 'rascunho' ? `<a class="btn peq" data-go="/painel/${esc(d.id)}">📡 Painel ao vivo</a>` : ME.facilita ? '' : '<span class="muted small">Em preparação pelos facilitadores</span>'}${d.resultadoEm ? `<a class="btn grad peq" data-go="/resultado/${esc(d.id)}">🏆 Resultado</a>` : ''}</div></div>`;
   const cardBanca = ({ desafio: d, avaliados, total }) => {
     const revelado = !!d.resultadoEm;
     return `<div class="card dcard bk-card">
@@ -4165,9 +4178,9 @@ ROTAS.inicio = async (el) => {
       ${ini.meus.length ? `<div class="grade">${ini.meus.map(cardMeu).join('')}</div>`
         : '<div class="card vazio"><div class="ico">🚀</div>Você ainda não participa de nenhum desafio em andamento.<br>Quando for sorteado para um time, o convite chega no seu e-mail.</div>'}</div>
     ${ini.banca && ini.banca.length ? `<div class="secao"><h3>Banca avaliadora</h3><div class="grade">${ini.banca.map(cardBanca).join('')}</div></div>` : ''}
-    ${ME.facilita ? `<div class="secao"><h3>Gestão de desafios</h3>
+    ${ME.facilita || ME.admin ? `<div class="secao"><h3>${ME.facilita ? 'Gestão de desafios' : 'Todos os desafios'}</h3>
       ${ini.gestao.length ? `<div class="grade">${ini.gestao.map(cardGestao).join('')}</div>`
-        : '<div class="card vazio"><div class="ico">🧭</div>Nenhum desafio criado ainda.<br><br><button class="btn grad" data-go="/desafio/novo">Criar o primeiro desafio</button></div>'}</div>` : ''}`;
+        : `<div class="card vazio"><div class="ico">🧭</div>Nenhum desafio criado ainda.${ME.facilita ? '<br><br><button class="btn grad" data-go="/desafio/novo">Criar o primeiro desafio</button>' : ''}</div>`}</div>` : ''}`;
 };
 
 /* ============================== DESAFIO (facilitador) ============================== */
@@ -4692,7 +4705,7 @@ ROTAS.usuarios = async (el) => {
       <label class="campo">Papéis no Pivotando <span class="muted small" style="font-weight:400">· marque quantos quiser; todos podem participar dos desafios</span></label>
       <div class="funcoes">
         <label class="check-funcao"><input type="checkbox" name="fFac" ${u.facilita ? 'checked' : ''} ${ME.admin ? '' : 'disabled'}><span><b>🧭 Facilitador</b><small>Cria e conduz desafios, cadastra participantes, abre o painel e a premiação.</small></span></label>
-        <label class="check-funcao"><input type="checkbox" name="fAdm" ${u.papel === 'admin' ? 'checked' : ''} ${ME.admin ? '' : 'disabled'}><span><b>🛡️ Administrador</b><small>Cadastra pessoas e define os papéis de cada uma.</small></span></label>
+        <label class="check-funcao"><input type="checkbox" name="fAdm" ${u.papel === 'admin' ? 'checked' : ''} ${ME.admin ? '' : 'disabled'}><span><b>🛡️ Administrador</b><small>Pode tudo: edita qualquer desafio, cadastra pessoas e define os papéis.</small></span></label>
       </div>
       <label class="check-banca"><input type="checkbox" name="bancaPadrao" ${u.bancaPadrao ? 'checked' : ''}><span><b>⭐ Banca padrão</b><small>Entra automaticamente na banca avaliadora de todo desafio novo (dá para tirar no desafio).</small></span></label>
       ${ME.admin ? '' : '<p class="muted small">Só administradores definem quem é facilitador e administrador.</p>'}
@@ -4743,7 +4756,7 @@ const ACAO_TXT = {
 };
 
 ROTAS.painel = async (el, id) => {
-  if (!ME.facilita) return falha(el, 'Apenas facilitadores acessam o painel.');
+  if (!ME.facilita && !ME.admin) return falha(el, 'Apenas facilitadores e administradores acessam o painel.');
   carregando(el, 'Conectando ao painel…');
   let p;
   try { p = await gs('api_painel', id); } catch (e) { return el.isConnected && falha(el, e); }
@@ -4752,7 +4765,7 @@ ROTAS.painel = async (el, id) => {
   const desenhar = (dados, primeira) => {
     const d = dados.desafio;
     if (primeira) {
-      el.innerHTML = `<button class="voltar" data-go="/desafio/${esc(d.id)}">← Configuração do desafio</button>
+      el.innerHTML = `${ME.facilita ? `<button class="voltar" data-go="/desafio/${esc(d.id)}">← Configuração do desafio</button>` : '<button class="voltar" data-go="/">← Início</button>'}
         <div class="inst-head"><div><div class="muted small" style="font-weight:700;letter-spacing:1px;text-transform:uppercase">Desafio #${esc(d.numero)}</div><h2>${esc(d.titulo)}</h2></div>
           ${d.status === 'em_andamento' || d.status === 'apresentacao' ? '<span class="ao-vivo">AO VIVO</span>' : statusTag(d.status)}<span class="espaco"></span>
           <a class="chip-banca" id="painel-banca" data-go="/resultado/${esc(d.id)}" style="display:none"></a>
