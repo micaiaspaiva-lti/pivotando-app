@@ -135,8 +135,9 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
 .fase .bola { width:64px; height:64px; border-radius:50%; display:grid; place-items:center; background:var(--fc); color:#fff; box-shadow:0 0 0 5px var(--fundo), 0 6px 18px color-mix(in srgb, var(--fc) 45%, transparent);
   transition: transform .3s cubic-bezier(.3,1.6,.5,1); position:relative; }
 .fase .bola svg { width:28px; height:28px; }
-.fase .nome { font-weight:700; font-size:12px; letter-spacing:.8px; text-transform:uppercase; color:var(--fc); }
-.fase .sub { font-size:11px; color:var(--muted); margin-top:-6px; }
+/* em destaque o instrumento; a fase (Definir, Idear…) vem embaixo, discreta */
+.fase .nome { font-weight:800; font-size:13px; color:var(--fc); }
+.fase .sub { font-size:10px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin-top:-6px; }
 .fase:hover .bola { transform:scale(1.08); }
 .fase.atual .nome { margin-top:8px; }
 .fase.atual .bola { transform:scale(1.22); box-shadow:0 0 0 5px var(--fundo), 0 0 0 9px color-mix(in srgb, var(--fc) 30%, transparent), 0 10px 26px color-mix(in srgb, var(--fc) 55%, transparent); }
@@ -331,7 +332,7 @@ main { max-width:1240px; margin:0 auto; padding:24px 20px 80px; }
   .hero { grid-template-columns:1fr; } .hero-dir { align-items:flex-start; }
   .mapa { position:static; }
   .fase .bola { width:46px; height:46px; } .fase .bola svg { width:20px; height:20px; } .trilha::before, .trilha .linha-prog { top:23px; }
-  .fase .nome { font-size:9px; } .fase .sub { display:none; }
+  .fase .nome { font-size:10px; } .fase .sub { display:none; }
   header.top { padding:0 12px; gap:10px; } .logo span { display:none; }
 }
 @media (max-width: 560px) { .gut-escalas { grid-template-columns:1fr; } main { padding:16px 16px 60px; } }
@@ -548,6 +549,15 @@ button.av.eu:hover { transform:scale(1.06); box-shadow:0 0 0 3px color-mix(in sr
 .check-banca { display:flex; gap:10px; align-items:flex-start; margin-top:16px; padding:12px; border-radius:12px; border:1px solid color-mix(in srgb,#f59e0b 40%, var(--borda)); background:color-mix(in srgb,#ffd54a 10%, var(--card)); cursor:pointer; }
 .modal .check-banca input, .modal .check-banca input[type=checkbox] { width:18px; height:18px; flex:none; padding:0; margin:2px 0 0; accent-color:#f59e0b; }
 .check-banca span { display:flex; flex-direction:column; }
+.funcoes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:560px) { .funcoes { grid-template-columns:1fr; } }
+.check-funcao { display:flex; gap:10px; align-items:flex-start; padding:12px; border-radius:12px; border:1px solid var(--borda); background:var(--card); cursor:pointer; }
+.check-funcao:has(input:checked) { border-color:color-mix(in srgb,var(--azul) 45%, var(--borda)); background:color-mix(in srgb,var(--azul) 7%, var(--card)); }
+.check-funcao:has(input:disabled) { cursor:default; }
+.modal .check-funcao input[type=checkbox] { width:18px; height:18px; flex:none; padding:0; margin:2px 0 0; }
+.check-funcao span { display:flex; flex-direction:column; }
+.check-funcao small { color:var(--muted); }
+.selo-func { display:inline-block; margin:1px 6px 1px 0; padding:1px 8px; border-radius:99px; font-size:11px; font-weight:700; background:color-mix(in srgb,var(--azul) 12%, var(--card)); }
 .check-banca small { color:var(--muted); }
 .bk-card::before { background:linear-gradient(90deg,#ffd54a,#f59e0b,var(--f-empatizar)); }
 .chip-banca { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px; font-size:12px; font-weight:600; text-decoration:none; cursor:pointer;
@@ -893,9 +903,9 @@ var PIVDEMO = (() => {
 
   // src/server/db.ts
   var TABLES = {
-    // papel: admin | facilitador | participante; ativo: '1' | ''
+    // papel: admin | facilitador | participante; ativo: '1' | ''; semFacilitar: '1' = admin que não facilita
     // bancaPadrao: '1' = entra na banca avaliadora de todo desafio novo
-    Usuarios: ["id", "email", "nome", "departamento", "funcao", "papel", "ativo", "criadoEm", "bancaPadrao"],
+    Usuarios: ["id", "email", "nome", "departamento", "funcao", "papel", "ativo", "criadoEm", "bancaPadrao", "semFacilitar"],
     // status: rascunho | em_andamento | apresentacao | encerrado; prazos em "yyyy-MM-dd"
     Desafios: [
       "id",
@@ -1138,6 +1148,9 @@ var PIVDEMO = (() => {
   function adminsAtivos() {
     return where("Usuarios", (u) => u.papel === "admin" && u.ativo === "1");
   }
+  function facilitaRow(u) {
+    return u.papel === "facilitador" || u.papel === "admin" && u.semFacilitar !== "1";
+  }
   function garantirPrimeiroAdmin() {
     const email = currentEmail();
     if (!email || adminsAtivos().length || email !== donoDoScript())
@@ -1155,7 +1168,7 @@ var PIVDEMO = (() => {
     if (!u || u.ativo !== "1")
       return null;
     const papel = u.papel || "participante";
-    return { email, nome: u.nome || email, papel, facilita: papel === "admin" || papel === "facilitador", admin: papel === "admin" };
+    return { email, nome: u.nome || email, papel, facilita: facilitaRow(u), admin: papel === "admin" };
   }
   function requireUsuario() {
     const p = perfilOuNulo();
@@ -1167,6 +1180,12 @@ var PIVDEMO = (() => {
     const p = requireUsuario();
     if (!p.facilita)
       throw new Error("Apenas facilitadores podem fazer isso.");
+    return p;
+  }
+  function requireGestorPessoas() {
+    const p = requireUsuario();
+    if (!p.facilita && !p.admin)
+      throw new Error("Apenas facilitadores e administradores podem fazer isso.");
     return p;
   }
   function requireTime(timeId, nivel2) {
@@ -1617,14 +1636,14 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
   // src/server/usuarios.ts
   var PAPEIS = ["admin", "facilitador", "participante"];
   function usuarioPublico(u) {
-    return { id: u.id, email: u.email, nome: u.nome, departamento: u.departamento, funcao: u.funcao, papel: u.papel, ativo: u.ativo === "1", bancaPadrao: u.bancaPadrao === "1" };
+    return { id: u.id, email: u.email, nome: u.nome, departamento: u.departamento, funcao: u.funcao, papel: u.papel, facilita: facilitaRow(u), ativo: u.ativo === "1", bancaPadrao: u.bancaPadrao === "1" };
   }
   function api_usuarios() {
-    requireFacilitador();
+    requireGestorPessoas();
     return all("Usuarios").map(usuarioPublico).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   }
   function api_usuarioSalvar(dados) {
-    const p = requireFacilitador();
+    const p = requireGestorPessoas();
     return withLock(() => {
       const email = txt(dados.email, 120).toLowerCase();
       if (!isEmail(email) || !email.endsWith("@" + DOMAIN))
@@ -1645,7 +1664,9 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
         papel,
         ativo: dados.ativo === false ? "" : "1",
         // sem o campo (telas antigas) mantém como está
-        bancaPadrao: dados.bancaPadrao === void 0 ? atual?.bancaPadrao || "" : dados.bancaPadrao ? "1" : ""
+        bancaPadrao: dados.bancaPadrao === void 0 ? atual?.bancaPadrao || "" : dados.bancaPadrao ? "1" : "",
+        // só faz sentido para admin; sem o campo (telas antigas) mantém como está
+        semFacilitar: papel !== "admin" ? "" : dados.facilita === void 0 ? atual?.semFacilitar || "" : dados.facilita ? "" : "1"
       };
       if (atual) {
         const deixaDeSerAdmin = atual.papel === "admin" && atual.ativo === "1" && (novo.papel !== "admin" || novo.ativo !== "1");
@@ -1660,7 +1681,7 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
     });
   }
   function api_usuariosImportar(texto) {
-    const p = requireFacilitador();
+    const p = requireGestorPessoas();
     return withLock(() => {
       let criados = 0;
       let atualizados = 0;
@@ -3507,7 +3528,7 @@ function montarCabecalho() {
   $('#eu').outerHTML = `<button class="av eu on" id="eu" style="--c:${corDe(ME.nome)}" title="${esc(ME.nome)} · ${esc(ME.email)}" aria-haspopup="menu">${esc(ini(ME.nome))}</button>`;
   $('#eu').onclick = (ev) => { ev.stopPropagation(); menuConta(); };
   const itens = [['inicio', '/', 'Início'], ['historico', '/historico', 'Acervo de ideias']];
-  if (ME.facilita) itens.push(['usuarios', '/usuarios', 'Pessoas']);
+  if (ME.facilita || ME.admin) itens.push(['usuarios', '/usuarios', 'Pessoas']);
   $('#menu').innerHTML = itens.map(([k, h, t]) => `<a data-menu="${k}" data-go="${h}">${t}</a>`).join('');
   const demoBtn = $('#btn-demo');
   if (demoBtn) demoBtn.remove();
@@ -3523,7 +3544,7 @@ const APP_PUBLICO = 'https://micaiaspaiva-lti.github.io/pivotando-app/';
 const CONTAS_GOOGLE = 'https://' + ['accounts', 'google', 'com'].join('.') + '/';
 const urlTrocarConta = (volta) => CONTAS_GOOGLE + 'Account' + 'Chooser?continue=' + encodeURIComponent(volta);
 const urlSair = (volta) => CONTAS_GOOGLE + 'Log' + 'out?continue=' + encodeURIComponent(volta);
-const PAPEL_NOME = { admin: 'Administrador', facilitador: 'Facilitador', participante: 'Participante' };
+const PAPEL_NOME = (m) => [m.admin && 'Administrador', m.facilita && 'Facilitador'].filter(Boolean).join(' · ') || 'Participante';
 
 /** Menu da conta (clique no avatar): quem sou eu, trocar de conta e sair. */
 function menuConta() {
@@ -3534,7 +3555,7 @@ function menuConta() {
   m.className = 'menu-conta';
   m.setAttribute('role', 'menu');
   m.innerHTML = `<div class="mc-topo">${av(ME.nome)}<div><b>${esc(ME.nome)}</b><div class="small muted">${esc(ME.email)}</div>
-      <span class="mc-papel">${esc(PAPEL_NOME[ME.papel] || ME.papel)}</span></div></div>
+      <span class="mc-papel">${esc(PAPEL_NOME(ME))}</span></div></div>
     ${BOOT.demo
       ? '<div class="mc-nota">🎬 Você está na demonstração. Use a barra no rodapé para trocar de visão ou sair.</div>'
       : `<a class="mc-item" role="menuitem" target="_top" href="${esc(urlTrocarConta(BOOT.execUrl || APP_PUBLICO))}" title="O Pivotando só aceita contas @lti.net.br: escolha outra conta da LTI">🔄 Trocar de conta LTI</a>
@@ -3746,7 +3767,7 @@ function desenharTrilha() {
     const ok = f.id !== 'pitch' && e[f.id].concluida;
     b.className = 'fase' + (f.id === T.fase ? ' atual' : '') + (!lib ? ' bloq' : '');
     b.style.setProperty('--fc', f.cor);
-    b.innerHTML = `<div class="bola">${ICO[f.ico]}${ok ? '<span class="selo">★</span>' : !lib ? '<span class="cadeado">🔒</span>' : ''}</div><div class="nome">${f.nome}</div><div class="sub">${f.sub}</div>`;
+    b.innerHTML = `<div class="bola">${ICO[f.ico]}${ok ? '<span class="selo">★</span>' : !lib ? '<span class="cadeado">🔒</span>' : ''}</div><div class="nome">${f.sub}</div><div class="sub">${f.nome}</div>`;
     b.onclick = () => {
       if (!lib) return toast('🔒 Conclua a etapa anterior para liberar');
       T.fase = f.id;
@@ -4633,9 +4654,11 @@ function passoAndamento(el) {
 }
 
 /* ============================== PESSOAS ============================== */
-const PAPEL = { admin: 'Administrador', facilitador: 'Facilitador', participante: 'Participante' };
+/** Papéis acumulam (administrador e facilitador são independentes); quem não tem nenhum é só participante. */
+const funcoes = (u) => (u.papel === 'admin' ? '<span class="selo-func">🛡️ Administrador</span>' : '')
+  + (u.facilita ? '<span class="selo-func">🧭 Facilitador</span>' : '') || '<span class="muted">Participante</span>';
 ROTAS.usuarios = async (el) => {
-  if (!ME.facilita) return falha(el, 'Apenas facilitadores acessam esta tela.');
+  if (!ME.facilita && !ME.admin) return falha(el, 'Apenas facilitadores e administradores acessam esta tela.');
   carregando(el);
   let us;
   try { us = await gs('api_usuarios'); } catch (e) { return el.isConnected && falha(el, e); }
@@ -4644,34 +4667,45 @@ ROTAS.usuarios = async (el) => {
   el.innerHTML = `<div class="cab-pag"><div><h1 class="pag">Pessoas</h1><p class="sub-pag">Colaboradores que podem participar dos desafios (contas @lti.net.br).</p></div><span class="espaco"></span>
       <button class="btn sec" id="importar">📋 Importar lista</button><button class="btn" id="nova">+ Pessoa</button></div>
     <div class="card"><input class="inp" id="busca-u" placeholder="🔎 Buscar por nome, e-mail, departamento ou função" style="margin-bottom:10px">
-      <div style="overflow:auto"><table class="tabela"><thead><tr><th>Pessoa</th><th>Departamento</th><th>Função</th><th>Papel</th></tr></thead><tbody id="tb-u"></tbody></table></div></div>`;
+      <div style="overflow:auto"><table class="tabela"><thead><tr><th>Pessoa</th><th>Departamento</th><th>Função</th><th>Papéis no Pivotando</th></tr></thead><tbody id="tb-u"></tbody></table></div></div>`;
   const desenhar = () => {
     const vis = us.filter((u) => !busca || `${u.nome} ${u.email} ${u.departamento} ${u.funcao}`.toLowerCase().includes(busca));
     $('#tb-u').innerHTML = vis.map((u) => `<tr class="click ${u.ativo ? '' : 'inativo'}" data-id="${esc(u.id)}"><td><div class="pessoa-cel">${av(u.nome)}<div><b>${esc(u.nome)}</b><div class="small muted">${esc(u.email)}</div></div></div></td>
       <td>${u.departamento ? `<span class="dep" style="--dc:${corDe(u.departamento)}">${esc(u.departamento)}</span>` : '<span class="muted">—</span>'}</td><td>${esc(u.funcao || '—')}</td>
-      <td>${esc(PAPEL[u.papel] || u.papel)}${u.ativo ? '' : ' · inativo'}${u.bancaPadrao ? ' <span class="selo-banca" title="Entra na banca de todo desafio novo">⭐ Banca</span>' : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="vazio">Ninguém encontrado.</td></tr>';
+      <td>${funcoes(u)}${u.ativo ? '' : ' <span class="muted">· inativo</span>'}${u.bancaPadrao ? ' <span class="selo-banca" title="Entra na banca de todo desafio novo">⭐ Banca</span>' : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="vazio">Ninguém encontrado.</td></tr>';
   };
   desenhar();
   $('#busca-u').oninput = (ev) => { busca = ev.target.value.trim().toLowerCase(); desenhar(); };
-  const deps = () => [...new Set(us.map((u) => u.departamento).filter(Boolean))].sort();
+  const deps = () => [...new Set(us.map((u) => u.departamento).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   const editar = (u) => {
-    u = u || { email: '', nome: '', departamento: '', funcao: '', papel: 'participante', ativo: true };
+    u = u || { email: '', nome: '', departamento: '', funcao: '', papel: 'participante', facilita: false, ativo: true };
     const m = modal(`<h2>${u.id ? 'Editar pessoa' : 'Nova pessoa'}</h2><form id="f-u">
       <label class="campo">E-mail</label><input name="email" type="email" required placeholder="nome@lti.net.br" value="${esc(u.email)}">
       <label class="campo">Nome</label><input name="nome" required value="${esc(u.nome)}">
-      <div class="cols2"><div><label class="campo">Departamento</label><input name="departamento" list="dl-deps" value="${esc(u.departamento)}"></div>
+      <div class="cols2"><div><label class="campo">Departamento</label><select name="depSel">
+          <option value="">— Sem departamento —</option>${deps().map((d) => `<option value="${esc(d)}" ${u.departamento === d ? 'selected' : ''}>${esc(d)}</option>`).join('')}
+          <option value="__novo">➕ Novo departamento…</option></select>
+          <input name="depNovo" placeholder="Nome do novo departamento" maxlength="80" hidden style="margin-top:8px"></div>
         <div><label class="campo">Função</label><input name="funcao" value="${esc(u.funcao)}"></div></div>
-      <datalist id="dl-deps">${deps().map((d) => `<option value="${esc(d)}">`).join('')}</datalist>
-      <div class="cols2"><div><label class="campo">Papel</label><select name="papel" ${ME.admin ? '' : 'disabled'}>${Object.entries(PAPEL).map(([k, t]) => `<option value="${k}" ${u.papel === k ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
-        <div><label class="campo">Situação</label><select name="ativo"><option value="1" ${u.ativo ? 'selected' : ''}>Ativo</option><option value="" ${u.ativo ? '' : 'selected'}>Inativo</option></select></div></div>
+      <label class="campo">Situação</label><select name="ativo"><option value="1" ${u.ativo ? 'selected' : ''}>Ativo</option><option value="" ${u.ativo ? '' : 'selected'}>Inativo</option></select>
+      <label class="campo">Papéis no Pivotando <span class="muted small" style="font-weight:400">· marque quantos quiser; todos podem participar dos desafios</span></label>
+      <div class="funcoes">
+        <label class="check-funcao"><input type="checkbox" name="fFac" ${u.facilita ? 'checked' : ''} ${ME.admin ? '' : 'disabled'}><span><b>🧭 Facilitador</b><small>Cria e conduz desafios, cadastra participantes, abre o painel e a premiação.</small></span></label>
+        <label class="check-funcao"><input type="checkbox" name="fAdm" ${u.papel === 'admin' ? 'checked' : ''} ${ME.admin ? '' : 'disabled'}><span><b>🛡️ Administrador</b><small>Cadastra pessoas e define os papéis de cada uma.</small></span></label>
+      </div>
       <label class="check-banca"><input type="checkbox" name="bancaPadrao" ${u.bancaPadrao ? 'checked' : ''}><span><b>⭐ Banca padrão</b><small>Entra automaticamente na banca avaliadora de todo desafio novo (dá para tirar no desafio).</small></span></label>
-      ${ME.admin ? '' : '<p class="muted small">Só administradores definem facilitadores e administradores.</p>'}
+      ${ME.admin ? '' : '<p class="muted small">Só administradores definem quem é facilitador e administrador.</p>'}
       <div class="acoes-form"><button type="button" class="btn sec" id="canc">Cancelar</button><button class="btn">Salvar</button></div></form>`);
     $('#canc', m.el).onclick = m.fechar;
+    const fF = $('[name=fFac]', m.el), fA = $('[name=fAdm]', m.el);
+    // "rh" digitado vira o "RH" que já existe, para não duplicar departamento
+    const mesmoDep = (n) => deps().find((d) => d.toLowerCase() === n.toLowerCase()) || n;
+    const dSel = $('[name=depSel]', m.el), dNovo = $('[name=depNovo]', m.el);
+    dSel.onchange = () => { const novo = dSel.value === '__novo'; dNovo.hidden = !novo; dNovo.required = novo; if (novo) dNovo.focus(); };
     $('#f-u', m.el).onsubmit = async (ev) => {
       ev.preventDefault();
       const f = ev.target;
-      const dados = { id: u.id, email: f.email.value, nome: f.nome.value, departamento: f.departamento.value, funcao: f.funcao.value, papel: f.papel.value || u.papel, ativo: !!f.ativo.value, bancaPadrao: f.bancaPadrao.checked };
+      const dados = { id: u.id, email: f.email.value, nome: f.nome.value, departamento: dSel.value === '__novo' ? mesmoDep(dNovo.value.trim()) : dSel.value, funcao: f.funcao.value, papel: ME.admin ? (fA.checked ? 'admin' : fF.checked ? 'facilitador' : 'participante') : u.papel, facilita: ME.admin ? fF.checked : u.facilita, ativo: !!f.ativo.value, bancaPadrao: f.bancaPadrao.checked };
       us = await acao(f.querySelector('button:last-child'), () => gs('api_usuarioSalvar', dados));
       m.fechar(); toast('✅ Pessoa salva'); desenhar();
     };
