@@ -968,7 +968,8 @@ var PIVDEMO = (() => {
     Lembretes: ["id", "timeId", "etapa", "enviadoEm"],
     // jurados da banca avaliadora de cada desafio; convidadoEm: quando recebeu o convite da banca;
     // notasAbertasEm: quando recebeu o aviso de que as notas abriram (no início das apresentações)
-    Banca: ["id", "desafioId", "email", "criadoEm", "convidadoEm", "notasAbertasEm"],
+    // ordem: posição do jurado na lista (vazio = ordem em que entrou)
+    Banca: ["id", "desafioId", "email", "criadoEm", "convidadoEm", "notasAbertasEm", "ordem"],
     // nota de um jurado para o pitch de um time; notas: JSON { criterioId: 1..5 }
     Avaliacoes: ["id", "desafioId", "timeId", "avaliador", "notas", "comentario", "criadoEm", "atualizadoEm"]
   };
@@ -1476,6 +1477,16 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
       <a href="${escapeHtml(url)}" style="background:${COR.azul};color:#fff;padding:14px 28px;text-decoration:none;border-radius:10px;display:inline-block;font-weight:bold;font-size:15px">${escapeHtml(texto)}</a>
       ${nota ? `<div style="font-size:12px;color:${COR.muted};margin-top:10px">${nota}</div>` : ""}</td></tr></table>`;
   }
+  var iniciais = (n) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]).join("").toUpperCase();
+  function blocoBanca(banca) {
+    if (!banca.length)
+      return "";
+    return `${secao("\u2696\uFE0F", "Banca avaliadora")}
+    <p style="margin:0 0 12px;line-height:1.5;color:#555">Na apresenta\xE7\xE3o, ${banca.length === 1 ? "quem avalia o pitch de cada time \xE9" : "quem avalia o pitch de cada time s\xE3o"}:</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${banca.map((j) => `<tr>
+      <td width="40" style="padding:0 10px 10px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${COR.roxo};color:#fff;text-align:center;font-weight:bold;font-size:12px">${escapeHtml(iniciais(j.nome))}</div></td>
+      <td style="padding:0 0 10px;font-size:14px"><b style="color:${COR.texto}">${escapeHtml(j.nome)}</b>${j.funcao ? `<span style="color:${COR.muted};font-size:12px"> \xB7 ${escapeHtml(j.funcao)}</span>` : ""}</td></tr>`).join("")}</table>`;
+  }
   function conteudoConvitePivotando(p) {
     const d = p.desafio;
     const mensagem = (p.mensagem || "").trim();
@@ -1512,6 +1523,8 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${passos.map(([t, txt2], i) => `<tr>
       <td valign="top" width="40" style="padding:0 12px 14px 0"><div style="width:30px;height:30px;line-height:30px;border-radius:50%;background:${COR.azul};color:#fff;text-align:center;font-weight:bold;font-size:14px">${i + 1}</div></td>
       <td valign="top" style="padding:4px 0 14px"><b style="color:${COR.texto}">${t}</b><div style="color:#555;line-height:1.5;margin-top:2px">${txt2}</div></td></tr>`).join("")}</table>
+
+    ${blocoBanca(p.banca || [])}
 
     ${tabelaPrazos(d)}
 
@@ -2043,7 +2056,11 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
   }
   function conviteDe(d, email, mensagem, remetente) {
     const u = usuarioPorEmail(email);
-    return conteudoConvitePivotando({ nome: (u?.nome || email).split(" ")[0], desafio: d, mensagem: txt(mensagem, 1500), remetente, link: APP_PUBLICO });
+    const banca = juradosDo(d.id).map((b) => {
+      const j = usuarioPorEmail(b.email);
+      return { nome: j?.nome || b.email, funcao: j?.funcao || j?.departamento || "" };
+    });
+    return conteudoConvitePivotando({ nome: (u?.nome || email).split(" ")[0], desafio: d, mensagem: txt(mensagem, 1500), remetente, link: APP_PUBLICO, banca });
   }
   function api_convitePrevia(desafioId, mensagem) {
     const p = requireFacilitador();
@@ -2130,7 +2147,7 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
       return {};
     }
   };
-  var juradosDo = (desafioId) => where("Banca", (b) => b.desafioId === desafioId);
+  var juradosDo = (desafioId) => where("Banca", (b) => b.desafioId === desafioId).map((b, i) => ({ b, k: b.ordem !== "" && b.ordem != null ? Number(b.ordem) : 1e3 + i })).sort((x, y) => x.k - y.k).map((x) => x.b);
   var ehJurado = (desafioId, email) => juradosDo(desafioId).some((b) => b.email === email);
   function timeDe(desafioId) {
     return new Map(where("Participacoes", (x) => x.desafioId === desafioId && !!x.timeId).map((x) => [x.email, x.timeId]));
@@ -2256,7 +2273,13 @@ ${APP_PUBLICO}#/avaliar/${d.id}`),
       }
       const ja = new Set(juradosDo(desafioId).map((b) => b.email));
       remove("Banca", (b) => b.desafioId === desafioId && !quer.has(b.email));
-      insert("Banca", [...quer].filter((e) => !ja.has(e)).map((email) => ({ id: uuid(), desafioId, email, criadoEm: nowIso() })));
+      const lista2 = [...quer];
+      insert("Banca", lista2.filter((e) => !ja.has(e)).map((email) => ({ id: uuid(), desafioId, email, criadoEm: nowIso(), ordem: String(lista2.indexOf(email)) })));
+      for (const b of where("Banca", (x) => x.desafioId === desafioId)) {
+        const o = String(lista2.indexOf(b.email));
+        if (b.ordem !== o)
+          update("Banca", b.id, { ordem: o });
+      }
       audit(p.email, "banca_definida", desafioId, "", { jurados: quer.size });
       return api_banca(desafioId);
     });
@@ -4927,7 +4950,7 @@ async function passoBanca(el) {
   const st = b.desafio.status;
   const revelado = !!b.desafio.resultadoEm;
   const travado = b.criteriosTravados || revelado;
-  const sel = new Set(b.banca.map((j) => j.email));
+  let sel = new Set(b.banca.map((j) => j.email));
   let crit = b.desafio.criterios.map((c) => ({ ...c }));
   let busca = '';
   const timeNome = new Map(b.times.map((t) => [t.id, t]));
@@ -4954,6 +4977,7 @@ async function passoBanca(el) {
       <div class="card"><div class="bk-cab"><h3>⚖️ Jurados <span class="muted small">(<span id="bk-n">${sel.size}</span>)</span></h3>
           <span class="muted small">⭐ = banca padrão (marque em Pessoas)</span></div>
         <div class="bk-chips" id="bk-chips"></div>
+        ${revelado ? "" : `<div class="muted small" style="margin-top:4px">Use ‹ › para mudar a ordem: é a ordem em que a banca aparece no convite.</div>`}
         <input class="inp" id="bk-busca" placeholder="🔎 Buscar pessoa para a banca" style="margin:10px 0 4px">
         <div class="selecao" id="bk-lista"></div></div>
       <div class="card"><div class="bk-cab"><h3>📋 Critérios</h3>
@@ -4985,10 +5009,10 @@ async function passoBanca(el) {
 
   const desenharJurados = () => {
     const us = b.usuarios;
-    $('#bk-chips').innerHTML = [...sel].map((e) => {
+    $('#bk-chips').innerHTML = [...sel].map((e, i) => {
       const u = us.find((x) => x.email === e) || { nome: e };
       const j = b.banca.find((x) => x.email === e);
-      return `<span class="bk-chip">${av(u.nome, 'mini')}${esc(u.nome)}${j && j.convidadoEm ? ` <i title="Recebeu o convite da banca em ${esc(fmtDataHora(j.convidadoEm))}">✉️</i>` : ''}${u.timeId ? ` <i title="Está no Time ${esc((timeNome.get(u.timeId) || {}).nome || '')}: não avalia o próprio time">⚠️</i>` : ''}${revelado ? '' : `<button data-tira="${esc(e)}" title="Tirar da banca">✕</button>`}</span>`;
+      return `<span class="bk-chip">${av(u.nome, 'mini')}${esc(u.nome)}${j && j.convidadoEm ? ` <i title="Recebeu o convite da banca em ${esc(fmtDataHora(j.convidadoEm))}">✉️</i>` : ''}${u.timeId ? ` <i title="Está no Time ${esc((timeNome.get(u.timeId) || {}).nome || '')}: não avalia o próprio time">⚠️</i>` : ''}${revelado ? '' : `${i > 0 ? `<button data-move="${esc(e)}" data-dir="-1" title="Mover para a esquerda">‹</button>` : ''}${i < sel.size - 1 ? `<button data-move="${esc(e)}" data-dir="1" title="Mover para a direita">›</button>` : ''}<button data-tira="${esc(e)}" title="Tirar da banca">✕</button>`}</span>`;
     }).join('') || '<span class="muted small">Ninguém na banca ainda.</span>';
     const vis = us.filter((u) => !busca || `${u.nome} ${u.email} ${u.departamento} ${u.funcao}`.toLowerCase().includes(busca));
     $('#bk-lista').innerHTML = vis.map((u) => `<label class="sel-pessoa ${sel.has(u.email) ? 'on' : ''}"><input type="checkbox" value="${esc(u.email)}" ${sel.has(u.email) ? 'checked' : ''} ${revelado ? 'disabled' : ''}>
@@ -5013,7 +5037,18 @@ async function passoBanca(el) {
 
   $('#bk-busca').oninput = (ev) => { busca = ev.target.value.trim().toLowerCase(); desenharJurados(); };
   $('#bk-lista').onchange = (ev) => { if (ev.target.checked) sel.add(ev.target.value); else sel.delete(ev.target.value); desenharJurados(); };
-  $('#bk-chips').onclick = (ev) => { const x = ev.target.closest('[data-tira]'); if (x) { sel.delete(x.dataset.tira); desenharJurados(); } };
+  $('#bk-chips').onclick = (ev) => {
+    const x = ev.target.closest('[data-tira]');
+    if (x) { sel.delete(x.dataset.tira); desenharJurados(); return; }
+    const m = ev.target.closest('[data-move]');
+    if (!m) return;
+    // reordena: a ordem dos chips é a ordem da banca no convite (salve para gravar)
+    const l = [...sel], i = l.indexOf(m.dataset.move), j = i + Number(m.dataset.dir);
+    if (j < 0 || j >= l.length) return;
+    [l[i], l[j]] = [l[j], l[i]];
+    sel = new Set(l);
+    desenharJurados();
+  };
   $('#bk-crit').oninput = (ev) => { const k = ev.target.dataset.k; if (k) crit[+ev.target.closest('.crit').dataset.i][k] = ev.target.value; };
   $('#bk-crit').onclick = (ev) => {
     const linha = ev.target.closest('.crit');
